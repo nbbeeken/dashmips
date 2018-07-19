@@ -2,14 +2,12 @@ from abc import ABC, abstractmethod
 
 
 class Node(ABC):
-
     @abstractmethod
     def evaluate(self):
         pass
 
 
 class StringNode(Node):
-
     def __init__(self, value):
         self.value = str(value)
 
@@ -18,6 +16,15 @@ class StringNode(Node):
 
     def __repr__(self):
         return str(self.value)
+
+
+class LabelNode(Node):
+    def __init__(self, name, address):
+        self.name = name
+        self.address = address
+
+    def evaluate(self):
+        raise Exception("Not Implemented Yet")
 
 
 class NumberNode(Node):
@@ -110,12 +117,11 @@ class NumberNode(Node):
 
 
 class InstructionSetNode(Node):
-
-    def __init__():
-        raise Exception('Not Implemented Yet')
+    def __init__(self):
+        raise Exception("Not Implemented Yet")
 
     def evaluate(self):
-        raise Exception('Not Implemented Yet')
+        raise Exception("Not Implemented Yet")
 
 
 class InstructionNode(Node):
@@ -123,9 +129,10 @@ class InstructionNode(Node):
 
 
 class RTypeInstructionNode(InstructionNode):
-
-    def __init__(self, instruction_name, rt, rs):
-        print(f'rd, rt, rs : {instruction_name}, {rt}, {rs}')
+    def __init__(self, instruction_name, rd, rt, rs):
+        print(f"rd, rt, rs : {instruction_name}, {rt}, {rs}")
 
     def evaluate(self):
+        # Preform look up to return 32bit representation
+        # Or execute?
         raise Exception()
