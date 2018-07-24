@@ -1,1 +1,1 @@
-__all__ = ['mips', 'parser', 'cpu']
+__all__ = ['mips', 'parser', 'hw']

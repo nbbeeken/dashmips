@@ -22,6 +22,9 @@ regplainname_to_regnum = {
 regnumname_to_regnum = {
     f'${num}': num for num, name in enumerate(MIPSRegisterNames)
 }
+regnum_to_regnum = {
+    num: num for num, _ in enumerate(MIPSRegisterNames)
+}
 RegnameToRegNum = {**regplainname_to_regnum, **regnumname_to_regnum}
 
 
@@ -42,3 +45,17 @@ class MIPSRegisters(dict):
         if type(key) is str:
             key = RegnameToRegNum[key]
         return super().__getitem__(key)
+
+    def update(self, d):
+        remap = {RegnameToRegNum[k]: v for k, v in d.items()}
+        return super().update(remap)
+
+
+class MIPSMemory(list):
+    pass
+
+
+SyscallFunctions = {
+    1: (lambda regs, memory: print(regs['$a0'])),
+    4: (lambda regs, memory: print(memory[regs['$a0']])),
+}

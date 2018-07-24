@@ -35,7 +35,7 @@ instr_rd_rs_rt = {
     'parse': (lambda arg: (arg[2], arg[3], arg[4])),
     # fmt: off
     'instructions': {
-        "add":  (lambda regs, lbls, rd, rs, rt: None),
+        "add":  (lambda regs, lbls, rd, rs, rt: None),  # TODO: Implement me
         "addu": (lambda regs, lbls, rd, rs, rt: None),  # TODO: Implement me
         "and":  (lambda regs, lbls, rd, rs, rt: None),  # TODO: Implement me
         "movn": (lambda regs, lbls, rd, rs, rt: None),  # TODO: Implement me
@@ -71,7 +71,8 @@ instr_rs_rt_number = {
     'parse': (lambda arg: (arg[2], arg[3], int(arg[4]))),
     # fmt: off
     'instructions': {
-        "addi":  (lambda regs, lbls, rs, rt, num: regs.update({rs: rt+num})),
+        "addi":  (lambda regs, lbls, rs, rt, num:
+                  regs.update({rs: regs[rt]+num})),
         "addiu": (lambda regs, lbls, rs, rt, num: None),
         "ori":   (lambda regs, lbls, rs, rt, num: None),
         "andi":  (lambda regs, lbls, rs, rt, num: None),

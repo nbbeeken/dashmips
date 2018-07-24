@@ -3,7 +3,7 @@ MIPS Parser
 """
 from typing import List, Dict, Any
 import re
-from dashmips import mips, cpu
+from dashmips import mips, hw
 
 RE_COMMENT = r"\#.*"
 DATA_SEC = ".data"
@@ -61,7 +61,7 @@ def exec_mips(code: str):
     code - multiline string of mips (first line MUST be .data/.text)
     """
     labels: dict = {}
-    registers = cpu.MIPSRegisters()
+    registers = hw.MIPSRegisters()
 
     parsedcode = preprocess_mips(labels, code)
 
@@ -88,3 +88,5 @@ def exec_mips(code: str):
         matches = [match[i] for i in range(0, match.re.groups+1)]
         args = grp['instruction_parsers'][matches[1]](matches)
         ifn(registers, labels, *args)
+
+    print(registers)
