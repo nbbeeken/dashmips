@@ -3,19 +3,19 @@ dashmips
 """
 
 import argparse
-from dashmips.parser import MIPSParser
+from dashmips.parser import exec_mips
 
 
 def main(args):
     string = """.data
 msg: .asciiz "Hello World"
 .text
-        li $v0, 4       # syscall 4 (print_str)
-        la $a0, msg     # argument: string
-        syscall         # print the string
-        lw $t1, foobar
-        jr $ra          # retrun to caller"""
-    MIPSParser().parse(string)
+main:
+    addi $v0, $zero, 4       # syscall 4 (print_str)
+    syscall                  # print the string
+    addi $v0, $zero, 10      # load imm hack
+    syscall                  # exit"""
+    exec_mips(string)
 
 
 if __name__ == "__main__":

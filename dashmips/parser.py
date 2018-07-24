@@ -1,113 +1,90 @@
 """
 MIPS Parser
 """
-import ply.lex as lex
-import ply.yacc as yacc
+from typing import List, Dict, Any
+import re
+from dashmips import mips, cpu
 
-from dashmips.nodes import StringNode, RTypeInstructionNode, InstructionSetNode
-from dashmips.mips import MIPSMnemonics, MIPSDirectives
+RE_COMMENT = r"\#.*"
+DATA_SEC = ".data"
+TEXT_SEC = ".text"
 
 
-class Parser:
-    def __init__(self):
-        self.lexer = lex.lex(module=self)
-        self.parser = yacc.yacc(module=self)
+def preprocess_mips(labels, code) -> dict:
+    code = [line for line in code.splitlines() if line]
+    code = [re.sub(RE_COMMENT, '', line).strip() for line in code]
 
-    def parse(self, text):
-        rootNode = yacc.parse(text)
-        if rootNode:
-            rootNode.execute()
+    processed_code = split_to_sections(code)
+
+    for idx, line in enumerate(processed_code[TEXT_SEC]):
+        match = re.match(f"({mips.RE_LABEL}):", line)
+        if match:
+            labels[match[1]] = idx
+            del processed_code[TEXT_SEC][idx]
+
+    return processed_code
+
+
+def split_to_sections(code) -> Dict[str, List[str]]:
+
+    section = code[0] if code[0] in [DATA_SEC, TEXT_SEC] else None
+    if not section:
+        raise Exception("first line must be .text/.data")
+
+    sections: Dict[str, List[str]] = {DATA_SEC: [], TEXT_SEC: []}
+    for line in code:
+        if line not in [DATA_SEC, TEXT_SEC]:
+            sections[section].append(line)
         else:
-            print("error in parsing, debug me plz")
+            section = line
+    return sections
 
 
-class MIPSParser(Parser):
+def build_data(labels: dict, data_sec: list) -> Dict[str, Any]:
+    labels = {**labels}
+    data_line_re = f"({mips.RE_LABEL}):\\s*({mips.RE_DIRECTIVE})\\s+(.*)"
 
-    labels = {}
-    tokens = (
-        "LPAREN",
-        "RPAREN",
-        "COMMA",
-        "NEWLINE",
-        "DATA_SEC",
-        "TEXT_SEC",
-        "INSTRUCTION",
-        "STRING",
-        "LABEL",
-        "COLON",
-        "DIRECTIVE",
-        "REGISTER",
-        "NUMBER",
-    )
+    for line in data_sec:
+        match = re.match(data_line_re, line)
+        if match:
+            label = match[1]
+            direc = match[2]
+            datas = match[3]
+            labels[label] = mips.MIPSDirectives[direc](datas)
 
-    t_ignore = " \t"
-    t_ignore_COMMENT = r"\#.*"
+    return labels
 
-    t_LPAREN = r"\("
-    t_RPAREN = r"\)"
-    t_COMMA = r","
-    t_COLON = r":"
-    t_NUMBER = r'\d+'
-    t_DATA_SEC = r".data"
-    t_TEXT_SEC = r".text"
-    t_INSTRUCTION = "|".join(MIPSMnemonics)
-    t_DIRECTIVE = "|".join([r'\.' + dirc for dirc in MIPSDirectives])
-    t_REGISTER = r"hi|lo|(\$((t[0-9]|s[0-7]|v[0-1]|a[0-3])|zero|sp|fp|gp|ra))"
 
-    nl_re = r"\n+"
+def exec_mips(code: str):
+    """
+    Execute Mips
+    code - multiline string of mips (first line MUST be .data/.text)
+    """
+    labels: dict = {}
+    registers = cpu.MIPSRegisters()
 
-    @lex.TOKEN(nl_re)
-    def t_NEWLINE(self, t):
-        self.lexer.lineno += len(t.value)
-        return t
+    parsedcode = preprocess_mips(labels, code)
 
-    string_re = r'"[^"\\\r\n]*(?:\\.[^"\\\r\n]*)*"'
+    labels = build_data(labels, parsedcode[DATA_SEC])
 
-    @lex.TOKEN(string_re)
-    def t_STRING(self, t):
-        t.value = StringNode(str(t.value[1 : len(str(t.value)) - 1]))
-        return t
+    regexs = [
+        regex
+        for igroup in mips.INSTRUCTION_GROUPS
+        for regex in igroup['instruction_regexs']
+    ]
 
-    label_re = r"[a-zA-Z_][a-zA-Z0-9_]*"
+    for instruction in parsedcode[TEXT_SEC]:
 
-    @lex.TOKEN(label_re)
-    def t_LABEL(self, t):
-        if t.value not in MIPSDirectives and t.value not in MIPSMnemonics:
-            return t
+        for regex in regexs:
+            match = re.match(regex, instruction)
+            if match:
+                grp = mips.INSTRUCTION_GROUPS[match.re.groups-1]
+                ifn = grp['instruction_fns'][match[1]]
+                break
+        else:
+            print(f'NO MATCH FOR {instruction}')
+            continue
 
-    def t_error(self, t):
-        print(f"Illegal character {t.value}")
-        t.lexer.skip(1)
-
-    ####################################################
-
-    def p_program(self, p):
-        """program : TEXT_SEC NEWLINE lines
-                   | DATA_SEC NEWLINE datas
-                   | program"""
-        print(f"program {p}")
-
-    def p_datas(self, p):
-        """datas : data NEWLINE datas
-                 | data NEWLINE"""
-        print(f"datas {p}")
-
-    def p_data(self, p):
-        """data : LABEL COLON DIRECTIVE STRING"""
-        print(f"data {p}")
-
-    def p_lines(self, p):
-        """lines : line NEWLINE lines
-                 | line NEWLINE"""
-        print(f"lines {p}")
-
-    def p_line(self, p):
-        """line : INSTRUCTION REGISTER COMMA REGISTER COMMA REGISTER
-                | INSTRUCTION REGISTER COMMA NUMBER
-                | INSTRUCTION REGISTER COMMA LABEL"""
-        print(f"line {p}")
-
-    def p_error(self, p):
-        if p:
-            print(p)
-            print(f"SYNTAX ERROR: {repr(p.value)} AT LINE {p.lineno} TYPE {p.type}")
+        matches = [match[i] for i in range(0, match.re.groups+1)]
+        args = grp['instruction_parsers'][matches[1]](matches)
+        ifn(registers, labels, *args)
