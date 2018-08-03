@@ -52,10 +52,20 @@ class MIPSRegisters(dict):
 
 
 class MIPSMemory(list):
-    pass
+    KIB = 1024
+
+    def __init__(self):
+        return super().__init__([0] * (2*MIPSMemory.KIB))
+
+    def __setitem__(self, key, value):
+        value &= 0xFF
+        if 0x0 <= key <= 0x3:
+            raise Exception('NULL-ish pointer')
+        return super().__setitem__(key, value)
 
 
-SyscallFunctions = {
+SyscallFn = {
     1: (lambda regs, memory: print(regs['$a0'])),
-    4: (lambda regs, memory: print(memory[regs['$a0']])),
+    4: (lambda regs, memory: print(memory.get(regs['$a0'], -1))),
+    **{i: (lambda _, __: None) for i in range(5, 100)}
 }

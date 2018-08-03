@@ -1,4 +1,5 @@
 from typing import List, Dict, Any
+from hw import SyscallFn
 
 MIPSDirectives = {
     # fmt: off
@@ -201,7 +202,7 @@ instr_special = {
     'parse': (lambda arg: tuple()),
     'instructions': {
         "nop": (lambda regs, lbls: True),
-        "syscall": (lambda regs, lbls: None),
+        "syscall": (lambda regs, lbls: SyscallFn[regs['$v0']](regs, {})),
     }
 }
 

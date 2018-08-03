@@ -62,6 +62,7 @@ def exec_mips(code: str):
     """
     labels: dict = {}
     registers = hw.MIPSRegisters()
+    # memory = hw.MIPSMemory()
 
     parsedcode = preprocess_mips(labels, code)
 

@@ -3,7 +3,7 @@ dashmips
 """
 
 import argparse
-from dashmips.parser import exec_mips
+from parser import exec_mips
 
 
 def main(args):
