@@ -3,3 +3,4 @@ dashmips/parsetab.py
 __pycache__
 .vscode
 .mypy_cache
+.vs/
