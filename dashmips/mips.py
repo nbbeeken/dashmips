@@ -1,8 +1,9 @@
-# import ast
-# import inspect
+"""Mips Management."""
+from typing import *
 
 
 def directive(directive):
+    """Derective handling master function."""
     def align(data):
         return None
 
@@ -48,7 +49,7 @@ def directive(directive):
     def word(data):
         return None
 
-
+directive_names: List[str] = []
 # directive_names = [fn.name for fn in
 #                    ast.walk(ast.parse(inspect.getsource(directive)))
 #                    if type(fn).__name__ == 'FunctionDef'
@@ -58,13 +59,21 @@ Mips_Instructions = []
 
 
 class Instruction:
+    """Instruction Class, callable."""
+
     def __init__(self, regex, parser):
+        """
+        Regex and argument parser for instruction.
+
+        Adds itself to list upon instanciation.
+        """
         self.regex = regex
         self.parser = parser
         Mips_Instructions.append(self)
 
     def __call__(self, fn):
-        self.name: str = fn.__name__
+        """Callable Instruction."""
+        self.name = fn.__name__
         if self.name.startswith('_'):
             self.name = self.name[1:]
         return fn
@@ -73,7 +82,7 @@ class Instruction:
 RE_REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
                r"|zero|sp|fp|gp|ra))")
 RE_LABEL = r"[a-zA-Z_][a-zA-Z0-9_]*"
-# RE_DIRECTIVE = "\\" + "|\\".join(directive_names)
+RE_DIRECTIVE = "\\" + "|\\".join(directive_names)
 
 RE_INSTRGAP = r"\s+"
 RE_ARGSGAP = r"\s*,\s*"
@@ -101,4 +110,6 @@ REGEXS = {
 }
 
 
-def instr_re(i, p): return f"({i}){p}".format(**REGEXS)
+def instr_re(i, p):
+    """Instruction Regex Builder."""
+    return f"({i}){p}".format(**REGEXS)

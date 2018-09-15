@@ -1,6 +1,4 @@
-"""
-MIPS Parser
-"""
+"""MIPS Parser."""
 from typing import List, Dict, Any
 import re
 from dashmips import mips, hw
@@ -11,6 +9,11 @@ TEXT_SEC = ".text"
 
 
 def preprocess_mips(labels, code) -> dict:
+    """
+    Prepare Mips for running.
+
+    Breaks the code into directive and text sections.
+    """
     code = [line for line in code.splitlines() if line]
     code = [re.sub(RE_COMMENT, '', line).strip() for line in code]
 
@@ -26,7 +29,11 @@ def preprocess_mips(labels, code) -> dict:
 
 
 def split_to_sections(code) -> Dict[str, List[str]]:
+    """
+    Handle file with mixed sections.
 
+    .text and .data sections can come in any order.
+    """
     section = code[0] if code[0] in [DATA_SEC, TEXT_SEC] else None
     if not section:
         raise Exception("first line must be .text/.data")
@@ -41,6 +48,11 @@ def split_to_sections(code) -> Dict[str, List[str]]:
 
 
 def build_data(labels: dict, data_sec: list) -> Dict[str, Any]:
+    """
+    Construct the .data section to spec.
+
+    Fill the .data section memory with user defined static data
+    """
     labels = {**labels}
     data_line_re = f"({mips.RE_LABEL}):\\s*({mips.RE_DIRECTIVE})\\s+(.*)"
 
@@ -50,14 +62,15 @@ def build_data(labels: dict, data_sec: list) -> Dict[str, Any]:
             label = match[1]
             direc = match[2]
             datas = match[3]
-            labels[label] = mips.MIPSDirectives[direc](datas)
+            # labels[label] = mips.MIPSDirectives[direc](datas)
 
     return labels
 
 
 def exec_mips(code: str):
     """
-    Execute Mips
+    Execute Mips.
+
     code - multiline string of mips (first line MUST be .data/.text)
     """
     labels: dict = {}
@@ -68,26 +81,26 @@ def exec_mips(code: str):
 
     labels = build_data(labels, parsedcode[DATA_SEC])
 
-    regexs = [
-        regex
-        for igroup in mips.INSTRUCTION_GROUPS
-        for regex in igroup['instruction_regexs']
-    ]
+    # regexs = [
+    #     regex
+    #     for igroup in mips.INSTRUCTION_GROUPS
+    #     for regex in igroup['instruction_regexs']
+    # ]
 
-    for instruction in parsedcode[TEXT_SEC]:
+    # for instruction in parsedcode[TEXT_SEC]:
 
-        for regex in regexs:
-            match = re.match(regex, instruction)
-            if match:
-                grp = mips.INSTRUCTION_GROUPS[match.re.groups-1]
-                ifn = grp['instruction_fns'][match[1]]
-                break
-        else:
-            print(f'NO MATCH FOR {instruction}')
-            continue
+    #     for regex in regexs:
+    #         match = re.match(regex, instruction)
+    #         if match:
+    #             grp = mips.INSTRUCTION_GROUPS[match.re.groups-1]
+    #             ifn = grp['instruction_fns'][match[1]]
+    #             break
+    #     else:
+    #         print(f'NO MATCH FOR {instruction}')
+    #         continue
 
-        matches = [match[i] for i in range(0, match.re.groups+1)]
-        args = grp['instruction_parsers'][matches[1]](matches)
-        ifn(registers, labels, *args)
+    #     matches = [match[i] for i in range(0, match.re.groups+1)]
+    #     args = grp['instruction_parsers'][matches[1]](matches)
+    #     ifn(registers, labels, *args)
 
-    print(registers)
+    # print(registers)

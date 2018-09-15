@@ -1,12 +1,11 @@
-"""
-dashmips
-"""
+"""dashmips program."""
 
 import argparse
 from dashmips.parser import exec_mips
 
 
 def main(args):
+    """Entry into dashmips."""
     with open(args.FILE) as file:
         mips_code = file.read()
         exec_mips(mips_code)
