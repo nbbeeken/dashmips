@@ -1,3 +1,3 @@
 """dashmips package."""
 
-__all__ = ['mips', 'parser', 'hw']
+__all__ = ['mips', 'mipsparser', 'hw']

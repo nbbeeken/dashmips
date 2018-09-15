@@ -1,6 +1,6 @@
-from dashmips.mips import Instruction
+from mips import Instruction
 
-PTRN = r"{instr_gap}({register})",
+PTRN = r"{instr_gap}({register})"
 
 
 def parse(arg):

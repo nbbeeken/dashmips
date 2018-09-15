@@ -1,12 +1,14 @@
-from dashmips.mips import Instruction
+from mips import Instruction
 
 
 def parse(arg):
     return tuple()
 
+
 @Instruction(r'noop', parse)
 def nop(regs, lbls):
     return True
+
 
 @Instruction(r'syscall', parse)
 def syscall(regs, lbls):

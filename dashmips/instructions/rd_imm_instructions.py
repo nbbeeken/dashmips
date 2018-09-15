@@ -1,5 +1,5 @@
 """Instructions that accept a register and immediate as an argument."""
-from dashmips.mips import Instruction
+from mips import Instruction
 
 PTRN = r"{instr_gap}({register}){args_gap}({number})"
 

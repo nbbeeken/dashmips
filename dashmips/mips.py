@@ -1,61 +1,16 @@
 """Mips Management."""
-from typing import *
+from typing import List
+import inspect
+import instructions
 
+import directives
 
-def directive(directive):
-    """Derective handling master function."""
-    def align(data):
-        return None
+MipsDirectives = {
+    directive: fn
+    for directive, fn in inspect.getmembers(directives, inspect.isfunction)
+}
 
-    def asciiz(data):
-        return (data[1:-1] + '\0').encode()
-
-    def ascii(data):
-        return (data[1:-1]).encode()
-
-    def byte(data):
-        return None
-
-    def double(data):
-        return None
-
-    def end_macro(data):
-        return None
-
-    def eqv(data):
-        return None
-
-    def extern(data):
-        return None
-
-    def globl(data):
-        return None
-
-    def half(data):
-        return None
-
-    def include(data):
-        return None
-
-    def macro(data):
-        return None
-
-    def set(data):
-        return None
-
-    def space(data):
-        return None
-
-    def word(data):
-        return None
-
-directive_names: List[str] = []
-# directive_names = [fn.name for fn in
-#                    ast.walk(ast.parse(inspect.getsource(directive)))
-#                    if type(fn).__name__ == 'FunctionDef'
-#                    and fn.name is not 'directive']
-
-Mips_Instructions = []
+MipsInstructions = []
 
 
 class Instruction:
@@ -69,7 +24,7 @@ class Instruction:
         """
         self.regex = regex
         self.parser = parser
-        Mips_Instructions.append(self)
+        MipsInstructions.append(self)
 
     def __call__(self, fn):
         """Callable Instruction."""
@@ -82,7 +37,7 @@ class Instruction:
 RE_REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
                r"|zero|sp|fp|gp|ra))")
 RE_LABEL = r"[a-zA-Z_][a-zA-Z0-9_]*"
-RE_DIRECTIVE = "\\" + "|\\".join(directive_names)
+RE_DIRECTIVE = "\\." + "|\\.".join(MipsDirectives.keys())
 
 RE_INSTRGAP = r"\s+"
 RE_ARGSGAP = r"\s*,\s*"

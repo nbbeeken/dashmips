@@ -1,7 +1,10 @@
 """MIPS Parser."""
 from typing import List, Dict, Any
 import re
-from dashmips import mips, hw
+import mips
+import hw
+
+from pprint import pprint as pretty
 
 RE_COMMENT = r"\#.*"
 DATA_SEC = ".data"
@@ -60,9 +63,9 @@ def build_data(labels: dict, data_sec: list) -> Dict[str, Any]:
         match = re.match(data_line_re, line)
         if match:
             label = match[1]
-            direc = match[2]
+            direc = match[2][1:]
             datas = match[3]
-            # labels[label] = mips.MIPSDirectives[direc](datas)
+            labels[label] = mips.MipsDirectives[direc](datas)
 
     return labels
 
@@ -75,32 +78,20 @@ def exec_mips(code: str):
     """
     labels: dict = {}
     registers = hw.MIPSRegisters()
-    # memory = hw.MIPSMemory()
+    memory = hw.MIPSMemory()
 
     parsedcode = preprocess_mips(labels, code)
 
     labels = build_data(labels, parsedcode[DATA_SEC])
 
-    # regexs = [
-    #     regex
-    #     for igroup in mips.INSTRUCTION_GROUPS
-    #     for regex in igroup['instruction_regexs']
-    # ]
+    for instruction in parsedcode[TEXT_SEC]:
 
-    # for instruction in parsedcode[TEXT_SEC]:
+        for instruction_fn in mips.MipsInstructions:
+            match = re.match(instruction_fn.regex, instruction)
+            if match:
+                matches = [match[i] for i in range(0, match.re.groups + 1)]
+                args = instruction_fn.parser(match)
+                instruction_fn(registers, labels, *args)
+                break
 
-    #     for regex in regexs:
-    #         match = re.match(regex, instruction)
-    #         if match:
-    #             grp = mips.INSTRUCTION_GROUPS[match.re.groups-1]
-    #             ifn = grp['instruction_fns'][match[1]]
-    #             break
-    #     else:
-    #         print(f'NO MATCH FOR {instruction}')
-    #         continue
-
-    #     matches = [match[i] for i in range(0, match.re.groups+1)]
-    #     args = grp['instruction_parsers'][matches[1]](matches)
-    #     ifn(registers, labels, *args)
-
-    # print(registers)
+    pretty(registers)
