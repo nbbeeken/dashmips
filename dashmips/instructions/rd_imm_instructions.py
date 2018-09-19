@@ -1,5 +1,5 @@
 """Instructions that accept a register and immediate as an argument."""
-from dashmips.mips import Instruction
+from dashmips.mips import mips_instruction
 
 PTRN = r"{instr_gap}({register}){args_gap}({number})"
 
@@ -9,7 +9,7 @@ def parse(args):
     return (args[2], int(args[3]))
 
 
-@Instruction(PTRN, parse)
+@mips_instruction(PTRN, parse)
 def lui():
     """Load upper immediate."""
     return None

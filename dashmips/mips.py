@@ -1,7 +1,7 @@
 """Mips Management."""
 from typing import List
 import inspect
-import dashmips.instructions
+from dashmips.instructions import *
 import dashmips.directives
 
 MipsDirectives = {
@@ -9,30 +9,6 @@ MipsDirectives = {
     for directive, fn in
     inspect.getmembers(dashmips.directives, inspect.isfunction)
 }
-
-MipsInstructions = []
-
-
-class Instruction:
-    """Instruction Class, callable."""
-
-    def __init__(self, regex, parser):
-        """
-        Regex and argument parser for instruction.
-
-        Adds itself to list upon instanciation.
-        """
-        self.regex = regex
-        self.parser = parser
-        MipsInstructions.append(self)
-
-    def __call__(self, fn):
-        """Callable Instruction."""
-        self.name = fn.__name__
-        if self.name.startswith('_'):
-            self.name = self.name[1:]
-        return fn
-
 
 RE_REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
                r"|zero|sp|fp|gp|ra))")
@@ -64,7 +40,44 @@ REGEXS = {
     'args_gap': RE_ARGSGAP,
 }
 
+MipsInstructions = []
 
-def instr_re(i, p):
-    """Instruction Regex Builder."""
-    return f"({i}){p}".format(**REGEXS)
+
+def mips_instruction(pattern, parser):
+    """Make an Instruction object from decorated function."""
+    def mips_decorator(func):
+        instr = Instruction(func, pattern, parser)
+
+        def mips_wrapper(name):
+            return instr
+
+        return instr
+
+    return mips_decorator
+
+
+class Instruction:
+    """Instruction Class, callable."""
+
+    def __init__(self, fn, regex_pattern, parser):
+        """
+        Regex and argument parser for instruction.
+
+        Adds itself to list upon instanciation.
+        """
+        self.fn = fn
+
+        name = self.fn.__name__
+        if name.startswith('_'):
+            name = name[1:]
+        self.name = name
+
+        self.regex = f"({self.name}){regex_pattern}".format(**REGEXS)
+
+        self.parser = parser
+
+        MipsInstructions.append(self)
+
+    def __call__(self, *args):
+        """Callable Instruction."""
+        return self.fn(*args)

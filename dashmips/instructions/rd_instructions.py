@@ -1,4 +1,4 @@
-from dashmips.mips import Instruction
+from dashmips.mips import mips_instruction
 
 PTRN = r"{instr_gap}({register})"
 
@@ -7,21 +7,21 @@ def parse(args):
     return (args[2],)
 
 
-@Instruction(PTRN, parse)
+@mips_instruction(PTRN, parse)
 def mflo(regs, lbls, rd):
     return None
 
 
-@Instruction(PTRN, parse)
+@mips_instruction(PTRN, parse)
 def mfhi(regs, lbls, rd):
     return None
 
 
-@Instruction(PTRN, parse)
+@mips_instruction(PTRN, parse)
 def mthi(regs, lbls, rd):
     return None
 
 
-@Instruction(PTRN, parse)
+@mips_instruction(PTRN, parse)
 def mtlo(regs, lbls, rd):
     return None

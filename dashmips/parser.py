@@ -94,4 +94,4 @@ def exec_mips(code: str):
                 instruction_fn(registers, labels, *args)
                 break
 
-    pretty(registers)
+    print(registers.pretty_str())
