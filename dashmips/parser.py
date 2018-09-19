@@ -80,6 +80,12 @@ def exec_mips(code: str):
     registers = hw.MIPSRegisters()
     memory = hw.MIPSMemory()
 
+    # FIXME: IMPORT BUG
+    x = mips.Syscalls
+    y = mips.MipsInstructions
+    pretty(x)
+    print(y)
+
     parsedcode = preprocess_mips(labels, code)
 
     labels = build_data(labels, parsedcode[DATA_SEC])

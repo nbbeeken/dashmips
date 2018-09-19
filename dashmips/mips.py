@@ -1,8 +1,10 @@
 """Mips Management."""
 from typing import List
 import inspect
-from dashmips.instructions import *
 import dashmips.directives
+
+from dashmips.syscalls import *
+from dashmips.instructions import *
 
 MipsDirectives = {
     directive: fn
@@ -81,3 +83,42 @@ class Instruction:
     def __call__(self, *args):
         """Callable Instruction."""
         return self.fn(*args)
+
+    def __repr__(self):
+        """Return Representation string."""
+        return f"Instruction({self.name})"
+
+
+Syscalls = {}
+
+
+def mips_syscall(number):
+    """Make a Syscall object from decorated function."""
+    def syscall_decorator(function):
+        syscall = Syscall(number, function)
+
+        def syscall_wrapper(name):
+            return syscall
+
+        return syscall
+
+    return syscall_decorator
+
+
+class Syscall:
+    """Syscall Class, callable."""
+
+    def __init__(self, number, function):
+        """Create Syscall."""
+        self.function = function
+        self.name = self.function.__name__
+        self.number = number
+        Syscalls[self.number] = self
+
+    def __call__(self):
+        """Callable Instruction."""
+        return self.function
+
+    def __repr__(self):
+        """Return Representation string."""
+        return f"Syscall({self.number}, {self.name})"
