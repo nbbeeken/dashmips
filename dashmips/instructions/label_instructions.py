@@ -1,5 +1,5 @@
 """Instructions that accept a label as an argument."""
-from mips import Instruction
+from dashmips.mips import Instruction
 
 PTRN = r"{instr_gap}({label})"
 

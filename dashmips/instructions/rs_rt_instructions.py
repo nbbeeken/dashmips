@@ -1,4 +1,4 @@
-from mips import Instruction
+from dashmips.mips import Instruction
 
 PTRN = r"{instr_gap}({register}){args_gap}({register})"
 

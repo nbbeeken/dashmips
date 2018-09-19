@@ -1,13 +1,13 @@
 """Mips Management."""
 from typing import List
 import inspect
-import instructions
-
-import directives
+import dashmips.instructions
+import dashmips.directives
 
 MipsDirectives = {
     directive: fn
-    for directive, fn in inspect.getmembers(directives, inspect.isfunction)
+    for directive, fn in
+    inspect.getmembers(dashmips.directives, inspect.isfunction)
 }
 
 MipsInstructions = []

@@ -1,8 +1,8 @@
 """MIPS Parser."""
 from typing import List, Dict, Any
 import re
-import mips
-import hw
+import dashmips.mips as mips
+import dashmips.hw as hw
 
 from pprint import pprint as pretty
 
