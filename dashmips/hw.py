@@ -67,29 +67,19 @@ class MIPSRegisters(dict):
 
     def pretty_str(self):
         """Generate Pretty String of Reg Contents."""
-        return f"""$zero: {self[0]},
-            $at: {self[1]},
-
-            $v0: {self[2]}, $v1: {self[3]},
-
-            $a0: {self[4]}, $a1: {self[5]}, $a2: {self[6]}, $a3: {self[7]},
-
-            $t0: {self[8]}, $t1: {self[9]}, $t2: {self[10]}, $t3: {self[11]},
-            $t4: {self[12]}, $t5: {self[13]}, $t6: {self[14]}, $t7: {self[15]},
-
-            $s0: {self[16]}, $s1: {self[17]}, $s2: {self[18]}, $s3: {self[19]},
-            $s4: {self[20]}, $s5: {self[21]}, $s6: {self[22]}, $s7: {self[23]},
-
-            $t8: {self[24]}, $t9: {self[25]},
-
-            $k0: {self[26]}, $k1: {self[27]},
-
-            $gp: {self[28]}, $sp: {self[29]}, $fp: {self[30]}, $ra: {self[31]},
-
-            pc: {self[32]},
-            hi: {self[33]},
-            lo: {self[34]},
-        """
+        s = (f"$ze: {self[0]:02},\n$at: {self[1]:02},\n$v0: {self[2]:02}, " +
+             f"$v1: {self[3]:02},\n$a0: {self[4]:02}, $a1: {self[5]:02}, " +
+             f"$a2: {self[6]:02}, $a3: {self[7]:02},\n$t0: {self[8]:02}, " +
+             f"$t1: {self[9]:02}, $t2: {self[10]:02}, $t3: {self[11]:02},\n" +
+             f"$t4: {self[12]:02}, $t5: {self[13]:02}, $t6: {self[14]:02}, " +
+             f"$t7: {self[15]:02},\n$s0: {self[16]:02}, $s1: {self[17]:02}, " +
+             f"$s2: {self[18]:02}, $s3: {self[19]:02},\n$s4: {self[20]:02}, " +
+             f"$s5: {self[21]:02}, $s6: {self[22]:02}, $s7: {self[23]:02},\n" +
+             f"$t8: {self[24]:02}, $t9: {self[25]:02},\n$k0: {self[26]:02}, " +
+             f"$k1: {self[27]:02},\n$gp: {self[28]:02}, $sp: {self[29]:02}, " +
+             f"$fp: {self[30]:02}, $ra: {self[31]:02},\n pc: {self[32]:02},\n" +
+             f" hi: {self[33]:02},\n lo: {self[34]:02},")
+        return s
 
 
 class MIPSMemory(list):
