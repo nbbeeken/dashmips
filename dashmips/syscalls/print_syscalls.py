@@ -1,5 +1,5 @@
 """Syscalls related to printing."""
-from dashmips.mips import mips_syscall
+from dashmips.syscalls import mips_syscall
 
 
 @mips_syscall(4)
@@ -9,6 +9,6 @@ def print_string(registers, labels, memory):
 
 
 @mips_syscall(10)
-def exit(registers, labels, memory):
+def _exit(registers, labels, memory):
     """Exit MIPS Program."""
     print('WIP PROPOGATE EXIT')

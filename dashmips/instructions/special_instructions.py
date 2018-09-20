@@ -1,4 +1,6 @@
-from dashmips.mips import mips_instruction, Syscalls
+"""Special Instructions."""
+from dashmips.instructions import mips_instruction
+from dashmips.syscalls import Syscalls
 
 
 def parse(arg):

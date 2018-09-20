@@ -11,3 +11,5 @@ import dashmips.instructions.rs_rt_imm_instructions
 import dashmips.instructions.rs_rt_instructions
 import dashmips.instructions.rs_rt_label_instructions
 import dashmips.instructions.special_instructions
+
+import dashmips.syscalls.print_syscalls

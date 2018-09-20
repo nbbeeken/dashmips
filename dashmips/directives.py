@@ -1,4 +1,4 @@
-"""Derective handling master function."""
+"""Derective handling."""
 
 
 def align(data):

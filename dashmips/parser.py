@@ -4,9 +4,10 @@ import re
 import dashmips.mips as mips
 import dashmips.hw as hw
 
+from dashmips.instructions import Instructions
+
 from pprint import pprint as pretty
 
-RE_COMMENT = r"\#.*"
 DATA_SEC = ".data"
 TEXT_SEC = ".text"
 
@@ -18,12 +19,12 @@ def preprocess_mips(labels, code) -> dict:
     Breaks the code into directive and text sections.
     """
     code = [line for line in code.splitlines() if line]
-    code = [re.sub(RE_COMMENT, '', line).strip() for line in code]
+    code = [re.sub(mips.RE.COMMENT, '', line).strip() for line in code]
 
     processed_code = split_to_sections(code)
 
     for idx, line in enumerate(processed_code[TEXT_SEC]):
-        match = re.match(f"({mips.RE_LABEL}):", line)
+        match = re.match(f"({mips.RE.LABEL}):", line)
         if match:
             labels[match[1]] = idx
             del processed_code[TEXT_SEC][idx]
@@ -57,7 +58,7 @@ def build_data(labels: dict, data_sec: list) -> Dict[str, Any]:
     Fill the .data section memory with user defined static data
     """
     labels = {**labels}
-    data_line_re = f"({mips.RE_LABEL}):\\s*({mips.RE_DIRECTIVE})\\s+(.*)"
+    data_line_re = f"({mips.RE.LABEL}):\\s*({mips.RE.DIRECTIVE})\\s+(.*)"
 
     for line in data_sec:
         match = re.match(data_line_re, line)
@@ -80,19 +81,13 @@ def exec_mips(code: str):
     registers = hw.MIPSRegisters()
     memory = hw.MIPSMemory()
 
-    # FIXME: IMPORT BUG
-    x = mips.Syscalls
-    y = mips.MipsInstructions
-    pretty(x)
-    print(y)
-
     parsedcode = preprocess_mips(labels, code)
 
     labels = build_data(labels, parsedcode[DATA_SEC])
 
     for instruction in parsedcode[TEXT_SEC]:
 
-        for instruction_fn in mips.MipsInstructions:
+        for instruction_fn in Instructions:
             match = re.match(instruction_fn.regex, instruction)
             if match:
                 matches = [match[i] for i in range(0, match.re.groups + 1)]

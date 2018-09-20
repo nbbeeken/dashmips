@@ -1,129 +1,47 @@
 """Mips Management."""
 from typing import List
 import inspect
-import dashmips.directives
 
-from dashmips.syscalls import *
-from dashmips.instructions import *
+import dashmips.directives as directives
 
 MipsDirectives = {
     directive: fn
     for directive, fn in
-    inspect.getmembers(dashmips.directives, inspect.isfunction)
+    inspect.getmembers(directives, inspect.isfunction)
 }
 
 
-class MipsRegExs:
+class RE:
     """All Mips Regexs encapsulated in a class."""
 
-    RE_REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
-                   r"|zero|sp|fp|gp|ra))")
-    RE_LABEL = r"[a-zA-Z_][a-zA-Z0-9_]*"
-    RE_DIRECTIVE = "\\." + "|\\.".join(MipsDirectives.keys())
+    REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
+                r"|zero|sp|fp|gp|ra))")
+    LABEL = r"[a-zA-Z_][a-zA-Z0-9_]*"
+    DIRECTIVE = "\\." + "|\\.".join(MipsDirectives.keys())
 
-    RE_INSTRGAP = r"\s+"
-    RE_ARGSGAP = r"\s*,\s*"
+    COMMENT = r"\#.*"
 
-    RE_DEC = "(?:(?:+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))"
-    RE_BIN = "(?:0(?:b|B)(?:_?[0-1])+)"
-    RE_OCT = "(?:0(?:o|O)(?:_?[0-7])+)"
-    RE_HEX = "(?:0(?:x|X)(?:_?([0-9]|[a-f]|[A-F]))+)"
+    INSTRGAP = r"\s+"
+    ARGSGAP = r"\s*,\s*"
 
-    RE_NUMBERS = [
-        RE_DEC,
-        RE_BIN,
-        RE_OCT,
-        RE_HEX,
+    DEC = "(?:(?:+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))"
+    BIN = "(?:0(?:b|B)(?:_?[0-1])+)"
+    OCT = "(?:0(?:o|O)(?:_?[0-7])+)"
+    HEX = "(?:0(?:x|X)(?:_?([0-9]|[a-f]|[A-F]))+)"
+
+    NUMBERS = [
+        DEC,
+        BIN,
+        OCT,
+        HEX,
     ]
 
-    RE_NUMBER = "(?:\d+)"  # "(?:" + "|".join(RE_NUMBERS) + ")"
+    NUMBER = "(?:\d+)"  # "(?:" + "|".join(RE_NUMBERS) + ")"
 
-    REGEXS = {
-        'register': RE_REGISTER,
-        'label': RE_LABEL,
-        'number': RE_NUMBER,
-        'instr_gap': RE_INSTRGAP,
-        'args_gap': RE_ARGSGAP,
+    ALL = {
+        'register': REGISTER,
+        'label': LABEL,
+        'number': NUMBER,
+        'instr_gap': INSTRGAP,
+        'args_gap': ARGSGAP,
     }
-
-
-MipsInstructions = []
-
-
-def mips_instruction(pattern, parser):
-    """Make an Instruction object from decorated function."""
-    def mips_decorator(func):
-        instr = Instruction(func, pattern, parser)
-
-        def mips_wrapper(name):
-            return instr
-
-        return instr
-
-    return mips_decorator
-
-
-class Instruction:
-    """Instruction Class, callable."""
-
-    def __init__(self, fn, regex_ptrn, parser):
-        """
-        Regex and argument parser for instruction.
-
-        Adds itself to list upon instanciation.
-        """
-        self.fn = fn
-
-        name = self.fn.__name__
-        if name.startswith('_'):
-            name = name[1:]
-        self.name = name
-
-        self.regex = f"({self.name}){regex_ptrn}".format(**MipsRegExs.REGEXS)
-
-        self.parser = parser
-
-        MipsInstructions.append(self)
-
-    def __call__(self, *args):
-        """Callable Instruction."""
-        return self.fn(*args)
-
-    def __repr__(self):
-        """Return Representation string."""
-        return f"Instruction({self.name})"
-
-
-Syscalls = {}
-
-
-def mips_syscall(number):
-    """Make a Syscall object from decorated function."""
-    def syscall_decorator(function):
-        syscall = Syscall(number, function)
-
-        def syscall_wrapper(name):
-            return syscall
-
-        return syscall
-
-    return syscall_decorator
-
-
-class Syscall:
-    """Syscall Class, callable."""
-
-    def __init__(self, number, function):
-        """Create Syscall."""
-        self.function = function
-        self.name = self.function.__name__
-        self.number = number
-        Syscalls[self.number] = self
-
-    def __call__(self):
-        """Callable Instruction."""
-        return self.function
-
-    def __repr__(self):
-        """Return Representation string."""
-        return f"Syscall({self.number}, {self.name})"
