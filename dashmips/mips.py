@@ -12,35 +12,40 @@ MipsDirectives = {
     inspect.getmembers(dashmips.directives, inspect.isfunction)
 }
 
-RE_REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
-               r"|zero|sp|fp|gp|ra))")
-RE_LABEL = r"[a-zA-Z_][a-zA-Z0-9_]*"
-RE_DIRECTIVE = "\\." + "|\\.".join(MipsDirectives.keys())
 
-RE_INSTRGAP = r"\s+"
-RE_ARGSGAP = r"\s*,\s*"
+class MipsRegExs:
+    """All Mips Regexs encapsulated in a class."""
 
-RE_DEC = "(?:(?:+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))"
-RE_BIN = "(?:0(?:b|B)(?:_?[0-1])+)"
-RE_OCT = "(?:0(?:o|O)(?:_?[0-7])+)"
-RE_HEX = "(?:0(?:x|X)(?:_?([0-9]|[a-f]|[A-F]))+)"
+    RE_REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
+                   r"|zero|sp|fp|gp|ra))")
+    RE_LABEL = r"[a-zA-Z_][a-zA-Z0-9_]*"
+    RE_DIRECTIVE = "\\." + "|\\.".join(MipsDirectives.keys())
 
-RE_NUMBERS = [
-    RE_DEC,
-    RE_BIN,
-    RE_OCT,
-    RE_HEX,
-]
+    RE_INSTRGAP = r"\s+"
+    RE_ARGSGAP = r"\s*,\s*"
 
-RE_NUMBER = "(?:\d+)"  # "(?:" + "|".join(RE_NUMBERS) + ")"
+    RE_DEC = "(?:(?:+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))"
+    RE_BIN = "(?:0(?:b|B)(?:_?[0-1])+)"
+    RE_OCT = "(?:0(?:o|O)(?:_?[0-7])+)"
+    RE_HEX = "(?:0(?:x|X)(?:_?([0-9]|[a-f]|[A-F]))+)"
 
-REGEXS = {
-    'register': RE_REGISTER,
-    'label': RE_LABEL,
-    'number': RE_NUMBER,
-    'instr_gap': RE_INSTRGAP,
-    'args_gap': RE_ARGSGAP,
-}
+    RE_NUMBERS = [
+        RE_DEC,
+        RE_BIN,
+        RE_OCT,
+        RE_HEX,
+    ]
+
+    RE_NUMBER = "(?:\d+)"  # "(?:" + "|".join(RE_NUMBERS) + ")"
+
+    REGEXS = {
+        'register': RE_REGISTER,
+        'label': RE_LABEL,
+        'number': RE_NUMBER,
+        'instr_gap': RE_INSTRGAP,
+        'args_gap': RE_ARGSGAP,
+    }
+
 
 MipsInstructions = []
 
@@ -61,7 +66,7 @@ def mips_instruction(pattern, parser):
 class Instruction:
     """Instruction Class, callable."""
 
-    def __init__(self, fn, regex_pattern, parser):
+    def __init__(self, fn, regex_ptrn, parser):
         """
         Regex and argument parser for instruction.
 
@@ -74,7 +79,7 @@ class Instruction:
             name = name[1:]
         self.name = name
 
-        self.regex = f"({self.name}){regex_pattern}".format(**REGEXS)
+        self.regex = f"({self.name}){regex_ptrn}".format(**MipsRegExs.REGEXS)
 
         self.parser = parser
 
