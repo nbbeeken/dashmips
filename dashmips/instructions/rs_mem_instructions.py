@@ -8,65 +8,65 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def lb(regs, lbls, rs, num, rt):
+def lb(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def lbu(regs, lbls, rs, num, rt):
+def lbu(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def lh(regs, lbls, rs, num, rt):
+def lh(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def lhu(regs, lbls, rs, num, rt):
+def lhu(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def lw(regs, lbls, rs, num, rt):
+def lw(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def lwl(regs, lbls, rs, num, rt):
+def lwl(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def sc(regs, lbls, rs, num, rt):
+def sc(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def lwr(regs, lbls, rs, num, rt):
+def lwr(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def sb(regs, lbls, rs, num, rt):
+def sb(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def sw(regs, lbls, rs, num, rt):
+def sw(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def swl(regs, lbls, rs, num, rt):
+def swl(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def swr(regs, lbls, rs, num, rt):
+def swr(registers, labels, memory, code, rs, num, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def sh(regs, lbls, rs, num, rt):
+def sh(registers, labels, memory, code, rs, num, rt):
     return None

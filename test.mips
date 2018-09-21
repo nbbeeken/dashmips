@@ -2,6 +2,7 @@
 msg: .asciiz "Hello World"
 .text
 main:
+    addi $a0, $zero, msg
     addi $v0, $zero, 4       # syscall 4 (print_str)
     syscall                  # print the string
     addi $v0, $zero, 10      # syscall 10 (exit)

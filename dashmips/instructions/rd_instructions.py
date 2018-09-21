@@ -8,20 +8,20 @@ def parse(args):
 
 
 @mips_instruction(PTRN, parse)
-def mflo(regs, lbls, rd):
+def mflo(registers, labels, memory, code, rd):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def mfhi(regs, lbls, rd):
+def mfhi(registers, labels, memory, code, rd):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def mthi(regs, lbls, rd):
+def mthi(registers, labels, memory, code, rd):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def mtlo(regs, lbls, rd):
+def mtlo(registers, labels, memory, code, rd):
     return None

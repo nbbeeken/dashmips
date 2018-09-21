@@ -21,9 +21,9 @@ class Instruction:
         self.regex = f"({self.name}){regex_ptrn}".format(**mips.RE.ALL)
         self.parser = parser
 
-    def __call__(self, *args):
+    def __call__(self, registers, labels, memory, code, args=tuple()):
         """Callable Instruction."""
-        return self.fn(*args)
+        return self.fn(registers, labels, memory, code, *args)
 
     def __repr__(self):
         """Return Representation string."""

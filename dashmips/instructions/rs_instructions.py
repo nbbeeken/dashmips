@@ -8,5 +8,5 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def jr(regs, lbls, rs):
+def jr(registers, labels, memory, code, rs):
     return None

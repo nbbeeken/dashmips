@@ -8,10 +8,10 @@ def parse(arg):
 
 
 @mips_instruction('', parse)
-def nop(regs, lbls):
+def nop(registers, labels, memory, code):
     return True
 
 
 @mips_instruction('', parse)
-def syscall(regs, lbls):
-    return Syscalls[regs['$v0']](regs, lbls, [])
+def syscall(registers, labels, memory, code):
+    return Syscalls[registers['$v0']](registers, labels, memory, code)

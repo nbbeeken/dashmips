@@ -1,10 +1,12 @@
 """Mips Management."""
-from typing import List
+from typing import List, Dict, Callable, Any, Tuple
 import inspect
 
+from dashmips.preprocessor import Label
 import dashmips.directives as directives
+from dashmips.hw import Memory
 
-MipsDirectives = {
+Directives: Dict[str, Callable[[str, Any, Memory], int]] = {
     directive: fn
     for directive, fn in
     inspect.getmembers(directives, inspect.isfunction)
@@ -14,10 +16,13 @@ MipsDirectives = {
 class RE:
     """All Mips Regexs encapsulated in a class."""
 
+    DATA_SEC = ".data"
+    TEXT_SEC = ".text"
+
     REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
                 r"|zero|sp|fp|gp|ra))")
     LABEL = r"[a-zA-Z_][a-zA-Z0-9_]*"
-    DIRECTIVE = "\\." + "|\\.".join(MipsDirectives.keys())
+    DIRECTIVE = "\\." + "|\\.".join(Directives.keys())
 
     COMMENT = r"\#.*"
 

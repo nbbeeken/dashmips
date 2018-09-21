@@ -10,9 +10,9 @@ class Syscall:
         self.name = self.function.__name__
         self.number = number
 
-    def __call__(self, *args):
+    def __call__(self, registers, labels, memory, code):
         """Callable Instruction."""
-        return self.function(*args)
+        return self.function(registers, labels, memory, code)
 
     def __repr__(self):
         """Return Representation string."""

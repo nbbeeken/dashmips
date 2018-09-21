@@ -1,6 +1,6 @@
 from dashmips.instructions import mips_instruction
 
-PTRN = r"{instr_gap}({register}){args_gap}({label})"
+PTRN = r"{instr_gap}({register}){args_gap}({number})"
 
 
 def parse(arg):
@@ -8,30 +8,30 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def bgez(regs, lbls, rs, label):
+def bgez(registers, labels, memory, code, rs, label):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def bgezal(regs, lbls, rs, label):
+def bgezal(registers, labels, memory, code, rs, label):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def bgtz(regs, lbls, rs, label):
+def bgtz(registers, labels, memory, code, rs, label):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def blez(regs, lbls, rs, label):
+def blez(registers, labels, memory, code, rs, label):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def bltz(regs, lbls, rs, label):
+def bltz(registers, labels, memory, code, rs, label):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def bltzal(regs, lbls, rs, label):
+def bltzal(registers, labels, memory, code, rs, label):
     return None

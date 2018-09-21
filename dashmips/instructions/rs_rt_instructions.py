@@ -8,55 +8,55 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def jalr(regs, lbls, rs, rt):
+def jalr(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def madd(regs, lbls, rs, rt):
+def madd(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def maddu(regs, lbls, rs, rt):
+def maddu(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def msubu(regs, lbls, rs, rt):
+def msubu(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def msub(regs, lbls, rs, rt):
+def msub(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def multu(regs, lbls, rs, rt):
+def multu(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def mult(regs, lbls, rs, rt):
+def mult(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def clo(regs, lbls, rs, rt):
+def clo(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def clz(regs, lbls, rs, rt):
+def clz(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def div(regs, lbls, rs, rt):
+def div(registers, labels, memory, code, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def divu(regs, lbls, rs, rt):
+def divu(registers, labels, memory, code, rs, rt):
     return None

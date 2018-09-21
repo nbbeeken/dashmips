@@ -1,7 +1,7 @@
 """Instructions that accept a label as an argument."""
 from dashmips.instructions import mips_instruction
 
-PTRN = r"{instr_gap}({label})"
+PTRN = r"{instr_gap}({number})"
 
 
 def parse(args):
@@ -10,12 +10,12 @@ def parse(args):
 
 
 @mips_instruction(PTRN, parse)
-def j(regs, lbls, label):
+def j(registers, labels, memory, code, label):
     """Jump unconditionally to label."""
     return None
 
 
 @mips_instruction(PTRN, parse)
-def jal(regs, lbls, label):
+def jal(registers, labels, memory, code, label):
     """Jump unconditionally to label and set $ra to current $pc."""
     return None

@@ -1,76 +1,85 @@
 """Derective handling."""
+from typing import Tuple, Any
+from dashmips.preprocessor import Label
+from dashmips.hw import Memory
 
 
-def align(data):
+def align(name: str, data: str, memory: Memory):
     """Align directive."""
     return None
 
 
-def asciiz(data):
+def asciiz(name: str, data: str, memory: Memory):
     """Asciiz directive."""
-    return (data[1:-1] + '\0').encode()
+    asciiz_bytes = (data[1:-1] + '\0').encode()
+    address = memory.malloc(len(asciiz_bytes))
+    memory[address] = asciiz_bytes
+    return address
 
 
-def ascii(data):
+def ascii(name: str, data: str, memory: Memory):
     """Ascii directive."""
-    return (data[1:-1]).encode()
+    ascii_bytes = (data[1:-1]).encode()
+    address = memory.malloc(len(ascii_bytes))
+    memory[address] = asciiz_bytes
+    return address
 
 
-def byte(data):
+def byte(name: str, data: str, memory: Memory):
     """Byte directive."""
     return None
 
 
-def double(data):
+def double(name: str, data: str, memory: Memory):
     """Double directive."""
     return None
 
 
-def end_macro(data):
+def end_macro(name: str, data: str, memory: Memory):
     """End_macro directive."""
     return None
 
 
-def eqv(data):
+def eqv(name: str, data: str, memory: Memory):
     """Eqv directive."""
     return None
 
 
-def extern(data):
+def extern(name: str, data: str, memory: Memory):
     """Extern directive."""
     return None
 
 
-def globl(data):
+def globl(name: str, data: str, memory: Memory):
     """Globl directive."""
     return None
 
 
-def half(data):
+def half(name: str, data: str, memory: Memory):
     """Half directive."""
     return None
 
 
-def include(data):
+def include(name: str, data: str, memory: Memory):
     """Include directive."""
     return None
 
 
-def macro(data):
+def macro(name: str, data: str, memory: Memory):
     """Macro directive."""
     return None
 
 
-def set(data):
+def set(name: str, data: str, memory: Memory):
     """Set directive."""
     return None
 
 
-def space(data):
+def space(name: str, data: str, memory: Memory):
     """Space directive."""
     return None
 
 
-def word(data):
+def word(name: str, data: str, memory: Memory):
     """Word directive."""
     return None

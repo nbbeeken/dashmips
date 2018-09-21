@@ -9,50 +9,60 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def addi(regs, lbls, rs, rt, num):
-    return regs.update({rs: regs[rt] + num})
+def addi(registers, labels, memory, code, rs, rt, num):
+    return registers.update({rs: registers[rt] + num})
 
 
 @mips_instruction(PTRN, parse)
-def addiu(regs, lbls, rs, rt, num):
+def addiu(registers, labels, memory, code, rs, rt, num):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def ori(regs, lbls, rs, rt, num):
+def ori(registers, labels, memory, code, rs, rt, num):
+    registers[rs] = registers[rt] | num
+
+
+@mips_instruction(PTRN, parse)
+def andi(registers, labels, memory, code, rs, rt, num):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def andi(regs, lbls, rs, rt, num):
+def slti(registers, labels, memory, code, rs, rt, num):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def slti(regs, lbls, rs, rt, num):
+def sltiu(registers, labels, memory, code, rs, rt, num):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def sltiu(regs, lbls, rs, rt, num):
+def xori(registers, labels, memory, code, rs, rt, num):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def xori(regs, lbls, rs, rt, num):
+def sra(registers, labels, memory, code, rs, rt, num):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def sra(regs, lbls, rs, rt, num):
+def sll(registers, labels, memory, code, rs, rt, num):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def sll(regs, lbls, rs, rt, num):
+def srl(registers, labels, memory, code, rs, rt, num):
     return None
 
 
 @mips_instruction(PTRN, parse)
-def srl(regs, lbls, rs, rt, num):
+def beq(registers, labels, memory, code, rs, rt, address):
+    return None
+
+
+@mips_instruction(PTRN, parse)
+def bne(registers, labels, memory, code, rs, rt, address):
     return None

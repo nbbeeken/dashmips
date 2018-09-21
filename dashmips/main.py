@@ -1,7 +1,10 @@
 """Main Dashmips Program."""
 import argparse
 import sys
-import dashmips.parser
+import dashmips.run
+import json
+import dashmips.preprocessor
+import dashmips.hw as hw
 
 
 def main(args):
@@ -9,9 +12,13 @@ def main(args):
     if args is None:
         args = dashmips_arguments()
 
+    registers = hw.Registers()
+    memory = hw.Memory()
+
     with open(args.FILE) as file:
-        mips_code = file.read()
-        dashmips.parser.exec_mips(mips_code)
+        rawcode = file.read()
+        labels, code_data = dashmips.preprocessor.preprocess(rawcode, memory)
+        dashmips.run.exec_mips(labels, code_data, registers, memory)
 
 
 def dashmips_arguments():

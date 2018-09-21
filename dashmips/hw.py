@@ -29,7 +29,7 @@ regnum_to_regnum = {
 RegnameToRegNum = {**regplainname_to_regnum, **regnumname_to_regnum}
 
 
-class MIPSRegisters(dict):
+class Registers(dict):
     """Mips Register File."""
 
     def __init__(self):
@@ -82,18 +82,48 @@ class MIPSRegisters(dict):
         return s
 
 
-class MIPSMemory(list):
+class Memory(list):
     """Mips RAM."""
 
     KIB = 1024
 
     def __init__(self):
         """Create 2KB of MIPS RAM."""
-        return super().__init__([0] * (2 * MIPSMemory.KIB))
+        super().__init__([0] * (2 * Memory.KIB))
+        self._freespace = 0x4
 
     def __setitem__(self, key, value):
         """Bounds checking on access."""
-        value &= 0xFF
-        if 0x0 <= key <= 0x3:
+        if 0x0 == key <= 0x3:
             raise Exception('NULL-ish pointer')
-        return super().__setitem__(key, value)
+        try:
+            for idx, val in enumerate(value):
+                # val &= 0xFF
+                super().__setitem__(key + idx, val)
+            return self[key]
+        except TypeError:
+            # value &= 0xFF
+            return super().__setitem__(key, value)
+
+    def __repr__(self):
+        """Compated Memory string."""
+        s = '['
+        zero_ct = 0
+        for v in self:
+            if v == 0:
+                zero_ct += 1
+            else:
+                if zero_ct != 0:
+                    s += f'<0 repeats {zero_ct} times>, '
+                    zero_ct = 0
+                s += str(v) + ', '
+        if zero_ct != 0:
+            s += f'<0 repeats {zero_ct} times>, '
+        s += ']'
+        return s
+
+    def malloc(self, size: int) -> int:
+        """Get address of unused memory."""
+        old_freespace = self._freespace
+        self._freespace += size
+        return old_freespace

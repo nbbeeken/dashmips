@@ -8,80 +8,80 @@ def parser(args):
 
 
 @mips_instruction(PTRN, parser)
-def add(regs, lbls, rd, rs, rt):
+def add(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def addu(regs, lbls, rd, rs, rt):
+def addu(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def _and(regs, lbls, rd, rs, rt):
+def _and(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def movn(regs, lbls, rd, rs, rt):
+def movn(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def movz(regs, lbls, rd, rs, rt):
+def movz(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def mul(regs, lbls, rd, rs, rt):
+def mul(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def nor(regs, lbls, rd, rs, rt):
+def nor(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def _or(regs, lbls, rd, rs, rt):
+def _or(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def sllv(regs, lbls, rd, rs, rt):
+def sllv(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def slt(regs, lbls, rd, rs, rt):
+def slt(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def sltu(regs, lbls, rd, rs, rt):
+def sltu(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def srav(regs, lbls, rd, rs, rt):
+def srav(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def srlv(regs, lbls, rd, rs, rt):
+def srlv(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def sub(regs, lbls, rd, rs, rt):
+def sub(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def subu(regs, lbls, rd, rs, rt):
+def subu(registers, labels, memory, code, rd, rs, rt):
     return None
 
 
 @mips_instruction(PTRN, parser)
-def xor(regs, lbls, rd, rs, rt):
+def xor(registers, labels, memory, code, rd, rs, rt):
     return None
