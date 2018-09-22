@@ -89,18 +89,32 @@ def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
     Fill the .text section memory with user code
     """
     text = []
+    lbl_ct = 0
     for idx, line in enumerate(text_sec):
-
-        for name, label in labels.items():
-            line = line.replace(name, str(label.value))
-
+        # For each line in the stipped text section, check for label
         match = re.match(f"({mips.RE.LABEL}):", line)
         if match:
-            labels[match[1]] = Label(
-                type=Label.text,
-                value=idx,
-                name=match[1]
-            )
+            # If there's a label save it to the labels dictionary
+            labels[match[1]] = Label(type=Label.text,
+                                     value=(idx - lbl_ct), name=match[1])
+            if len(line) > len(match[0]):
+                # If the line is longer than what was matched, lets assume
+                # the rest is an instruction (comments and whitespace should
+                # already have been stripped) we cut out the label
+                text.append(line[len(match[0]):].strip())
+            else:
+                # To offset the previously removed label lines
+                lbl_ct += 1
         else:
+            # Otherwise save the line as is
             text.append(line)
+
+    # Converting in code labels to values
+    for idx, line in enumerate(text):
+        for name, label in labels.items():
+            # For each label modify the string so that the
+            # label is replaced with the value
+            if name in line:
+                text[idx] = line.replace(name, str(label.value))
+
     return text
