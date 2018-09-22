@@ -9,54 +9,54 @@ def parse(arg):
 
 @mips_instruction(PTRN, parse)
 def jalr(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def madd(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def maddu(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def msubu(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def msub(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def multu(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def mult(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def clo(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def clz(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def div(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def divu(registers, labels, memory, code, rs, rt):
-    return None
+    raise Exception('TODO: Not Implemented')

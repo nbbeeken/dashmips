@@ -11,7 +11,8 @@ def align(name: str, data: str, memory: Memory):
 
 def asciiz(name: str, data: str, memory: Memory):
     """Asciiz directive."""
-    asciiz_bytes = (data[1:-1] + '\0').encode()
+    string = data[1:-1].encode('ascii', 'ignore').decode('unicode_escape')
+    asciiz_bytes = (string + '\0').encode()
     address = memory.malloc(len(asciiz_bytes))
     memory[address] = asciiz_bytes
     return address
@@ -19,9 +20,10 @@ def asciiz(name: str, data: str, memory: Memory):
 
 def ascii(name: str, data: str, memory: Memory):
     """Ascii directive."""
-    ascii_bytes = (data[1:-1]).encode()
+    string = data[1:-1].encode('ascii', 'ignore').decode('unicode_escape')
+    ascii_bytes = (s).encode()
     address = memory.malloc(len(ascii_bytes))
-    memory[address] = asciiz_bytes
+    memory[address] = ascii_bytes
     return address
 
 

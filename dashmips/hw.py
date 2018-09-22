@@ -67,7 +67,7 @@ class Registers(dict):
 
     def pretty_str(self):
         """Generate Pretty String of Reg Contents."""
-        s = (f"$ze: {self[0]:02},\n$at: {self[1]:02},\n$v0: {self[2]:02}, " +
+        s = (f"$at: {self[1]:02},\n$v0: {self[2]:02}, " +
              f"$v1: {self[3]:02},\n$a0: {self[4]:02}, $a1: {self[5]:02}, " +
              f"$a2: {self[6]:02}, $a3: {self[7]:02},\n$t0: {self[8]:02}, " +
              f"$t1: {self[9]:02}, $t2: {self[10]:02}, $t3: {self[11]:02},\n" +

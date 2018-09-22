@@ -25,13 +25,19 @@ def preprocess(code: str, memory) -> Tuple[Dict[str, Label], List[str]]:
     Breaks the code into directive and text sections.
     """
     # Clean out comments and empty lines
-    linesofcode = [
-        re.sub(mips.RE.COMMENT, '', line).strip()
-        for line in [
-            line
-            for line in code.splitlines() if line
-        ]
-    ]
+    linesofcode: List[str] = list(
+        # Listify
+        map(lambda line: ' '.join(line.split()),
+            # make every white space just one space
+            filter(lambda line: line != '',
+                   # drop lines that are empty
+                   map(lambda line: re.sub(mips.RE.COMMENT, '', line).strip(),
+                       # remove comments
+                       code.splitlines()
+                       )
+                   )
+            )
+    )
 
     labels: Dict[str, Label] = {}
 
@@ -88,6 +94,8 @@ def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
 
     Fill the .text section memory with user code
     """
+    from dashmips.instructions import Instructions
+
     text = []
     lbl_ct = 0
     for idx, line in enumerate(text_sec):
@@ -106,6 +114,10 @@ def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
                 # To offset the previously removed label lines
                 lbl_ct += 1
         else:
+            instruction = line.split(' ')[0]
+            if instruction not in Instructions:
+                print(f'Error line {idx}: "{instruction}" invalid')
+                exit(1)
             # Otherwise save the line as is
             text.append(line)
 

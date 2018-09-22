@@ -9,19 +9,19 @@ def parse(args):
 
 @mips_instruction(PTRN, parse)
 def mflo(registers, labels, memory, code, rd):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def mfhi(registers, labels, memory, code, rd):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def mthi(registers, labels, memory, code, rd):
-    return None
+    raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
 def mtlo(registers, labels, memory, code, rd):
-    return None
+    raise Exception('TODO: Not Implemented')

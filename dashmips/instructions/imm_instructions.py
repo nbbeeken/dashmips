@@ -6,16 +6,16 @@ PTRN = r"{instr_gap}({number})"
 
 def parse(args):
     """Parse label to pass to instruction function."""
-    return (str(args[2]),)
+    return (int(args[2]),)
 
 
 @mips_instruction(PTRN, parse)
-def j(registers, labels, memory, code, label):
+def j(registers, labels, memory, code, address: int):
     """Jump unconditionally to label."""
-    return None
+    registers['pc'] = address
 
 
 @mips_instruction(PTRN, parse)
-def jal(registers, labels, memory, code, label):
+def jal(registers, labels, memory, code, address: int):
     """Jump unconditionally to label and set $ra to current $pc."""
-    return None
+    raise Exception('TODO: Not Implemented')

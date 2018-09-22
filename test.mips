@@ -1,9 +1,48 @@
-.data
-msg: .asciiz "Hello World"
+# Sum all the numbers from 1 up to the number inputted
+
 .text
+
 main:
-    addi $a0, $zero, msg
-    addi $v0, $zero, 4       # syscall 4 (print_str)
-    syscall                  # print the string
-    addi $v0, $zero, 10      # syscall 10 (exit)
-    syscall                  # exit
+        # Print msg1
+        addi $v0, $zero, 4              # print_string syscall code = 4
+        addi $a0, $zero, msg1
+        syscall
+
+        # Get N from user and save
+        addi $v0, $zero, 5              # read_int syscall code = 5
+        syscall
+        addu $t0,$zero,$v0              # syscall results returned in $v0
+
+        # Initialize registers
+        addi $t1, $zero, 0              # initialize counter (i)
+        addi $t2, $zero, 0              # initialize sum
+
+        # Main loop body
+loop:   addi $t1, $t1, 1    # i = i + 1
+        add     $t2, $t2, $t1   # sum = sum + i
+        beq     $t0, $t1, exit  # if i = N, continue
+        j       loop
+
+        # Exit routine - print msg2
+exit:   addi $v0,$zero, 4               # print_string syscall code = 4
+        addi $a0, $zero,msg2
+        syscall
+
+        # Print sum
+        addi $v0,$zero,1                # print_int syscall code = 1
+        addu $a0, $zero, $t2
+        syscall
+
+        # Print newline
+        addi $v0,$zero,4                # print_string syscall code = 4
+        addi $a0, $zero, lf
+        syscall
+        add $a0, $zero, $zero           # new feature! $a0 holds exit_code
+        addi $v0,$zero,10               # exit
+        syscall
+
+# Start .data segment (data!)
+.data
+msg1:   .asciiz "Number of integers (N)?  "
+msg2:   .asciiz "Sum = "
+lf:     .asciiz "\n"

@@ -13,25 +13,20 @@ from pprint import pprint
 
 def exec_mips(labels: Dict[str, Label], code: List[str], registers, memory):
     """Execute Preprocessed Mips."""
-    pprint(labels)
-    pprint(code)
-    print(memory)
+    registers['pc'] = labels['main'].value
+    while True:
+        current_pc = registers['pc']
+        if len(code) < current_pc:
+            raise Exception(f'Bad pc value {current_pc}')
+        lineofcode = code[current_pc]
+        instruction = lineofcode.split(' ')[0]
 
-    print('\n--- Program Output Start ---\n')
-
-    for instruction in code:
-
-        for instruction_fn in Instructions:
-            match = re.match(instruction_fn.regex, instruction)
-            if match:
-                matches = [match[i] for i in range(0, match.re.groups + 1)]
-                args = instruction_fn.parser(match)
-                instruction_fn(registers, labels, memory, code, args)
-                break
-        else:
-            print(f'instruction "{instruction}" not recognized')
-            exit(1)
-
-    print('\n--- Program Output End ---\n')
-
-    print(registers.pretty_str())
+        instruction_fn = Instructions[instruction]
+        match = re.match(instruction_fn.regex, lineofcode)
+        if match:
+            args = instruction_fn.parser(match)
+            instruction_fn(registers, labels, memory, code, args)
+        if current_pc == registers['pc']:
+            # If a instruction didn't explicitly set the PC
+            # FIXME: Edge case: jump to label that is the current_pc
+            registers['pc'] += 1
