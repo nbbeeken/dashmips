@@ -10,6 +10,6 @@ def parse(args):
 
 
 @mips_instruction(PTRN, parse)
-def lui(registers, labels, memory, code, rd, immediate):
+def lui(program, rd, immediate):
     """Load upper immediate, NOT LOAD FROM MEMORY."""
-    registers[rd] = (immediate << 16) & 0xFFFF_0000
+    program.registers[rd] = (immediate << 16) & 0xFFFF_0000

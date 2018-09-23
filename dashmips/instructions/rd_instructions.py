@@ -8,20 +8,20 @@ def parse(args):
 
 
 @mips_instruction(PTRN, parse)
-def mflo(registers, labels, memory, code, rd):
+def mflo(program, rd):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def mfhi(registers, labels, memory, code, rd):
+def mfhi(program, rd):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def mthi(registers, labels, memory, code, rd):
+def mthi(program, rd):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def mtlo(registers, labels, memory, code, rd):
+def mtlo(program, rd):
     raise Exception('TODO: Not Implemented')

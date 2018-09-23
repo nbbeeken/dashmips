@@ -5,6 +5,7 @@ import dashmips.run
 import json
 import dashmips.preprocessor
 import dashmips.hw as hw
+from dashmips.MipsProgram import MipsProgram
 
 
 def main(args):
@@ -17,12 +18,18 @@ def main(args):
 
     with open(args.FILE) as file:
         rawcode = file.read()
-        labels, code_data = dashmips.preprocessor.preprocess(rawcode, memory)
-        dashmips.run.exec_mips(labels, code_data, registers, memory)
+        labels, code = dashmips.preprocessor.preprocess(rawcode, memory)
+        program = MipsProgram(labels, code, memory, registers)
+        if args.debug:
+            dashmips.run.debug_mips(program)
+        else:
+            dashmips.run.exec_mips(program)
 
 
 def dashmips_arguments():
     """Parse Dashmips Arguments."""
     parser = argparse.ArgumentParser("dashmips")
     parser.add_argument("FILE")
+    parser.add_argument('-d', '--debug', dest='debug',
+                        action='store_true', help='run debugger')
     return parser.parse_args(sys.argv[1:])

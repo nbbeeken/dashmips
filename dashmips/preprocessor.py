@@ -41,9 +41,13 @@ def preprocess(code: str, memory) -> Tuple[Dict[str, Label], List[str]]:
 
     labels: Dict[str, Label] = {}
 
+    # Gather .data/.text sections into seperate lists
     unprocessed_labels, unprocessed_code = split_to_sections(linesofcode)
 
+    # First process all the .data labels so they can be replaced in .text
     data_labels(labels, unprocessed_labels, memory)
+    # Second gather the code labels,
+    # this also replaces all labels in code with the correct value
     processed_code = code_labels(labels, unprocessed_code)
 
     return labels, processed_code

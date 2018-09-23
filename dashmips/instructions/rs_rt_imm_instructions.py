@@ -9,62 +9,62 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def addi(registers, labels, memory, code, rs, rt, num):
-    registers[rs] = registers[rt] + num
+def addi(program, rs, rt, num):
+    program.registers[rs] = program.registers[rt] + num
 
 
 @mips_instruction(PTRN, parse)
-def addiu(registers, labels, memory, code, rs, rt, num):
+def addiu(program, rs, rt, num):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def ori(registers, labels, memory, code, rs, rt, num):
-    registers[rs] = registers[rt] | num
+def ori(program, rs, rt, num):
+    program.registers[rs] = program.registers[rt] | num
 
 
 @mips_instruction(PTRN, parse)
-def andi(registers, labels, memory, code, rs, rt, num):
+def andi(program, rs, rt, num):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def slti(registers, labels, memory, code, rs, rt, num):
+def slti(program, rs, rt, num):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def sltiu(registers, labels, memory, code, rs, rt, num):
+def sltiu(program, rs, rt, num):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def xori(registers, labels, memory, code, rs, rt, num):
+def xori(program, rs, rt, num):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def sra(registers, labels, memory, code, rs, rt, num):
+def sra(program, rs, rt, num):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def sll(registers, labels, memory, code, rs, rt, num):
+def sll(program, rs, rt, num):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def srl(registers, labels, memory, code, rs, rt, num):
+def srl(program, rs, rt, num):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def beq(registers, labels, memory, code, rs, rt, address):
+def beq(program, rs, rt, address):
     """Branch to address if Reg[rs] equals Reg[rt]."""
-    if registers[rs] == registers[rt]:
-        registers['pc'] = address
+    if program.registers[rs] == program.registers[rt]:
+        program.registers['pc'] = address
 
 
 @mips_instruction(PTRN, parse)
-def bne(registers, labels, memory, code, rs, rt, address):
+def bne(program, rs, rt, address):
     raise Exception('TODO: Not Implemented')

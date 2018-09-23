@@ -10,12 +10,12 @@ def parse(args):
 
 
 @mips_instruction(PTRN, parse)
-def j(registers, labels, memory, code, address: int):
+def j(program, address: int):
     """Jump unconditionally to label."""
-    registers['pc'] = address
+    program.registers['pc'] = address
 
 
 @mips_instruction(PTRN, parse)
-def jal(registers, labels, memory, code, address: int):
+def jal(program, address: int):
     """Jump unconditionally to label and set $ra to current $pc."""
     raise Exception('TODO: Not Implemented')

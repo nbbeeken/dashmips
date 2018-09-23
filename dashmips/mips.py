@@ -2,7 +2,6 @@
 from typing import List, Dict, Callable, Any, Tuple
 import inspect
 
-from dashmips.preprocessor import Label
 import dashmips.directives as directives
 from dashmips.hw import Memory
 

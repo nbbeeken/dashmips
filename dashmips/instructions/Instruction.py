@@ -1,4 +1,6 @@
 """Instruction class."""
+from typing import Callable, Tuple, Match
+from dashmips.MipsProgram import MipsProgram
 import dashmips.mips as mips
 
 
@@ -19,11 +21,11 @@ class Instruction:
         self.name = name
 
         self.regex = f"({self.name}){regex_ptrn}".format(**mips.RE.ALL)
-        self.parser = parser
+        self.parser: Callable[[Union[Tuple, Match]], Tuple] = parser
 
-    def __call__(self, registers, labels, memory, code, args=tuple()):
+    def __call__(self, program: MipsProgram, args=tuple()):
         """Callable Instruction."""
-        return self.fn(registers, labels, memory, code, *args)
+        return self.fn(program, *args)
 
     def __repr__(self):
         """Return Representation string."""

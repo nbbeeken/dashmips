@@ -8,65 +8,65 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def lb(registers, labels, memory, code, rs, num, rt):
+def lb(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def lbu(registers, labels, memory, code, rs, num, rt):
+def lbu(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def lh(registers, labels, memory, code, rs, num, rt):
+def lh(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def lhu(registers, labels, memory, code, rs, num, rt):
+def lhu(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def lw(registers, labels, memory, code, rs, num, rt):
+def lw(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def lwl(registers, labels, memory, code, rs, num, rt):
+def lwl(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def sc(registers, labels, memory, code, rs, num, rt):
+def sc(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def lwr(registers, labels, memory, code, rs, num, rt):
+def lwr(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def sb(registers, labels, memory, code, rs, num, rt):
+def sb(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def sw(registers, labels, memory, code, rs, num, rt):
+def sw(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def swl(registers, labels, memory, code, rs, num, rt):
+def swl(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def swr(registers, labels, memory, code, rs, num, rt):
+def swr(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def sh(registers, labels, memory, code, rs, num, rt):
+def sh(program, rs, num, rt):
     raise Exception('TODO: Not Implemented')

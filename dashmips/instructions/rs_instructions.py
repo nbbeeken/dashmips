@@ -8,5 +8,5 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def jr(registers, labels, memory, code, rs):
+def jr(program, rs):
     raise Exception('TODO: Not Implemented')

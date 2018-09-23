@@ -1,6 +1,5 @@
 """Derective handling."""
 from typing import Tuple, Any
-from dashmips.preprocessor import Label
 from dashmips.hw import Memory
 
 
@@ -21,7 +20,7 @@ def asciiz(name: str, data: str, memory: Memory):
 def ascii(name: str, data: str, memory: Memory):
     """Ascii directive."""
     string = data[1:-1].encode('ascii', 'ignore').decode('unicode_escape')
-    ascii_bytes = (s).encode()
+    ascii_bytes = (string).encode()
     address = memory.malloc(len(ascii_bytes))
     memory[address] = ascii_bytes
     return address

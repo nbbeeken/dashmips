@@ -8,30 +8,30 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def bgez(registers, labels, memory, code, rs, label):
+def bgez(program, rs, label):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def bgezal(registers, labels, memory, code, rs, label):
+def bgezal(program, rs, label):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def bgtz(registers, labels, memory, code, rs, label):
+def bgtz(program, rs, label):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def blez(registers, labels, memory, code, rs, label):
+def blez(program, rs, label):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def bltz(registers, labels, memory, code, rs, label):
+def bltz(program, rs, label):
     raise Exception('TODO: Not Implemented')
 
 
 @mips_instruction(PTRN, parse)
-def bltzal(registers, labels, memory, code, rs, label):
+def bltzal(program, rs, label):
     raise Exception('TODO: Not Implemented')

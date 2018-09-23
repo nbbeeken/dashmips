@@ -5,7 +5,7 @@
 main:
         # Print msg1
         addi $v0, $zero, 4              # print_string syscall code = 4
-        addi $a0, $zero, msg1
+        addi $a0,$zero, msg1
         syscall
 
         # Get N from user and save
@@ -25,7 +25,7 @@ loop:   addi $t1, $t1, 1    # i = i + 1
 
         # Exit routine - print msg2
 exit:   addi $v0,$zero, 4               # print_string syscall code = 4
-        addi $a0, $zero,msg2
+        addi $a0,$zero, msg2
         syscall
 
         # Print sum
@@ -35,7 +35,7 @@ exit:   addi $v0,$zero, 4               # print_string syscall code = 4
 
         # Print newline
         addi $v0,$zero,4                # print_string syscall code = 4
-        addi $a0, $zero, lf
+        addi $a0,$zero, lf
         syscall
         add $a0, $zero, $zero           # new feature! $a0 holds exit_code
         addi $v0,$zero,10               # exit
