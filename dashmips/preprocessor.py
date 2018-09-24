@@ -3,9 +3,17 @@ from typing import List, Dict, Any, Tuple
 import re
 import dashmips.mips as mips
 import dashmips.hw as hw
-from collections import namedtuple
+from dataclasses import dataclass
 
-Label = namedtuple("Label", ('type', 'value', 'name'))
+
+@dataclass
+class Label:
+    """Mips Preprocessor Label."""
+
+    type: str
+    value: int
+    name: str
+
 text_sec_label = 'text'
 data_sec_label = 'data'
 

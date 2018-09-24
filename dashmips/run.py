@@ -35,8 +35,3 @@ def exec_mips(program: MipsProgram):
         else:
             # Bad arguments to instruction
             raise MipsException(f"{lineofcode} is malformed for {instruction}")
-
-        if current_pc == program.registers['pc']:
-            # If a instruction didn't explicitly set the PC
-            # FIXME: Edge case: jump to label that is the current_pc
-            program.registers['pc'] += 1  # What?? not pc + 4?? haha.

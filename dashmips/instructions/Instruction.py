@@ -1,5 +1,5 @@
 """Instruction class."""
-from typing import Callable, Tuple, Match
+from typing import Callable, Any, Iterable, Match
 from dashmips.MipsProgram import MipsProgram
 import dashmips.mips as mips
 
@@ -13,7 +13,7 @@ class Instruction:
 
         Adds itself to list upon instanciation.
         """
-        self.fn = fn
+        self.fn: Callable[[MipsProgram, Iterable[Any]]] = fn
 
         name = self.fn.__name__
         if name.startswith('_'):
@@ -21,11 +21,20 @@ class Instruction:
         self.name = name
 
         self.regex = f"({self.name}){regex_ptrn}".format(**mips.RE.ALL)
-        self.parser: Callable[[Union[Tuple, Match]], Tuple] = parser
+        self.parser: Callable[[Match], Iterable[Any]] = parser
 
-    def __call__(self, program: MipsProgram, args=tuple()):
+    def __call__(self, program: MipsProgram, args: Iterable = None):
         """Callable Instruction."""
-        return self.fn(program, *args)
+        if not args:
+            args = tuple()
+
+        save_pc = program.registers['pc']
+        program.registers['pc'] = None
+        self.fn(program, *args)
+        if program.registers['pc'] is None:
+            # if not jmp/branch instruction pc will be None so we increment
+            # otherwise, pc will have some value for next line of execution
+            program.registers['pc'] = save_pc + 1
 
     def __repr__(self):
         """Return Representation string."""

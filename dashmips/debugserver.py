@@ -1,13 +1,31 @@
 """Mips Debug Server."""
 import json
-from typing import Any
+import sys
+import os
+from typing import Any, List
 from socketserver import TCPServer, StreamRequestHandler
-from dataclasses import dataclass, is_dataclass, asdict
+from socket import SOL_SOCKET, SO_REUSEADDR
+from dataclasses import dataclass, asdict
 
 from dashmips.MipsProgram import MipsProgram
-BAD_MSG = json.dumps({'command': 'stop', 'value': 'malformed message'})
-ERR_MSG = json.dumps({'command': 'stop', 'value': '500 internal eror'})
-BYE_MSG = json.dumps({'command': 'stop', 'value': 'end debug session'})
+BAD_MSG = json.dumps({
+    'command': 'stop',
+    'message': 'malformed message',
+    'program': None,
+    'error': True
+})
+ERR_MSG = json.dumps({
+    'command': 'stop',
+    'message': '500 internal error',
+    'program': None,
+    'error': True,
+})
+BYE_MSG = json.dumps({
+    'command': 'stop',
+    'message': 'end debug session',
+    'program': None,
+    'error': False
+})
 
 
 @dataclass
@@ -15,7 +33,10 @@ class DebugMessage:
     """Format for debug messages."""
 
     command: str
-    value: Any
+    message: str
+    program: MipsProgram
+    breakpoints: List[int]
+    error: bool = False
 
     @staticmethod
     def from_json(jsonstr):
@@ -23,26 +44,24 @@ class DebugMessage:
         from dashmips.debugger import Commands
 
         try:
-            jsonpayload = json.loads(jsonstr)
+            payload = json.loads(jsonstr)
 
-            if 'value' not in jsonpayload or 'command' not in jsonpayload:
+            if 'command' not in payload:
+                # Json doesn't contain all the necessary fields
                 return None
-            if jsonpayload['command'] not in Commands:
+
+            if payload['command'] not in Commands:
                 return None
 
             return DebugMessage(
-                command=jsonpayload['command'],
-                value=jsonpayload['value'],
+                command=payload['command'],
+                message=payload.get('message', ''),
+                program=MipsProgram.from_json(**payload.get('program', {})),
+                error=payload.get('error', False),
+                breakpoints=payload.get('breakpoints', []),
             )
         except json.JSONDecodeError:
             return None
-
-    def to_dict(self):
-        """Debug Message."""
-        return {
-            'command': self.command,
-            'value': self.value
-        }
 
 
 class MipsDebugRequestHandler(StreamRequestHandler):
@@ -59,7 +78,7 @@ class MipsDebugRequestHandler(StreamRequestHandler):
         self.wfile.write(msg_to_send + b'\r\n')
         self.wfile.flush()
 
-    def receive(self):
+    def receive(self) -> DebugMessage:
         """Receive Client Command."""
         return DebugMessage.from_json(self.rfile.readline().strip())
 
@@ -72,17 +91,33 @@ class MipsDebugRequestHandler(StreamRequestHandler):
                     self.respond(BAD_MSG)
                     return
 
-                from dashmips.debugger import Commands
-                resp = Commands[msg.command](self.server.program, msg)
-                if not resp:
-                    self.respond(BYE_MSG)
-                    return
+                if msg.command == 'start':
+                    msg.program = self.server.program
 
-                self.respond(resp.to_dict())
-        finally:
+                from dashmips.debugger import Commands
+                resp = Commands[msg.command](msg)
+
+                if msg.command == 'stop':
+                    self.respond(BYE_MSG)
+                    self.server.shutdown()
+                    self.server.server_close()
+                    exit(0)
+
+                self.respond(asdict(resp))
+        except Exception as ex:
             # Incase of any issues attemp to let client down easy
-            self.respond(ERR_MSG)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            err_msg = json.dumps({
+                'command': 'stop',
+                'message': str(f'{fname}:{exc_tb.tb_lineno} {exc_type} {ex}'),
+                'program': None,
+                'error': True,
+            })
+            self.respond(err_msg)
             # Arbitrarily large bad exit code to signal it was serious
+            self.server.shutdown()
+            self.server.server_close()
             exit(24)
 
 
@@ -102,6 +137,11 @@ class MipsDebugServer(TCPServer):
             bind_and_activate
         )
 
+    def server_bind(self):
+        """Set reusable address opt."""
+        self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        self.socket.bind(self.server_address)
+
 
 def debug_mips(program: MipsProgram):
     """Create a debugging instance of mips."""
@@ -111,3 +151,4 @@ def debug_mips(program: MipsProgram):
             server.serve_forever()
         except KeyboardInterrupt:
             server.shutdown()
+            server.server_close()

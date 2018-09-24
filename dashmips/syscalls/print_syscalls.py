@@ -36,5 +36,4 @@ def print_int(program):
 def _exit(program):
     """Exit MIPS Program."""
     # print('\n--- Program Output End ---\n')
-    print(program.registers.pretty_str())
     exit(program.registers['$a0'])
