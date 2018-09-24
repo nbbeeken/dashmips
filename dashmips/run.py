@@ -40,8 +40,3 @@ def exec_mips(program: MipsProgram):
             # If a instruction didn't explicitly set the PC
             # FIXME: Edge case: jump to label that is the current_pc
             program.registers['pc'] += 1  # What?? not pc + 4?? haha.
-
-
-def debug_mips(labels: Dict[str, Label], code: List[str], registers, memory):
-    """Create a debugging instance of mips."""
-    pass

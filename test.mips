@@ -2,6 +2,24 @@
 
 .text
 
+        # Exit routine - print msg2
+exit:   addi $v0,$zero, 4               # print_string syscall code = 4
+        addi $a0,$zero, msg2
+        syscall
+
+        # Print sum
+        addi $v0,$zero,1                # print_int syscall code = 1
+        addu $a0, $zero, $t2
+        syscall
+
+        # Print newline
+        addi $v0,$zero,4                # print_string syscall code = 4
+        addi $a0,$zero, lf
+        syscall
+        add $a0, $zero, $zero           # new feature! $a0 holds exit_code
+        addi $v0,$zero,10               # exit
+        syscall
+
 main:
         # Print msg1
         addi $v0, $zero, 4              # print_string syscall code = 4
@@ -22,24 +40,6 @@ loop:   addi $t1, $t1, 1    # i = i + 1
         add     $t2, $t2, $t1   # sum = sum + i
         beq     $t0, $t1, exit  # if i = N, continue
         j       loop
-
-        # Exit routine - print msg2
-exit:   addi $v0,$zero, 4               # print_string syscall code = 4
-        addi $a0,$zero, msg2
-        syscall
-
-        # Print sum
-        addi $v0,$zero,1                # print_int syscall code = 1
-        addu $a0, $zero, $t2
-        syscall
-
-        # Print newline
-        addi $v0,$zero,4                # print_string syscall code = 4
-        addi $a0,$zero, lf
-        syscall
-        add $a0, $zero, $zero           # new feature! $a0 holds exit_code
-        addi $v0,$zero,10               # exit
-        syscall
 
 # Start .data segment (data!)
 .data

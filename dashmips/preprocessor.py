@@ -3,19 +3,11 @@ from typing import List, Dict, Any, Tuple
 import re
 import dashmips.mips as mips
 import dashmips.hw as hw
-from dataclasses import dataclass
+from collections import namedtuple
 
-
-@dataclass
-class Label:
-    """Multiprupose human name for data/address."""
-
-    type: str
-    value: int
-    name: str
-
-    text = 'text'
-    data = 'data'
+Label = namedtuple("Label", ('type', 'value', 'name'))
+text_sec_label = 'text'
+data_sec_label = 'data'
 
 
 def preprocess(code: str, memory) -> Tuple[Dict[str, Label], List[str]]:
@@ -89,7 +81,7 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory):
             name = match[1]
             directive = mips.Directives[match[2][1:]]
             address = directive(name, match[3], memory)
-            labels[name] = Label(name=name, value=address, type=Label.data)
+            labels[name] = Label(name=name, value=address, type=data_sec_label)
 
 
 def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
@@ -107,7 +99,7 @@ def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
         match = re.match(f"({mips.RE.LABEL}):", line)
         if match:
             # If there's a label save it to the labels dictionary
-            labels[match[1]] = Label(type=Label.text,
+            labels[match[1]] = Label(type=text_sec_label,
                                      value=(idx - lbl_ct), name=match[1])
             if len(line) > len(match[0]):
                 # If the line is longer than what was matched, lets assume

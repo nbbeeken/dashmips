@@ -2,6 +2,7 @@
 import argparse
 import sys
 import dashmips.run
+import dashmips.debugserver
 import json
 import dashmips.preprocessor
 import dashmips.hw as hw
@@ -19,9 +20,9 @@ def main(args):
     with open(args.FILE) as file:
         rawcode = file.read()
         labels, code = dashmips.preprocessor.preprocess(rawcode, memory)
-        program = MipsProgram(labels, code, memory, registers)
+        program = MipsProgram(args.FILE, labels, code, memory, registers)
         if args.debug:
-            dashmips.run.debug_mips(program)
+            dashmips.debugserver.debug_mips(program)
         else:
             dashmips.run.exec_mips(program)
 

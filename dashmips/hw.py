@@ -81,6 +81,9 @@ class Registers(dict):
              f" hi: {self[33]:02},\n lo: {self[34]:02},")
         return s
 
+    def to_regname_to_val_dict(self):
+        return {name: self[name] for name in regplainname_to_regnum.keys()}
+
 
 class Memory(list):
     """Mips RAM."""
