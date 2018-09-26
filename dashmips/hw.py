@@ -90,7 +90,9 @@ class Memory(list):
 
         if listish is None:
             listish = []
-        remaining_size = (2 * Memory.KIB) - len(list(listish))
+        else:
+            listish = list(listish)
+        remaining_size = (2 * Memory.KIB) - len(listish)
 
         super().__init__([
             *listish,

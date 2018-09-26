@@ -16,11 +16,13 @@ wfile = SOCKET.makefile('w', encoding='utf8', buffering=1)
 
 
 def send(msg):
+    """Send json encoded message."""
     wfile.write(json.dumps(msg) + '\r\n')
     wfile.flush()
 
 
 def recv():
+    """Recv json encoded message."""
     resp = json.loads(rfile.readline().strip())
     return resp
 

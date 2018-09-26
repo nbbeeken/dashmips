@@ -35,5 +35,17 @@ def print_int(program):
 @mips_syscall(10)
 def _exit(program):
     """Exit MIPS Program."""
-    # print('\n--- Program Output End ---\n')
     exit(program.registers['$a0'])
+
+
+@mips_syscall(45)
+def dump_program(program):
+    """Print json format of program."""
+    import json
+    from dataclasses import asdict
+    import base64
+    p = asdict(program)
+    p['memory'] = base64.a85encode(
+        bytes(p['memory']), foldspaces=True
+    ).decode('utf8')
+    print(json.dumps(p, indent=4))

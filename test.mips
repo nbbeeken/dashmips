@@ -16,6 +16,9 @@ exit:   addi $v0,$zero, 4               # print_string syscall code = 4
         addi $v0,$zero,4                # print_string syscall code = 4
         addi $a0,$zero, lf
         syscall
+        add $a0, $zero, $zero           # new feature!
+        addi $v0,$zero,45               # 45 dump json of program state
+        syscall
         add $a0, $zero, $zero           # new feature! $a0 holds exit_code
         addi $v0,$zero,10               # exit
         syscall

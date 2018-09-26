@@ -48,6 +48,7 @@ def preprocess(code: str, memory) -> Tuple[Dict[str, Label], List[str]]:
     data_labels(labels, unprocessed_labels, memory)
     # Second gather the code labels,
     # this also replaces all labels in code with the correct value
+    # TODO: unprocessed_code = psuedo_instruction_expansion(unprocessed_code)
     processed_code = code_labels(labels, unprocessed_code)
 
     return labels, processed_code
@@ -134,3 +135,8 @@ def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
                 text[idx] = line.replace(name, str(label.value))
 
     return text
+
+
+def psuedo_instruction_expansion(text_section: List[str]) -> List[str]:
+    """TODO: Evaluate and expand pseudo instructions."""
+    return text_section  # currently noop
