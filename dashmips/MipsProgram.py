@@ -1,6 +1,6 @@
 """MipsProgram class."""
 from typing import Dict, List
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 
 @dataclass
@@ -32,6 +32,15 @@ class MipsProgram:
             memory=Memory(kwargs['memory']),
             registers=Registers(kwargs['registers']),
         )
+
+    def __iter__(self):
+        """Export basic python dictionary."""
+        import base64
+        p = asdict(self)
+        p['memory'] = base64.a85encode(
+            bytes(p['memory']), foldspaces=True
+        ).decode('utf8')
+        return iter(p.items())
 
 
 class MipsException(Exception):

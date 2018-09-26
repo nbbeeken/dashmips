@@ -2,10 +2,10 @@
 import json
 import sys
 import os
-from typing import Any, List
+from typing import Any, List, Dict
 from socketserver import TCPServer, StreamRequestHandler
 from socket import SOL_SOCKET, SO_REUSEADDR
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 from dashmips.MipsProgram import MipsProgram
 BAD_MSG = json.dumps({
@@ -63,6 +63,10 @@ class DebugMessage:
         except json.JSONDecodeError:
             return None
 
+    def __iter__(self):
+        """Iterate Debug message."""
+        return iter(asdict(self).items())
+
 
 class MipsDebugRequestHandler(StreamRequestHandler):
     """Mips Debug Client Request Handler."""
@@ -103,7 +107,7 @@ class MipsDebugRequestHandler(StreamRequestHandler):
                     self.server.server_close()
                     exit(0)
 
-                self.respond(asdict(resp))
+                self.respond(dict(resp))
         except Exception as ex:
             # Incase of any issues attemp to let client down easy
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -126,11 +130,13 @@ class MipsDebugServer(TCPServer):
 
     def __init__(self,
                  program: MipsProgram,
+                 sourcemap: Dict[int, int],
                  server_address=('localhost', 9999),
                  RequestHandlerClass=MipsDebugRequestHandler,
                  bind_and_activate=True) -> None:
         """Create Mips Debug Server."""
         self.program = program
+        self.sourcemap = sourcemap
         return super().__init__(
             server_address,
             RequestHandlerClass,
@@ -143,9 +149,9 @@ class MipsDebugServer(TCPServer):
         self.socket.bind(self.server_address)
 
 
-def debug_mips(program: MipsProgram):
+def debug_mips(program: MipsProgram, sourcemap: Dict[int, int]):
     """Create a debugging instance of mips."""
-    with MipsDebugServer(program) as server:
+    with MipsDebugServer(program, sourcemap) as server:
         try:
             server.allow_reuse_address = True
             server.serve_forever()

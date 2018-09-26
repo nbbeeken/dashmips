@@ -1,5 +1,5 @@
 """Preprocessor for mips assembly."""
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 import re
 import dashmips.mips as mips
 import dashmips.hw as hw
@@ -14,32 +14,34 @@ class Label:
     value: int
     name: str
 
-text_sec_label = 'text'
-data_sec_label = 'data'
+
+lbldict = Dict[str, Label]
 
 
-def preprocess(code: str, memory) -> Tuple[Dict[str, Label], List[str]]:
+def preprocess(code: str, memory) -> Tuple[lbldict, List[str], Dict[int, int]]:
     """
     Prepare Mips for running.
 
     Breaks the code into directive and text sections.
     """
-    # Clean out comments and empty lines
-    linesofcode: List[str] = list(
-        # Listify
-        map(lambda line: ' '.join(line.split()),
-            # make every white space just one space
-            filter(lambda line: line != '',
-                   # drop lines that are empty
-                   map(lambda line: re.sub(mips.RE.COMMENT, '', line).strip(),
-                       # remove comments
-                       code.splitlines()
-                       )
-                   )
-            )
+    linenumbers = list(enumerate(code.splitlines()))
+    # remove comments
+    nocomments = map(
+        lambda ln: (ln[0] + 1, re.sub(mips.RE.COMMENT, '', ln[1]).strip()),
+        linenumbers
     )
+    # drop lines that are empty
+    noemptylines = filter(
+        lambda ln: ln[1] != '',
+        nocomments
+    )
+    # make every white space just one space
+    linesofcode: List[Tuple[int, str]] = list(map(
+        lambda ln: (ln[0], ' '.join(ln[1].split())),
+        noemptylines
+    ))
 
-    labels: Dict[str, Label] = {}
+    labels: lbldict = {}
 
     # Gather .data/.text sections into seperate lists
     unprocessed_labels, unprocessed_code = split_to_sections(linesofcode)
@@ -48,36 +50,48 @@ def preprocess(code: str, memory) -> Tuple[Dict[str, Label], List[str]]:
     data_labels(labels, unprocessed_labels, memory)
     # Second gather the code labels,
     # this also replaces all labels in code with the correct value
-    # TODO: unprocessed_code = psuedo_instruction_expansion(unprocessed_code)
     processed_code = code_labels(labels, unprocessed_code)
 
-    return labels, processed_code
+    nl_to_ol = {
+        nl: ol[0]
+        for nl, ol in enumerate(processed_code)
+    }
+
+    return labels, [line[1] for line in processed_code], nl_to_ol
 
 
-def split_to_sections(code) -> Tuple[List[str], List[str]]:
+sectionsType = Tuple[List[str], List[Tuple[int, str]]]
+
+
+def split_to_sections(code: List[Tuple[int, str]]) -> sectionsType:
     """
     Handle file with mixed sections.
 
     .text and .data sections can come in any order.
     """
-    if code[0] in [mips.RE.DATA_SEC, mips.RE.TEXT_SEC]:
-        section = code[0]
-    else:
-        section = None
+    section: Optional[str] = None
+    if code[0][1] in [mips.RE.DATA_SEC, mips.RE.TEXT_SEC]:
+        section = code[0][1]
 
-    if not section:
+    if section is None:
         raise Exception("first line must be .text/.data")
 
     sections: Dict[str, Any] = {mips.RE.DATA_SEC: [], mips.RE.TEXT_SEC: []}
-    for line in code:
+    for lineno, line in code:
         if line not in [mips.RE.DATA_SEC, mips.RE.TEXT_SEC]:
-            sections[section].append(line)
+            if section == mips.RE.DATA_SEC:
+                sections[section].append(line)  # Discard line number
+                continue
+            if section == mips.RE.TEXT_SEC:
+                sections[section].append((lineno, line))  # Save og line number
+                continue
         else:
             section = line
+
     return sections[mips.RE.DATA_SEC], sections[mips.RE.TEXT_SEC]
 
 
-def data_labels(labels: Dict[str, Label], data_sec: List[str], memory):
+def data_labels(labels: lbldict, data_sec: List[str], memory):
     """
     Construct the .data section to spec.
 
@@ -90,10 +104,17 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory):
             name = match[1]
             directive = mips.Directives[match[2][1:]]
             address = directive(name, match[3], memory)
-            labels[name] = Label(name=name, value=address, type=data_sec_label)
+            labels[name] = Label(
+                name=name,
+                value=address,
+                type=mips.RE.DATA_SEC
+            )
 
 
-def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
+def code_labels(
+    labels: lbldict,
+    text_sec: List[Tuple[int, str]]
+) -> List[Tuple[int, str]]:
     """
     Construct the .text section to spec.
 
@@ -103,18 +124,22 @@ def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
 
     text = []
     lbl_ct = 0
-    for idx, line in enumerate(text_sec):
+    for idx, linenotpl in enumerate(text_sec):
+        lineno, line = linenotpl
         # For each line in the stipped text section, check for label
         match = re.match(f"({mips.RE.LABEL}):", line)
         if match:
             # If there's a label save it to the labels dictionary
-            labels[match[1]] = Label(type=text_sec_label,
-                                     value=(idx - lbl_ct), name=match[1])
+            labels[match[1]] = Label(
+                type=mips.RE.TEXT_SEC,
+                value=(idx - lbl_ct),
+                name=match[1]
+            )
             if len(line) > len(match[0]):
                 # If the line is longer than what was matched, lets assume
                 # the rest is an instruction (comments and whitespace should
                 # already have been stripped) we cut out the label
-                text.append(line[len(match[0]):].strip())
+                text.append((lineno, line[len(match[0]):].strip()))
             else:
                 # To offset the previously removed label lines
                 lbl_ct += 1
@@ -124,19 +149,15 @@ def code_labels(labels: Dict[str, Label], text_sec: List[str]) -> List[str]:
                 print(f'Error line {idx}: "{instruction}" invalid')
                 exit(1)
             # Otherwise save the line as is
-            text.append(line)
+            text.append((lineno, line))
 
     # Converting in code labels to values
-    for idx, line in enumerate(text):
+    for idx, linenotpl in enumerate(text):
+        lineno, line = linenotpl
         for name, label in labels.items():
             # For each label modify the string so that the
             # label is replaced with the value
             if name in line:
-                text[idx] = line.replace(name, str(label.value))
+                text[idx] = (lineno, line.replace(name, str(label.value)))
 
     return text
-
-
-def psuedo_instruction_expansion(text_section: List[str]) -> List[str]:
-    """TODO: Evaluate and expand pseudo instructions."""
-    return text_section  # currently noop
