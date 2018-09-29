@@ -1,8 +1,9 @@
 """Mips Debugger."""
 import re
-from dashmips.instructions import Instructions
 from typing import Dict, Callable, Optional
+
 from dashmips.debugserver import DebugMessage
+from dashmips.instructions import Instructions
 
 
 def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
@@ -11,21 +12,16 @@ def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
     return msg
 
 
-def debug_stop(msg: DebugMessage) -> DebugMessage:
-    """Debug stop."""
-    return msg
-
-
 def debug_step(msg: DebugMessage) -> DebugMessage:
     """Debug step."""
     current_pc = msg.program.registers['pc']
-    if len(msg.program.code) < current_pc:
+    if len(msg.program.source) < current_pc:
         # We jumped or executed beyond available text
-        msg.message = 'pc is greater than len(code)'
+        msg.message = 'pc is greater than len(source)'
         msg.error = True
         return msg
 
-    lineofcode = msg.program.code[current_pc]  # Current line of execution
+    lineofcode = msg.program.source[current_pc].line  # Current line of execution
     instruction = lineofcode.split(' ')[0]  # Grab the instruction name
 
     instruction_fn = Instructions[instruction]  # relevant Instruction()
@@ -44,22 +40,8 @@ def debug_step(msg: DebugMessage) -> DebugMessage:
     return msg
 
 
-def debug_setbreakpoints(msg: DebugMessage) -> DebugMessage:
-    """Debug setbreakpoint."""
-    msg.message = 'Not Implemented'
-    msg.error = True
-    return msg
-
-
 def debug_continue(msg: DebugMessage) -> DebugMessage:
     """Debug continue."""
-    msg.message = 'Not Implemented'
-    msg.error = True
-    return msg
-
-
-def debug_lines(msg: DebugMessage) -> DebugMessage:
-    """Debug lines."""
     msg.message = 'Not Implemented'
     msg.error = True
     return msg
@@ -81,10 +63,8 @@ def debug_restart(msg: DebugMessage) -> DebugMessage:
 
 Commands: Dict[str, Callable] = {
     'start': debug_start,
-    'stop': debug_stop,
     'restart': debug_restart,
     'step': debug_step,
     'stepreverse': debug_stepreverse,
-    'setbreakpoints': debug_setbreakpoints,
     'continue': debug_continue,
 }

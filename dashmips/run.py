@@ -1,28 +1,20 @@
 """MIPS Runner."""
-from typing import List, Dict, Any
 import re
 
-from dashmips.MipsProgram import MipsProgram, MipsException
-
-import dashmips.mips as mips
-import dashmips.hw as hw
 from dashmips.instructions import Instructions
-
-from dashmips.preprocessor import Label
-
-from pprint import pprint
+from dashmips.preprocessor import MipsProgram
 
 
-def exec_mips(program: MipsProgram):
+def run(program: MipsProgram):
     """Execute Preprocessed Mips."""
     program.registers['pc'] = program.labels['main'].value
     while True:
         current_pc = program.registers['pc']
-        if len(program.code) < current_pc:
+        if len(program.source) < current_pc:
             # We jumped or executed beyond available text
-            raise MipsException(f'Bad pc value {current_pc}')
+            raise Exception(f'Bad pc value {current_pc}')
 
-        lineofcode = program.code[current_pc]  # Current line of execution
+        lineofcode = program.source[current_pc].line  # line to execute
         instruction = lineofcode.split(' ')[0]  # Grab the instruction name
 
         instruction_fn = Instructions[instruction]  # relevant Instruction()
@@ -34,4 +26,4 @@ def exec_mips(program: MipsProgram):
             instruction_fn(program, args)
         else:
             # Bad arguments to instruction
-            raise MipsException(f"{lineofcode} is malformed for {instruction}")
+            raise Exception(f"{lineofcode} is malformed for {instruction}")

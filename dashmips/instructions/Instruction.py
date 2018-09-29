@@ -1,7 +1,8 @@
 """Instruction class."""
 from typing import Callable, Any, Iterable, Match
-from dashmips.MipsProgram import MipsProgram
+
 import dashmips.mips as mips
+from dashmips.preprocessor import MipsProgram
 
 
 class Instruction:

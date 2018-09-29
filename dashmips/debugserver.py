@@ -1,13 +1,14 @@
 """Mips Debug Server."""
 import json
-import sys
 import os
-from typing import Any, List, Dict
-from socketserver import TCPServer, StreamRequestHandler
+import sys
+from dataclasses import dataclass, field, asdict
 from socket import SOL_SOCKET, SO_REUSEADDR
-from dataclasses import dataclass
+from socketserver import TCPServer, StreamRequestHandler
+from typing import List, Optional
 
-from dashmips.MipsProgram import MipsProgram
+from dashmips.preprocessor import MipsProgram
+
 BAD_MSG = json.dumps({
     'command': 'stop',
     'message': 'malformed message',
@@ -20,12 +21,6 @@ ERR_MSG = json.dumps({
     'program': None,
     'error': True,
 })
-BYE_MSG = json.dumps({
-    'command': 'stop',
-    'message': 'end debug session',
-    'program': None,
-    'error': False
-})
 
 
 @dataclass
@@ -33,88 +28,72 @@ class DebugMessage:
     """Format for debug messages."""
 
     command: str
-    message: str
     program: MipsProgram
-    breakpoints: List[int]
+    breakpoints: List[int] = field(default_factory=list)
+    message: str = ''
     error: bool = False
 
+    def dumps(self):
+        """Dump Json formatted Debug message"""
+        msg = asdict(self)
+        return json.dumps(msg)
+
     @staticmethod
-    def from_json(jsonstr):
+    def loads(string):
         """Deserialize from json to DebugMessage."""
         from dashmips.debugger import Commands
-
         try:
-            payload = json.loads(jsonstr)
+            payload = json.loads(string)
 
-            if 'command' not in payload:
-                # Json doesn't contain all the necessary fields
+            if ('command' not in payload and
+                    payload['command'] not in Commands):
+                # Json doesn't contain a valid command nor program
                 return None
 
-            if payload['command'] not in Commands:
-                return None
-
-            return DebugMessage(
-                command=payload['command'],
-                message=payload.get('message', ''),
-                program=MipsProgram.from_json(**payload.get('program', {})),
-                error=payload.get('error', False),
-                breakpoints=payload.get('breakpoints', []),
-            )
+            if 'program' in payload:
+                payload['program'] = MipsProgram(
+                    **MipsProgram.from_dict(payload.get('program', {}))
+                )
+            else:
+                payload['program'] = None  # command stop doesn't need a program
+            return DebugMessage(**payload)
         except json.JSONDecodeError:
             return None
-
-    def __iter__(self):
-        """Iterate Debug message."""
-        return iter(asdict(self).items())
 
 
 class MipsDebugRequestHandler(StreamRequestHandler):
     """Mips Debug Client Request Handler."""
 
-    def respond(self, msg):
+    def respond(self, msg: DebugMessage):
         """Send response."""
-        msg_to_send = msg
-        if type(msg) is str:
-            msg_to_send = msg.encode('utf8')
-        elif type(msg) is dict:
-            msg_to_send = json.dumps(msg).encode('utf8')
-
-        self.wfile.write(msg_to_send + b'\r\n')
+        msg_to_send = msg.dumps().encode('utf8')
+        self.wfile.write(msg_to_send + b'\r\n\r\n')
         self.wfile.flush()
 
-    def receive(self) -> DebugMessage:
+    def receive(self) -> Optional[DebugMessage]:
         """Receive Client Command."""
-        return DebugMessage.from_json(self.rfile.readline().strip())
+        return DebugMessage.loads(self.rfile.readline().strip())
 
     def handle(self):
         """Handle Client Req."""
+        from dashmips.debugger import Commands
         try:
-            while True:
-                msg = self.receive()
-                if not msg:
-                    self.respond(BAD_MSG)
-                    return
 
-                if msg.command == 'start':
-                    msg.program = self.server.program
+            msg = self.receive()
+            if msg is None:
+                self.respond(BAD_MSG)
+                return  # End this party now
+            self.respond(Commands[msg.command](msg))
 
-                from dashmips.debugger import Commands
-                resp = Commands[msg.command](msg)
-
-                if msg.command == 'stop':
-                    self.respond(BYE_MSG)
-                    self.server.shutdown()
-                    self.server.server_close()
-                    exit(0)
-
-                self.respond(dict(resp))
         except Exception as ex:
-            # Incase of any issues attemp to let client down easy
+            # In case of any issues attempt to let client down easy
+            # Exceptions only occur in errors of this program
+            # they should not occur b/c of any bad input
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            err_msg = json.dumps({
+            err_msg = DebugMessage(**{
                 'command': 'stop',
-                'message': str(f'{fname}:{exc_tb.tb_lineno} {exc_type} {ex}'),
+                'message': f'{fname}:{exc_tb.tb_lineno} {exc_type} {ex}',
                 'program': None,
                 'error': True,
             })
@@ -129,15 +108,11 @@ class MipsDebugServer(TCPServer):
     """Mips Debug Server."""
 
     def __init__(self,
-                 program: MipsProgram,
-                 sourcemap: Dict[int, int],
                  server_address=('localhost', 9999),
                  RequestHandlerClass=MipsDebugRequestHandler,
                  bind_and_activate=True) -> None:
         """Create Mips Debug Server."""
-        self.program = program
-        self.sourcemap = sourcemap
-        return super().__init__(
+        super().__init__(
             server_address,
             RequestHandlerClass,
             bind_and_activate
@@ -149,9 +124,9 @@ class MipsDebugServer(TCPServer):
         self.socket.bind(self.server_address)
 
 
-def debug_mips(program: MipsProgram, sourcemap: Dict[int, int]):
+def debug_mips(host='localhost', port=9999):
     """Create a debugging instance of mips."""
-    with MipsDebugServer(program, sourcemap) as server:
+    with MipsDebugServer(server_address=(host, port)) as server:
         try:
             server.allow_reuse_address = True
             server.serve_forever()

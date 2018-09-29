@@ -1,6 +1,5 @@
 """Derective handling."""
-from typing import Tuple, Any
-from dashmips.hw import Memory
+from dashmips.hardware import Memory
 
 
 def align(name: str, data: str, memory: Memory):

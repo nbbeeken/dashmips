@@ -1,9 +1,9 @@
 """Mips Management."""
-from typing import List, Dict, Callable, Any, Tuple
 import inspect
+from typing import Dict, Callable, Any
 
 import dashmips.directives as directives
-from dashmips.hw import Memory
+from dashmips.hardware import Memory
 
 Directives: Dict[str, Callable[[str, Any, Memory], int]] = {
     directive: fn

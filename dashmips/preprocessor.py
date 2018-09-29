@@ -1,9 +1,20 @@
 """Preprocessor for mips assembly."""
-from typing import List, Dict, Any, Tuple, Optional
+import json
 import re
+from dataclasses import dataclass, field, asdict
+from typing import List, Dict, Any, Tuple, Optional, TextIO
+
 import dashmips.mips as mips
-import dashmips.hw as hw
-from dataclasses import dataclass
+from dashmips.hardware import Memory, Registers
+
+
+@dataclass
+class SourceLine:
+    """Mips Preprocessor Label."""
+
+    filename: str
+    lineno: int
+    line: str
 
 
 @dataclass
@@ -15,15 +26,60 @@ class Label:
     name: str
 
 
-lbldict = Dict[str, Label]
+@dataclass
+class MipsProgram:
+    """All data associated with a mips program."""
+
+    name: str
+    labels: Dict[str, Label]
+    source: List[SourceLine]
+    memory: Memory = field(default_factory=Memory)
+    registers: Registers = field(default_factory=Registers)
+
+    def dump(self, fp, **kwargs):
+        json.dump(self, fp, cls=MipsProgram.Encoder, **kwargs)
+
+    def dumps(self, **kwargs):
+        return json.dumps(self, cls=MipsProgram.Encoder, **kwargs)
+
+    @staticmethod
+    def from_dict(prg) -> dict:
+        prg['memory'] = Memory(prg['memory'])
+        prg['registers'] = Registers(prg['registers'])
+        prg['labels'] = {ln: Label(**l) for ln, l in prg['labels'].items()}
+        prg['source'] = [SourceLine(**m) for m in prg['source']]
+        return prg
+
+    @staticmethod
+    def load(fp):
+        prg = MipsProgram.from_dict(json.load(fp))
+        return MipsProgram(**prg)
+
+    @staticmethod
+    def loads(string):
+        prg = MipsProgram.from_dict(json.loads(string))
+        return MipsProgram(**prg)
+
+    class Encoder(json.JSONEncoder):
+        """JSONEncoder for MipsProgram."""
+
+        def default(self, obj):
+            """Object encoder."""
+            if isinstance(obj, MipsProgram):
+                p = asdict(obj)
+                p['memory'] = p['memory'].encoded_str()
+                return p
+            return json.JSONEncoder.default(self, obj)
 
 
-def preprocess(code: str, memory) -> Tuple[lbldict, List[str], Dict[int, int]]:
+def preprocess(file: TextIO) -> MipsProgram:
     """
     Prepare Mips for running.
 
     Breaks the code into directive and text sections.
     """
+    memory = Memory()
+    code = file.read()
     linenumbers = list(enumerate(code.splitlines()))
     # remove comments
     nocomments = map(
@@ -41,7 +97,7 @@ def preprocess(code: str, memory) -> Tuple[lbldict, List[str], Dict[int, int]]:
         noemptylines
     ))
 
-    labels: lbldict = {}
+    labels: Dict[str, Label] = {}
 
     # Gather .data/.text sections into seperate lists
     unprocessed_labels, unprocessed_code = split_to_sections(linesofcode)
@@ -52,12 +108,19 @@ def preprocess(code: str, memory) -> Tuple[lbldict, List[str], Dict[int, int]]:
     # this also replaces all labels in code with the correct value
     processed_code = code_labels(labels, unprocessed_code)
 
-    nl_to_ol = {
-        nl: ol[0]
-        for nl, ol in enumerate(processed_code)
-    }
+    source = [
+        SourceLine(file.name, lineno=ol[0], line=ol[1]) for ol in processed_code
+    ]
 
-    return labels, [line[1] for line in processed_code], nl_to_ol
+    assert 'main' in labels
+
+    return MipsProgram(
+        name=file.name,
+        labels=labels,
+        memory=memory,
+        source=source,
+        registers=Registers({'pc': labels['main'].value}),
+    )
 
 
 sectionsType = Tuple[List[str], List[Tuple[int, str]]]
@@ -91,7 +154,7 @@ def split_to_sections(code: List[Tuple[int, str]]) -> sectionsType:
     return sections[mips.RE.DATA_SEC], sections[mips.RE.TEXT_SEC]
 
 
-def data_labels(labels: lbldict, data_sec: List[str], memory):
+def data_labels(labels: Dict[str, Label], data_sec: List[str], memory):
     """
     Construct the .data section to spec.
 
@@ -112,7 +175,7 @@ def data_labels(labels: lbldict, data_sec: List[str], memory):
 
 
 def code_labels(
-    labels: lbldict,
+    labels: Dict[str, Label],
     text_sec: List[Tuple[int, str]]
 ) -> List[Tuple[int, str]]:
     """

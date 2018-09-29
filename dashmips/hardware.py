@@ -1,4 +1,5 @@
 """Mips Hardware."""
+from base64 import a85encode, a85decode
 from typing import Dict, Union
 
 names_enum = tuple(enumerate((
@@ -62,10 +63,11 @@ class Registers(dict):
         """
         return super().__getitem__(RegisterResolve[key])
 
-    def update(self, d):
+    def update(self, d, **kwargs):
         """Resolve register names before calling dict update."""
+        d.update(kwargs)
         remap = {
-            RegisterResolve[key]: v
+            RegisterResolve[k]: v
             for k, v in d.items()
         }
         return super().update(remap)
@@ -87,8 +89,9 @@ class Memory(list):
     def __init__(self, listish=None):
         """Create 2KB of MIPS RAM."""
         self._freespace = 0x4
-
-        if listish is None:
+        if isinstance(listish, bytes) or isinstance(listish, str):
+            listish = list(a85decode(listish, foldspaces=True))
+        elif listish is None:
             listish = []
         else:
             listish = list(listish)
@@ -134,3 +137,7 @@ class Memory(list):
         old_freespace = self._freespace
         self._freespace += size
         return old_freespace
+
+    def encoded_str(self):
+        """Base85 encoding of memory."""
+        return a85encode(bytes(self), foldspaces=True).decode('utf8')
