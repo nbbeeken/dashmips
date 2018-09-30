@@ -89,9 +89,9 @@ class Memory(list):
     def __init__(self, listish=None):
         """Create 2KB of MIPS RAM."""
         self._freespace = 0x4
-        if isinstance(listish, bytes) or isinstance(listish, str):
-            listish = list(a85decode(listish, foldspaces=True))
-        elif listish is None:
+        # if isinstance(listish, bytes) or isinstance(listish, str):
+        #     listish = list(a85decode(listish, foldspaces=True))
+        if listish is None:
             listish = []
         else:
             listish = list(listish)
@@ -105,7 +105,8 @@ class Memory(list):
     def __setitem__(self, key, value):
         """Bounds checking on access."""
         if 0x0 == key <= 0x3:
-            raise Exception('NULL-ish pointer')
+            from dashmips.mips import MipsException
+            raise MipsException('NULL-ish pointer')
         try:
             for idx, val in enumerate(value):
                 # val &= 0xFF
@@ -116,7 +117,7 @@ class Memory(list):
             return super().__setitem__(key, value)
 
     def __repr__(self):
-        """Compated Memory string."""
+        """Compacted Memory string."""
         s = '['
         zero_ct = 0
         for v in self:
@@ -138,6 +139,6 @@ class Memory(list):
         self._freespace += size
         return old_freespace
 
-    def encoded_str(self):
-        """Base85 encoding of memory."""
-        return a85encode(bytes(self), foldspaces=True).decode('utf8')
+    # def encoded_str(self):
+    #     """Base85 encoding of memory."""
+    #     return a85encode(bytes(self), foldspaces=True).decode('utf8')

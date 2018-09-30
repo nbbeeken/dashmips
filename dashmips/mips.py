@@ -5,6 +5,15 @@ from typing import Dict, Callable, Any
 import dashmips.directives as directives
 from dashmips.hardware import Memory
 
+
+class MipsException(Exception):
+    """Mips related errors"""
+
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
+
+
 Directives: Dict[str, Callable[[str, Any, Memory], int]] = {
     directive: fn
     for directive, fn in

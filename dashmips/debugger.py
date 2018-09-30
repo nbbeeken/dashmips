@@ -3,7 +3,8 @@ import re
 from typing import Dict, Callable, Optional
 
 from dashmips.debugserver import DebugMessage
-from dashmips.instructions import Instructions
+from dashmips.run import next_instruction, run
+from dashmips.mips import MipsException
 
 
 def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
@@ -14,57 +15,40 @@ def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
 
 def debug_step(msg: DebugMessage) -> DebugMessage:
     """Debug step."""
-    current_pc = msg.program.registers['pc']
-    if len(msg.program.source) < current_pc:
-        # We jumped or executed beyond available text
-        msg.message = 'pc is greater than len(source)'
+    try:
+        next_instruction(msg.program)
+        # TODO: Should be doing something with breakpoints here
+    except MipsException as exc:
         msg.error = True
-        return msg
-
-    lineofcode = msg.program.source[current_pc].line  # Current line of execution
-    instruction = lineofcode.split(' ')[0]  # Grab the instruction name
-
-    instruction_fn = Instructions[instruction]  # relevant Instruction()
-
-    match = re.match(instruction_fn.regex, lineofcode)
-    if match:
-        # Instruction has the correct format
-        args = instruction_fn.parser(match)
-        instruction_fn(msg.program, args)
-    else:
-        # Bad arguments to instruction
-        msg.message = f"{lineofcode} is malformed for {instruction}"
-        msg.error = True
-        return msg
+        msg.message = exc.message
 
     return msg
 
 
 def debug_continue(msg: DebugMessage) -> DebugMessage:
     """Debug continue."""
-    msg.message = 'Not Implemented'
-    msg.error = True
-    return msg
+    starting_pc = msg.program.registers['pc']
 
+    def breaking_condition(program):
+        nonlocal starting_pc
+        if program.registers['pc'] == starting_pc:
+            # current instruction will execute even if on breakpoint
+            # b/c we would have broken on it last time.
+            return True
+        if program.registers['pc'] in msg.breakpoints:
+            return False
+        return True
+    try:
+        run(msg.program, breaking_condition)
+    except MipsException as exc:
+        msg.error = True
+        msg.message = exc.message
 
-def debug_stepreverse(msg: DebugMessage) -> DebugMessage:
-    """Debug stepreverse."""
-    msg.message = 'Not Implemented'
-    msg.error = True
-    return msg
-
-
-def debug_restart(msg: DebugMessage) -> DebugMessage:
-    """Debug restart."""
-    msg.message = 'Not Implemented'
-    msg.error = True
     return msg
 
 
 Commands: Dict[str, Callable] = {
     'start': debug_start,
-    'restart': debug_restart,
     'step': debug_step,
-    'stepreverse': debug_stepreverse,
     'continue': debug_continue,
 }

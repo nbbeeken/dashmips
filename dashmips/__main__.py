@@ -1,15 +1,18 @@
 """dashmips program."""
+import json
 from dashmips.preprocessor import preprocess, MipsProgram
 from dashmips.debugserver import debug_mips
+
 
 def main_compile(args):
     """Compile/Exec mips code."""
     program = preprocess(args.FILE)
     if args.out:
-        program.dump(args.out)
+        json.dump(dict(program), args.out)
 
     if args.json:
-        print(program.dumps(), end='\r\n\r\n')  # Ending matches socket comm
+        # Ending matches socket communication
+        print(json.dumps(dict(program)), end='\r\n\r\n')
 
     if args.run:
         from dashmips.run import run
@@ -23,10 +26,13 @@ def main_debug(args):
     debug_mips(host=args.host, port=args.port)
 
 
-if __name__ == "__main__":
+def main():
+    """Entry function for Dashmips."""
     import argparse
     import sys
     parser = argparse.ArgumentParser('dashmips')
+
+    parser.add_argument('-v', '--version', action='version', version='0.0.1')
 
     sbp = parser.add_subparsers(title='commands', dest='command', required=True)
     compileparse = sbp.add_parser('compile', aliases=['c'])
@@ -52,9 +58,13 @@ if __name__ == "__main__":
         '-p', '--port', type=int, default=9999, help='run debugger on port'
     )
     debugparse.add_argument(
-        '-i', '--host', default='localhost', help='run debugger on host'
+        '-i', '--host', default='0.0.0.0', help='run debugger on host'
     )
     debugparse.set_defaults(func=main_debug)
 
     prog_args = parser.parse_args()
     sys.exit(prog_args.func(prog_args))
+
+
+if __name__ == "__main__":
+    main()

@@ -4,6 +4,7 @@ import re
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Any, Tuple, Optional, TextIO
 
+from dashmips.mips import MipsException
 import dashmips.mips as mips
 from dashmips.hardware import Memory, Registers
 
@@ -36,40 +37,18 @@ class MipsProgram:
     memory: Memory = field(default_factory=Memory)
     registers: Registers = field(default_factory=Registers)
 
-    def dump(self, fp, **kwargs):
-        json.dump(self, fp, cls=MipsProgram.Encoder, **kwargs)
-
-    def dumps(self, **kwargs):
-        return json.dumps(self, cls=MipsProgram.Encoder, **kwargs)
-
     @staticmethod
-    def from_dict(prg) -> dict:
+    def from_dict(prg) -> 'MipsProgram':
+        """From Basic dictionary to MipsProgram."""
         prg['memory'] = Memory(prg['memory'])
         prg['registers'] = Registers(prg['registers'])
         prg['labels'] = {ln: Label(**l) for ln, l in prg['labels'].items()}
         prg['source'] = [SourceLine(**m) for m in prg['source']]
-        return prg
-
-    @staticmethod
-    def load(fp):
-        prg = MipsProgram.from_dict(json.load(fp))
         return MipsProgram(**prg)
 
-    @staticmethod
-    def loads(string):
-        prg = MipsProgram.from_dict(json.loads(string))
-        return MipsProgram(**prg)
-
-    class Encoder(json.JSONEncoder):
-        """JSONEncoder for MipsProgram."""
-
-        def default(self, obj):
-            """Object encoder."""
-            if isinstance(obj, MipsProgram):
-                p = asdict(obj)
-                p['memory'] = p['memory'].encoded_str()
-                return p
-            return json.JSONEncoder.default(self, obj)
+    def __iter__(self):
+        """Two item iterable for dictionary making."""
+        return iter(asdict(self).items())
 
 
 def preprocess(file: TextIO) -> MipsProgram:
@@ -137,7 +116,7 @@ def split_to_sections(code: List[Tuple[int, str]]) -> sectionsType:
         section = code[0][1]
 
     if section is None:
-        raise Exception("first line must be .text/.data")
+        raise MipsException("first line must be .text/.data")
 
     sections: Dict[str, Any] = {mips.RE.DATA_SEC: [], mips.RE.TEXT_SEC: []}
     for lineno, line in code:
