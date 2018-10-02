@@ -39,7 +39,6 @@ def _exit(program):
     sys.exit(program.registers['$a0'])
 
 
-
 @mips_syscall(45)
 def dump_program(program):
     """Print json format of program."""

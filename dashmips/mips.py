@@ -7,9 +7,10 @@ from dashmips.hardware import Memory
 
 
 class MipsException(Exception):
-    """Mips related errors"""
+    """Mips related errors."""
 
     def __init__(self, message):
+        """Create MipsException."""
         super().__init__(message)
         self.message = message
 

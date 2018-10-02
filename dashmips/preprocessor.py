@@ -88,7 +88,8 @@ def preprocess(file: TextIO) -> MipsProgram:
     processed_code = code_labels(labels, unprocessed_code)
 
     source = [
-        SourceLine(file.name, lineno=ol[0], line=ol[1]) for ol in processed_code
+        SourceLine(file.name, lineno=ol[0], line=ol[1])
+        for ol in processed_code
     ]
 
     assert 'main' in labels

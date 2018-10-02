@@ -21,10 +21,12 @@ class DebugMessage:
     error: bool = False
 
     def __post_init__(self):
+        """Ensure unique breakpoints."""
         # set to remove duplicates and sort
         self.breakpoints = sorted(set(self.breakpoints))
 
     def __iter__(self):
+        """Make DebugMessage castable to dict."""
         return iter(asdict(self).items())
 
     @staticmethod
@@ -54,7 +56,8 @@ class MipsDebugRequestHandler(StreamRequestHandler):
         msg_to_send = json.dumps(dict(msg)).encode('utf8')
         self.wfile.write(msg_to_send + b'\r\n\r\n')
         self.wfile.flush()
-        print(f"{self.client_address}: Respond {msg}")
+        if self.server.log:
+            print(f"{self.client_address}: Respond {msg}")
 
     def receive(self) -> Optional[DebugMessage]:
         """Receive Client Command."""
@@ -62,7 +65,8 @@ class MipsDebugRequestHandler(StreamRequestHandler):
             msg = DebugMessage.from_dict(
                 json.loads(self.rfile.readline().strip())
             )
-            print(f"{self.client_address}: Receive {msg}")
+            if self.server.log:
+                print(f"{self.client_address}: Receive {msg}")
             return msg
         except json.JSONDecodeError:
             return None
@@ -71,7 +75,8 @@ class MipsDebugRequestHandler(StreamRequestHandler):
         """Handle Client Req."""
         from dashmips.debugger import Commands
         try:
-            print(f"{self.client_address}: Connected")
+            if self.server.log:
+                print(f"{self.client_address}: Connected")
             msg = self.receive()
             if msg is None:
                 self.respond(DebugMessage(**{
@@ -111,16 +116,19 @@ class MipsDebugServer(TCPServer):
 
     def __init__(self,
                  server_address=('0.0.0.0', 9999),
+                 log=False,
                  RequestHandlerClass=MipsDebugRequestHandler,
                  bind_and_activate=True) -> None:
         """Create Mips Debug Server."""
         self.allow_reuse_address = True
+        self.log = log
         super().__init__(
             server_address,
             RequestHandlerClass,
             bind_and_activate
         )
-        print(f"Server is listening on {self.socket.getsockname()}")
+        if self.log:
+            print(f"Server is listening on {self.socket.getsockname()}")
 
     def server_bind(self):
         """Set reusable address opt."""
@@ -128,9 +136,9 @@ class MipsDebugServer(TCPServer):
         self.socket.bind(self.server_address)
 
 
-def debug_mips(host='localhost', port=9999):
+def debug_mips(host='localhost', port=9999, log=False):
     """Create a debugging instance of mips."""
-    with MipsDebugServer(server_address=(host, port)) as server:
+    with MipsDebugServer(server_address=(host, port), log=log) as server:
         try:
             server.allow_reuse_address = True
             server.serve_forever()

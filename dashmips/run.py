@@ -13,6 +13,7 @@ def run(program: MipsProgram, runnable=lambda _: True):
 
 
 def next_instruction(program):
+    """Execute One Instruction."""
     current_pc = program.registers['pc']
     if len(program.source) < current_pc:
         # We jumped or executed beyond available text

@@ -23,7 +23,7 @@ def main_compile(args):
 
 def main_debug(args):
     """Start debug server for mips."""
-    debug_mips(host=args.host, port=args.port)
+    debug_mips(host=args.host, port=args.port, log=args.log)
 
 
 def main():
@@ -34,7 +34,9 @@ def main():
 
     parser.add_argument('-v', '--version', action='version', version='0.0.1')
 
-    sbp = parser.add_subparsers(title='commands', dest='command', required=True)
+    sbp = parser.add_subparsers(
+        title='commands', dest='command', required=True
+    )
     compileparse = sbp.add_parser('compile', aliases=['c'])
     debugparse = sbp.add_parser('debug', aliases=['d'])
 
@@ -59,6 +61,10 @@ def main():
     )
     debugparse.add_argument(
         '-i', '--host', default='0.0.0.0', help='run debugger on host'
+    )
+    debugparse.add_argument(
+        '-l', '--log', dest='log',
+        action='store_true', help='Log all network traffic'
     )
     debugparse.set_defaults(func=main_debug)
 
