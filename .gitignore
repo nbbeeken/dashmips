@@ -7,3 +7,5 @@ __pycache__
 test.mips.json
 .idea/
 *.egg-info
+build/
+dist/
