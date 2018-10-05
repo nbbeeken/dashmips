@@ -7,7 +7,7 @@ import json
 from time import sleep
 from pprint import pformat
 
-SERVER = Popen(split("python -m dashmips debug"))
+SERVER = Popen(split("python -m dashmips debug -l"))
 sleep(0.1)  # Should be plenty of time to start and bind
 
 
@@ -73,6 +73,7 @@ class TestMipsDebugServer(unittest.TestCase):
     def stop_debugging(self):
         """Send a proper stop command to the debugger."""
         SERVER.kill()
+
 
 if __name__ == '__main__':
     try:

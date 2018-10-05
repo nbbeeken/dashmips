@@ -12,7 +12,7 @@ def main_compile(args):
 
     if args.json:
         # Ending matches socket communication
-        print(json.dumps(dict(program)), end='\r\n\r\n')
+        print(json.dumps(dict(program)))
 
     if args.run:
         from dashmips.run import run
@@ -23,7 +23,7 @@ def main_compile(args):
 
 def main_debug(args):
     """Start debug server for mips."""
-    debug_mips(host=args.host, port=args.port, log=args.log)
+    debug_mips(host=args.host, port=args.port, should_log=args.log)
 
 
 def main():

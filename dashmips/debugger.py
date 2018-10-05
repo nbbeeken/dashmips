@@ -38,6 +38,7 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
         if program.registers['pc'] in msg.breakpoints:
             return False
         return True
+
     try:
         run(msg.program, breaking_condition)
     except MipsException as exc:
@@ -47,8 +48,13 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
     return msg
 
 
+def debug_stop(msg: DebugMessage) -> DebugMessage:
+    return msg
+
+
 Commands: Dict[str, Callable] = {
     'start': debug_start,
     'step': debug_step,
     'continue': debug_continue,
+    'stop': debug_stop,
 }
