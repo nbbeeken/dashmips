@@ -89,6 +89,7 @@ class DebugServer:
         log.warning("Shutdown", extra={'client': ''})
 
     def find_client(self, fd):
+        """Find client by rfile fd."""
         for c in self.clients:
             if c.rfile.fileno() == fd:
                 return c
@@ -186,6 +187,7 @@ class DebugServer:
             return None
 
     def remove_client(self, client):
+        """Remove client from list."""
         self.clients.remove(client)
         try:
             self.sel.unregister(client.rfile)

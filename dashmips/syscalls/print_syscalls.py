@@ -35,8 +35,8 @@ def print_int(program):
 @mips_syscall(10)
 def _exit(program):
     """Exit MIPS Program."""
-    import sys
-    sys.exit(program.registers['$a0'])
+    # Internal definition of exited program
+    program.registers['pc'] = -1
 
 
 @mips_syscall(45)

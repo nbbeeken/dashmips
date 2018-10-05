@@ -1,5 +1,7 @@
 """Mips Debugger."""
 import re
+import os
+import logging as log
 from typing import Dict, Callable, Optional
 
 from dashmips.debugserver import DebugMessage
@@ -10,6 +12,7 @@ from dashmips.mips import MipsException
 def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
     """Debug start."""
     msg.program.registers['pc'] = msg.program.labels['main'].value
+    msg.message = str(os.getpid())
     return msg
 
 
@@ -18,6 +21,8 @@ def debug_step(msg: DebugMessage) -> DebugMessage:
     try:
         next_instruction(msg.program)
         # TODO: Should be doing something with breakpoints here
+        if msg.program.registers['pc'] == -1:
+            msg.command = 'stop'
     except MipsException as exc:
         msg.error = True
         msg.message = exc.message
@@ -31,16 +36,22 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
 
     def breaking_condition(program):
         nonlocal starting_pc
+        log.info(f"bps: {msg.breakpoints}", extra={'client': ''})
         if program.registers['pc'] == starting_pc:
             # current instruction will execute even if on breakpoint
             # b/c we would have broken on it last time.
             return True
         if program.registers['pc'] in msg.breakpoints:
             return False
+        if program.registers['pc'] == -1:
+            return False
         return True
 
     try:
         run(msg.program, breaking_condition)
+        if msg.program.registers['pc'] == -1:
+            # Exited
+            msg.command = 'stop'
     except MipsException as exc:
         msg.error = True
         msg.message = exc.message
@@ -49,6 +60,7 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
 
 
 def debug_stop(msg: DebugMessage) -> DebugMessage:
+    """Stop messages incoming mean nothing to a server."""
     return msg
 
 

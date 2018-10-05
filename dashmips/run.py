@@ -6,7 +6,7 @@ from dashmips.instructions import Instructions
 from dashmips.preprocessor import MipsProgram
 
 
-def run(program: MipsProgram, runnable=lambda _: True):
+def run(program: MipsProgram, runnable=lambda p: p.registers['pc'] != -1):
     """Execute Preprocessed Mips."""
     while runnable(program):
         next_instruction(program)
