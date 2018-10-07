@@ -10,11 +10,10 @@ lf:     .asciiz "\n"
 # .globl main
 
 main:
-    li      $v0, 4                     # print_string syscall code = 4
+    li      $v0, 0x4                     # print_string syscall code = 4
     la      $a0, msg1
     syscall
     move   $t2, $zero
-    div    $t1, $t2
 
     # Get N from user and save
     li      $v0, 5                     # read_int syscall code = 5
@@ -46,11 +45,11 @@ exit:
     li      $v0, 4                     # print_string syscall code = 4
     la      $a0, lf
     syscall
-    # # Dump JSON
-    # li      $a0, 0                     # new feature!
-    # li      $v0, 45                    # 45 dump json of program state
-    # syscall
+    # Dump JSON
+    li      $a0, 0                     # new feature!
+    li      $v0, '-'                   # ascii 45 dump json of program state
+    syscall
     # Exit program
     li      $a0, 0                     # new feature! $a0 holds exit_code
-    li      $v0, 10                    # exit
+    li      $v0, 0xA                    # exit
     syscall

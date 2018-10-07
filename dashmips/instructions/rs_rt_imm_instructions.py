@@ -1,5 +1,5 @@
 """Two Register and Immediate instructions."""
-from dashmips.instructions import mips_instruction
+from dashmips.instructions import mips_instruction, parse_int
 
 
 PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({number})"
@@ -11,7 +11,7 @@ def parse(arg):
     :param arg:
 
     """
-    return (arg[2], arg[3], int(arg[4]))
+    return (arg[2], arg[3], parse_int(arg[4]))
 
 
 @mips_instruction(PTRN, parse)

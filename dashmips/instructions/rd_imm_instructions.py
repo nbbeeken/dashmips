@@ -1,5 +1,5 @@
 """Instructions that accept a register and immediate as an argument."""
-from dashmips.instructions import mips_instruction
+from dashmips.instructions import mips_instruction, parse_int
 
 PTRN = r"{instr_gap}({register}){args_gap}({number})"
 
@@ -10,7 +10,7 @@ def parse(args):
     :param args:
 
     """
-    return (args[2], int(args[3]))
+    return (args[2], parse_int(args[3]))
 
 
 @mips_instruction(PTRN, parse)

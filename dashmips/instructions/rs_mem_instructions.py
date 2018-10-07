@@ -1,5 +1,5 @@
 """Register and Memory access Instructions."""
-from dashmips.instructions import mips_instruction
+from dashmips.instructions import mips_instruction, parse_int
 
 PTRN = r"{instr_gap}({register}){args_gap}({number}?)\(({register})\)"
 
@@ -10,7 +10,11 @@ def parse(arg):
     :param arg:
 
     """
-    return (arg[2], int(arg[3]), arg[4])
+    offset = 0
+    if args[3]:
+        offset = parse_int(arg[3])
+
+    return (arg[2], offset, arg[4])
 
 
 @mips_instruction(PTRN, parse)

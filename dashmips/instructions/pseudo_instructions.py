@@ -1,5 +1,5 @@
 """Instructions that are not real."""
-from dashmips.instructions import mips_instruction
+from dashmips.instructions import mips_instruction, parse_int
 
 PTRN = r"{instr_gap}({register}){args_gap}({number})"
 
@@ -16,7 +16,7 @@ def la(program, rd, address):
     program.registers[rd] = address
 
 
-@mips_instruction(PTRN, lambda args: (args[2], int(args[3])))
+@mips_instruction(PTRN, lambda args: (args[2], parse_int(args[3])))
 def li(program, rd, number):
     """Load immediate.
 

@@ -28,3 +28,13 @@ def mips_instruction(pattern, parser, label=False):
         return instr
 
     return decorator
+
+
+def parse_int(int_str):
+    """Take a python number literal and returns an int."""
+    arg = eval(int_str)
+    if type(arg) is str:
+        arg = ord(arg)
+    else:
+        arg = int(arg)
+    return arg

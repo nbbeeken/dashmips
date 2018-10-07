@@ -1,5 +1,5 @@
 """Instructions that accept a label as an argument."""
-from dashmips.instructions import mips_instruction
+from dashmips.instructions import mips_instruction, parse_int
 
 PTRN = r"{instr_gap}({number})"
 
@@ -10,7 +10,7 @@ def parse(args):
     :param args:
 
     """
-    return (int(args[2]),)
+    return (parse_int(args[2]),)
 
 
 @mips_instruction(PTRN, parse, label=True)

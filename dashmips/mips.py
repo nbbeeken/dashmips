@@ -38,6 +38,9 @@ class RE:
     INSTRGAP = r"\s+"
     ARGSGAP = r"\s*,\s*"
 
+    # FIXME: Cannot capture '\''
+    ASCII_LITERAL = r"'([\x00-\x7F]|\\[0abfnrt\\ve])'"
+
     DEC = r"\b(?:(?:\+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))\b"
     BIN = r"\b(?:0(?:b|B)(?:_?[0-1])+)\b"
     OCT = r"\b(?:0(?:o|O)(?:_?[0-7])+)\b"
@@ -48,6 +51,7 @@ class RE:
         BIN,
         OCT,
         HEX,
+        ASCII_LITERAL
     ]
 
     NUMBER = "(?:" + "|".join(NUMBERS) + ")"
