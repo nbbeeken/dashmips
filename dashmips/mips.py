@@ -30,7 +30,7 @@ class RE:
 
     REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
                 r"|zero|sp|fp|gp|ra))")
-    LABEL = r"[a-zA-Z_][a-zA-Z0-9_]*"
+    LABEL = r"\b[\w]+\b"
     DIRECTIVE = "\\." + "|\\.".join(Directives.keys())
 
     COMMENT = r"\#.*"
@@ -38,10 +38,10 @@ class RE:
     INSTRGAP = r"\s+"
     ARGSGAP = r"\s*,\s*"
 
-    DEC = "(?:(?:+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))"
-    BIN = "(?:0(?:b|B)(?:_?[0-1])+)"
-    OCT = "(?:0(?:o|O)(?:_?[0-7])+)"
-    HEX = "(?:0(?:x|X)(?:_?([0-9]|[a-f]|[A-F]))+)"
+    DEC = r"\b(?:(?:\+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))\b"
+    BIN = r"\b(?:0(?:b|B)(?:_?[0-1])+)\b"
+    OCT = r"\b(?:0(?:o|O)(?:_?[0-7])+)\b"
+    HEX = r"\b(?:0[xX])(?:_?[0-9a-fA-F])+\b"
 
     NUMBERS = [
         DEC,
@@ -50,7 +50,7 @@ class RE:
         HEX,
     ]
 
-    NUMBER = "(?:\d+)"  # "(?:" + "|".join(RE_NUMBERS) + ")"
+    NUMBER = "(?:" + "|".join(NUMBERS) + ")"
 
     ALL = {
         'register': REGISTER,
