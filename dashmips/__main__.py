@@ -2,6 +2,7 @@
 import json
 from dashmips.preprocessor import preprocess, MipsProgram
 from dashmips.debugserver import debug_mips
+from dashmips.extension import generate_snippets
 
 
 def main_compile(args):
@@ -13,6 +14,10 @@ def main_compile(args):
     if args.json:
         # Ending matches socket communication
         print(json.dumps(dict(program)))
+
+    if args.vscode:
+        snippets = generate_snippets()
+        print(json.dumps(snippets, indent=4))
 
     if args.run:
         from dashmips.run import run
@@ -53,6 +58,9 @@ def main():
     )
     compileparse.add_argument(
         '-j', '--json', action='store_true', help='Output json to stdout'
+    )
+    compileparse.add_argument(
+        '--vscode', action='store_true', help='Output json for vscode'
     )
     compileparse.set_defaults(func=main_compile)
 
