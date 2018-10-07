@@ -16,7 +16,7 @@ class MipsException(Exception):
 
 
 Directives: Dict[str, Callable[[str, Any, Memory], int]] = {
-    directive: fn
+    directive.replace('_', ''): fn
     for directive, fn in
     inspect.getmembers(directives, inspect.isfunction)
 }

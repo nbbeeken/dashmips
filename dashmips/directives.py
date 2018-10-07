@@ -28,7 +28,7 @@ def asciiz(name: str, data: str, memory: Memory):
     return address
 
 
-def ascii(name: str, data: str, memory: Memory):
+def _ascii(name: str, data: str, memory: Memory):
     """Ascii directive.
 
     :param name: str:
@@ -54,96 +54,8 @@ def byte(name: str, data: str, memory: Memory):
     return None
 
 
-def double(name: str, data: str, memory: Memory):
-    """Double directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: Memory:
-
-    """
-    return None
-
-
-def end_macro(name: str, data: str, memory: Memory):
-    """End_macro directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: Memory:
-
-    """
-    return None
-
-
-def eqv(name: str, data: str, memory: Memory):
-    """Eqv directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: Memory:
-
-    """
-    return None
-
-
-def extern(name: str, data: str, memory: Memory):
-    """Extern directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: Memory:
-
-    """
-    return None
-
-
-def globl(name: str, data: str, memory: Memory):
-    """Globl directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: Memory:
-
-    """
-    return None
-
-
 def half(name: str, data: str, memory: Memory):
     """Half directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: Memory:
-
-    """
-    return None
-
-
-def include(name: str, data: str, memory: Memory):
-    """Include directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: Memory:
-
-    """
-    return None
-
-
-def macro(name: str, data: str, memory: Memory):
-    """Macro directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: Memory:
-
-    """
-    return None
-
-
-def set(name: str, data: str, memory: Memory):
-    """Set directive.
 
     :param name: str:
     :param data: str:

@@ -1,6 +1,7 @@
 """Preprocessor for mips assembly."""
 import json
 import re
+import os.path
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Any, Tuple, Optional, TextIO
 
@@ -63,6 +64,7 @@ def preprocess(file: TextIO) -> MipsProgram:
     :param file: TextIO:
 
     """
+    filename = os.path.abspath(file.name)
     memory = Memory()
     code = file.read()
     linenumbers = list(enumerate(code.splitlines()))
@@ -83,6 +85,8 @@ def preprocess(file: TextIO) -> MipsProgram:
     ))
 
     labels: Dict[str, Label] = {}
+    # Collect Preproccessor Directives.
+    # eqvs = preprocessor_directives(linesofcode)
 
     # Gather .data/.text sections into seperate lists
     unprocessed_labels, unprocessed_code = split_to_sections(linesofcode)
@@ -94,14 +98,14 @@ def preprocess(file: TextIO) -> MipsProgram:
     processed_code = code_labels(labels, unprocessed_code)
 
     source = [
-        SourceLine(file.name, lineno=ol[0], line=ol[1])
+        SourceLine(filename, lineno=ol[0], line=ol[1])
         for ol in processed_code
     ]
 
     assert 'main' in labels
 
     return MipsProgram(
-        name=file.name,
+        name=filename,
         labels=labels,
         memory=memory,
         source=source,
@@ -176,11 +180,8 @@ def code_labels(
 
     Fill the .text section memory with user code
 
-    :param labels: Dict[str:
-    :param Label]:
-    :param text_sec: List[Tuple[int:
-    :param str]]:
-
+    :param labels:
+    :param text_sec:
     """
     from dashmips.instructions import Instructions
 
@@ -223,3 +224,15 @@ def code_labels(
                 text[idx] = (lineno, line.replace(name, str(label.value)))
 
     return text
+
+
+def preprocessor_directives(lines: List[str]):
+    """Preprocessor Directives handler.
+
+    :param lines: lines to compile.
+    """
+    directives = ['eqv', 'macro', 'end_macro', 'include']
+
+    for line in lines:
+        if 'include' in line:
+            pass
