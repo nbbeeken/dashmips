@@ -13,7 +13,7 @@ def parse(args):
     return (int(args[2]),)
 
 
-@mips_instruction(PTRN, parse)
+@mips_instruction(PTRN, parse, label=True)
 def j(program, address: int):
     """Jump unconditionally to label.
 
@@ -24,7 +24,7 @@ def j(program, address: int):
     program.registers['pc'] = address
 
 
-@mips_instruction(PTRN, parse)
+@mips_instruction(PTRN, parse, label=True)
 def jal(program, address: int):
     """Jump unconditionally to label and set $ra to current $pc.
 

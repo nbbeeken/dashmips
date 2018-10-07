@@ -4,7 +4,7 @@ from dashmips.instructions import mips_instruction
 PTRN = r"{instr_gap}({register}){args_gap}({number})"
 
 
-@mips_instruction(PTRN, lambda args: (args[2], int(args[3])))
+@mips_instruction(PTRN, lambda args: (args[2], int(args[3])), label=True)
 def la(program, rd, address):
     """Load address.
 

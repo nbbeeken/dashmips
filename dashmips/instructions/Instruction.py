@@ -8,7 +8,7 @@ from dashmips.preprocessor import MipsProgram
 class Instruction:
     """Instruction Class, callable."""
 
-    def __init__(self, fn, regex_ptrn, parser):
+    def __init__(self, fn, regex_ptrn, parser, label=False):
         """
         Regex and argument parser for instruction.
 
@@ -21,6 +21,8 @@ class Instruction:
             name = name[1:]
         self.name = name
 
+        self.label = label
+        self.pattern = regex_ptrn
         self.regex = f"({self.name}){regex_ptrn}".format(**mips.RE.ALL)
         self.parser: Callable[[Match], Iterable[Any]] = parser
 

@@ -13,7 +13,7 @@ def parse(arg):
     return (arg[2], str(arg[3]))
 
 
-@mips_instruction(PTRN, parse)
+@mips_instruction(PTRN, parse, label=True)
 def bgez(program, rs, label):
     """Branch if Reg[rs] >= 0.
 
@@ -25,7 +25,7 @@ def bgez(program, rs, label):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parse)
+@mips_instruction(PTRN, parse, label=True)
 def bgezal(program, rs, label):
     """Branch if Reg[rs] >= 0 and link.
 
@@ -37,7 +37,7 @@ def bgezal(program, rs, label):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parse)
+@mips_instruction(PTRN, parse, label=True)
 def bgtz(program, rs, label):
     """Branch if Reg[rs] > 0.
 
@@ -49,7 +49,7 @@ def bgtz(program, rs, label):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parse)
+@mips_instruction(PTRN, parse, label=True)
 def blez(program, rs, label):
     """Branch if Reg[rs] <= 0.
 
@@ -61,7 +61,7 @@ def blez(program, rs, label):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parse)
+@mips_instruction(PTRN, parse, label=True)
 def bltz(program, rs, label):
     """Branch if Reg[rs] < 0.
 
@@ -73,7 +73,7 @@ def bltz(program, rs, label):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parse)
+@mips_instruction(PTRN, parse, label=True)
 def bltzal(program, rs, label):
     """Branch if Reg[rs] < 0 and link.
 

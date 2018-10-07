@@ -2,7 +2,7 @@
 import json
 from dashmips.preprocessor import preprocess, MipsProgram
 from dashmips.debugserver import debug_mips
-from dashmips.extension import generate_snippets
+from dashmips.extension import generate_snippets, instruction_name_regex
 
 
 def main_compile(args):
@@ -22,6 +22,8 @@ def main_compile(args):
     if args.vscode:
         snippets = generate_snippets()
         print(json.dumps(snippets, indent=4))
+        print('\n\n\n')
+        print(instruction_name_regex())
 
     if args.run:
         from dashmips.run import run

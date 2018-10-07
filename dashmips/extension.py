@@ -1,5 +1,19 @@
 """Vscode extension helpers."""
+import re
 from dashmips.instructions import Instructions
+
+
+snippet_part = '${{{count}:{filler}}}'
+
+SNIPPET_REPLACEMENTS = {
+    'register': '\\$reg',
+    'label': 'label',
+    'number': 'number',
+    'instr_gap': ' ',
+    'args_gap': ', ',
+}
+
+REG_ARGS = ['t0', 't1', 't2']
 
 
 def generate_snippets():
@@ -8,10 +22,47 @@ def generate_snippets():
     names = sorted(Instructions.keys())
     for name in names:
         ins = Instructions[name]
+        body = build_body(ins.name, ins.pattern, ins.label)
+        desc = ins.fn.__doc__.split('\n')[0] if ins.fn.__doc__ else ''
+
         snippets[name] = {
             'prefix': name,
-            'body': f'{name} ',
-            'description': ins.fn.__doc__.split('\n')[0] if ins.fn.__doc__ else '',
+            'body': body,
+            'description': desc,
             'scope': 'mips',
         }
     return snippets
+
+
+def build_body(name, pattern, label):
+    """Create snippet body.
+
+    :param name: Instruction name
+    :param pattern: Instruction regex pattern
+    """
+    snip: str = f'{name:7s}' + pattern.format(**SNIPPET_REPLACEMENTS)
+    snip = snip.replace('(', '')
+    snip = snip.replace(')', '')
+    snip = snip.replace('number?\\\\$reg\\', 'number(\\$reg)')
+    replace_ct = 1
+
+    reg_ct = snip.count('reg')
+    for i in range(0, reg_ct):
+        f = f'${{{replace_ct}:{REG_ARGS[i]}}}'
+        snip = snip.replace('reg', f, 1)
+        replace_ct += 1
+
+    if label:
+        snip = snip.replace('number', f'${{{replace_ct}:label}}')
+        replace_ct += 1
+    else:
+        snip = snip.replace('number', f'${{{replace_ct}:100}}')
+        replace_ct += 1
+
+    return snip
+
+
+def instruction_name_regex():
+    """Generate big or capture regex for all instruction names."""
+    names = sorted(Instructions.keys())
+    return f"\\\\b({'|'.join(names)})\\\\b"

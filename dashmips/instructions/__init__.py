@@ -10,20 +10,20 @@ from dashmips.instructions.Instruction import Instruction
 Instructions: Dict[str, Instruction] = {}
 
 
-def mips_instruction(pattern, parser):
+def mips_instruction(pattern, parser, label=False):
     """Make an Instruction object from decorated function.
 
     :param pattern: param parser:
-    :param parser: 
+    :param parser:
 
     """
     def decorator(function):
         """Instruction Decorator wrapper.
 
-        :param function: 
+        :param function:
 
         """
-        instr = Instruction(function, pattern, parser)
+        instr = Instruction(function, pattern, parser, label=label)
         Instructions[instr.name] = instr
         return instr
 
