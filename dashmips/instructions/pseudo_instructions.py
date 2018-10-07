@@ -6,13 +6,25 @@ PTRN = r"{instr_gap}({register}){args_gap}({number})"
 
 @mips_instruction(PTRN, lambda args: (args[2], int(args[3])))
 def la(program, rd, address):
-    """Load address."""
+    """Load address.
+
+    :param program:
+    :param address:
+    :param rd:
+
+    """
     program.registers[rd] = address
 
 
 @mips_instruction(PTRN, lambda args: (args[2], int(args[3])))
 def li(program, rd, number):
-    """Load address."""
+    """Load immediate.
+
+    :param program:
+    :param number:
+    :param rd:
+
+    """
     program.registers[rd] = number
 
 
@@ -21,5 +33,11 @@ def li(program, rd, number):
     lambda args: (args[2], args[3])
 )
 def move(program, rd, rs):
-    """Overwrite rd with rs."""
+    """Overwrite rd with rs.
+
+    :param program:
+    :param rs:
+    :param rd:
+
+    """
     program.registers[rd] = program.registers[rs]

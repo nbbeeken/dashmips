@@ -11,7 +11,7 @@ def generate_snippets():
         snippets[name] = {
             'prefix': name,
             'body': f'{name} ',
-            'description': ins.fn.__doc__ if ins.fn.__doc__ else '',
+            'description': ins.fn.__doc__.split('\n')[0] if ins.fn.__doc__ else '',
             'scope': 'mips',
         }
     return snippets

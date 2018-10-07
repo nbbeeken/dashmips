@@ -4,17 +4,29 @@ from dashmips.syscalls import Syscalls
 
 
 def parse(arg):
-    """Instructions that take no arguments."""
+    """Instructions that take no arguments.
+
+    :param arg:
+
+    """
     return tuple()
 
 
 @mips_instruction('', parse)
 def nop(program):
-    """Do nothing."""
+    """Do nothing.
+
+    :param program:
+
+    """
     return True
 
 
 @mips_instruction('', parse)
 def syscall(program):
-    """Call syscall specified in $v0."""
+    """Call syscall specified in $v0.
+
+    :param program:
+
+    """
     return Syscalls[program.registers['$v0']](program)

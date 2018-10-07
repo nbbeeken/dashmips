@@ -39,7 +39,11 @@ class MipsProgram:
 
     @staticmethod
     def from_dict(prg) -> 'MipsProgram':
-        """From Basic dictionary to MipsProgram."""
+        """From Basic dictionary to MipsProgram.
+
+        :param prg:
+
+        """
         prg['memory'] = Memory(prg['memory'])
         prg['registers'] = Registers(prg['registers'])
         prg['labels'] = {ln: Label(**l) for ln, l in prg['labels'].items()}
@@ -52,10 +56,12 @@ class MipsProgram:
 
 
 def preprocess(file: TextIO) -> MipsProgram:
-    """
-    Prepare Mips for running.
+    """Prepare Mips for running.
 
     Breaks the code into directive and text sections.
+
+    :param file: TextIO:
+
     """
     memory = Memory()
     code = file.read()
@@ -107,10 +113,13 @@ sectionsType = Tuple[List[str], List[Tuple[int, str]]]
 
 
 def split_to_sections(code: List[Tuple[int, str]]) -> sectionsType:
-    """
-    Handle file with mixed sections.
+    """Handle file with mixed sections.
 
     .text and .data sections can come in any order.
+
+    :param code: List[Tuple[int:
+    :param str]]:
+
     """
     section: Optional[str] = None
     if code[0][1] in [mips.RE.DATA_SEC, mips.RE.TEXT_SEC]:
@@ -135,10 +144,15 @@ def split_to_sections(code: List[Tuple[int, str]]) -> sectionsType:
 
 
 def data_labels(labels: Dict[str, Label], data_sec: List[str], memory):
-    """
-    Construct the .data section to spec.
+    """Construct the .data section to spec.
 
     Fill the .data section memory with user defined static data
+
+    :param labels: Dict[str:
+    :param Label]:
+    :param data_sec: List[str]:
+    :param memory:
+
     """
     data_line_re = f"({mips.RE.LABEL}):\\s*({mips.RE.DIRECTIVE})\\s+(.*)"
     for line in data_sec:
@@ -158,10 +172,15 @@ def code_labels(
     labels: Dict[str, Label],
     text_sec: List[Tuple[int, str]]
 ) -> List[Tuple[int, str]]:
-    """
-    Construct the .text section to spec.
+    """Construct the .text section to spec.
 
     Fill the .text section memory with user code
+
+    :param labels: Dict[str:
+    :param Label]:
+    :param text_sec: List[Tuple[int:
+    :param str]]:
+
     """
     from dashmips.instructions import Instructions
 

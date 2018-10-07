@@ -15,8 +15,16 @@ def mips_syscall(number):
 
     Note: If you use this to make a new instruction
     YOU MUST import that function in `dashmips/__init__.py`
+
+    :param number:
+
     """
     def decorator(function):
+        """Syscall Decorator wrapper.
+
+        :param function:
+
+        """
         syscall = Syscall(function, number)
         Syscalls[syscall.number] = syscall
         return syscall

@@ -10,14 +10,22 @@ from dashmips.mips import MipsException
 
 
 def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
-    """Debug start."""
+    """Debug start.
+
+    :param msg: DebugMessage:
+
+    """
     msg.program.registers['pc'] = msg.program.labels['main'].value
     msg.message = str(os.getpid())
     return msg
 
 
 def debug_step(msg: DebugMessage) -> DebugMessage:
-    """Debug step."""
+    """Debug step.
+
+    :param msg: DebugMessage:
+
+    """
     try:
         next_instruction(msg.program)
         # TODO: Should be doing something with breakpoints here
@@ -31,10 +39,19 @@ def debug_step(msg: DebugMessage) -> DebugMessage:
 
 
 def debug_continue(msg: DebugMessage) -> DebugMessage:
-    """Debug continue."""
+    """Debug continue.
+
+    :param msg: DebugMessage:
+
+    """
     starting_pc = msg.program.registers['pc']
 
     def breaking_condition(program):
+        """Condition function to stop execution.
+
+        :param program:
+
+        """
         nonlocal starting_pc
         log.info(f"bps: {msg.breakpoints}", extra={'client': ''})
         if program.registers['pc'] == starting_pc:
@@ -60,7 +77,11 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
 
 
 def debug_stop(msg: DebugMessage) -> DebugMessage:
-    """Stop messages incoming mean nothing to a server."""
+    """Stop messages incoming mean nothing to a server.
+
+    :param msg: DebugMessage:
+
+    """
     return msg
 
 

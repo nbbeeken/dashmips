@@ -6,7 +6,11 @@ from dashmips.extension import generate_snippets
 
 
 def main_compile(args):
-    """Compile/Exec mips code."""
+    """Compile/Exec mips code.
+
+    :param args:
+
+    """
     program = preprocess(args.FILE)
     if args.out:
         json.dump(dict(program), args.out)
@@ -27,7 +31,11 @@ def main_compile(args):
 
 
 def main_debug(args):
-    """Start debug server for mips."""
+    """Start debug server for mips.
+
+    :param args:
+
+    """
     debug_mips(host=args.host, port=args.port, should_log=args.log)
 
 

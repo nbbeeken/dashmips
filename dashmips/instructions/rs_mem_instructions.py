@@ -1,72 +1,169 @@
+"""Register and Memory access Instructions."""
 from dashmips.instructions import mips_instruction
 
 PTRN = r"{instr_gap}({register}){args_gap}({number}?)\(({register})\)"
 
 
 def parse(arg):
+    """Register and Memory access Instructions Parser.
+
+    :param arg:
+
+    """
     return (arg[2], int(arg[3]), arg[4])
 
 
 @mips_instruction(PTRN, parse)
 def lb(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Load Byte.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def lbu(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Load Byte Unsigned.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def lh(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Load half-word.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def lhu(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Load half-word unsigned.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def lw(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Load word.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def lwl(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Load Word Left: Load from 1 to 4 bytes left-justified into $t1.
 
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
 
-@mips_instruction(PTRN, parse)
-def sc(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def lwr(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Load Word Right: Load from 1 to 4 bytes right-justified into $t1.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def sb(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Store Byte.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def sw(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Store word.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def swl(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Store Word Left: Load from 1 to 4 bytes left-justified into $t1.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def swr(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Store Word Right: Load from 1 to 4 bytes right-justified into $t1.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')
 
 
 @mips_instruction(PTRN, parse)
 def sh(program, rs, num, rt):
-    raise Exception('TODO: Not Implemented')
+    """Store halfword.
+
+    :param program:
+    :param num:
+    :param rs:
+    :param rt:
+
+    """
+    raise NotImplementedError('TODO')

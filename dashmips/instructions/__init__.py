@@ -11,8 +11,18 @@ Instructions: Dict[str, Instruction] = {}
 
 
 def mips_instruction(pattern, parser):
-    """Make an Instruction object from decorated function."""
+    """Make an Instruction object from decorated function.
+
+    :param pattern: param parser:
+    :param parser: 
+
+    """
     def decorator(function):
+        """Instruction Decorator wrapper.
+
+        :param function: 
+
+        """
         instr = Instruction(function, pattern, parser)
         Instructions[instr.name] = instr
         return instr

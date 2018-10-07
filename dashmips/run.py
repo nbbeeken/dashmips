@@ -7,13 +7,22 @@ from dashmips.preprocessor import MipsProgram
 
 
 def run(program: MipsProgram, runnable=lambda p: p.registers['pc'] != -1):
-    """Execute Preprocessed Mips."""
+    """Execute Preprocessed Mips.
+
+    :param program: MipsProgram:
+    :param runnable:  (Default value = lambda p: p.registers['pc'] != -1)
+
+    """
     while runnable(program):
         next_instruction(program)
 
 
 def next_instruction(program):
-    """Execute One Instruction."""
+    """Execute One Instruction.
+
+    :param program:
+
+    """
     current_pc = program.registers['pc']
     if len(program.source) < current_pc:
         # We jumped or executed beyond available text

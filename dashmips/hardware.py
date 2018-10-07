@@ -64,7 +64,12 @@ class Registers(dict):
         return super().__getitem__(RegisterResolve[key])
 
     def update(self, d, **kwargs):
-        """Resolve register names before calling dict update."""
+        """Resolve register names before calling dict update.
+
+        :param d:
+        :param **kwargs:
+
+        """
         d.update(kwargs)
         remap = {
             RegisterResolve[k]: v
@@ -72,13 +77,13 @@ class Registers(dict):
         }
         return super().update(remap)
 
-    def readablenum_registers(self):
-        """Return a dictionary of $regnum->val."""
-        return None
+    # def readablenum_registers(self):
+    #     """ """
+    #     return None
 
-    def computer_registers(self):
-        """Return a dictionary of num->val."""
-        return None
+    # def computer_registers(self):
+    #     """ """
+    #     return None
 
 
 class Memory(list):
@@ -134,7 +139,11 @@ class Memory(list):
         return s
 
     def malloc(self, size: int) -> int:
-        """Get address of unused memory."""
+        """Get address of unused memory.
+
+        :param size: int:
+
+        """
         old_freespace = self._freespace
         self._freespace += size
         return old_freespace

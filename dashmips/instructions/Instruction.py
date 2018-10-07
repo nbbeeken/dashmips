@@ -30,7 +30,7 @@ class Instruction:
             args = tuple()
 
         save_pc = program.registers['pc']
-        program.registers['pc'] = None
+        program.registers['pc'] = None  # type: ignore
         self.fn(program, *args)
         if program.registers['pc'] is None:
             # if not jmp/branch instruction pc will be None so we increment
