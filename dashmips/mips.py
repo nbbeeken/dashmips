@@ -33,6 +33,10 @@ class RE:
     LABEL = r"\b[\w]+\b"
     DIRECTIVE = "\\." + "|\\.".join(Directives.keys())
 
+    MACRO = r'\.macro\s+(\w+)\s*(?:\((.+)\))?'
+    END_MACRO = r'\.end_macro'
+    EQVS = r'\.eqv\s+(\w+)\s+(.+)'
+
     COMMENT = r"\#.*"
 
     INSTRGAP = r"\s+"

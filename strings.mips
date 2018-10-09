@@ -1,0 +1,586 @@
+# Do NOT modify this file.
+# This file is NOT part of your homework 2 submission.
+.data
+str_input: .asciiz "Input: "
+str_result: .asciiz "Result: "
+
+# strlen
+strlen_header: .asciiz "\n\n********* strlen *********\n"
+str_helloworld: .asciiz "Hello, World"
+str_abc: .asciiz "abc\n"
+
+# strcmp
+strcmp_header: .asciiz "\n\n********* strcmp *********\n"
+strcmp_abc: .asciiz "abc"
+strcmp_ABCD: .asciiz "ABCD"
+
+# strncpy
+strncpy_header: .asciiz "\n\n********* strncpy *********\n"
+strncpy_buffer: .asciiz "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW"
+
+# indexof
+indexof_header: .asciiz "\n\n********* indexof *********\n"
+
+# reverse_str
+reverse_header: .asciiz "\n\n********* reverse_str *********\n"
+
+# atoi
+atoi_header: .asciiz "\n\n********* atoi *********\n"
+atoi_str: .asciiz "220"
+atoi_12b5: .asciiz "12b5"
+
+# cut
+cut_header: .asciiz "\n\n********* cut *********\n"
+cut_awesome: .asciiz "Awesome ANSI escape: \\033[1;45mHello, World!\\033[1;40m Yay!"
+cut_pattern_start: .asciiz "\\033["
+cut_pattern_end: .asciiz "m"
+
+# strtok
+strtok_header: .asciiz "\n\n********* strtok *********\n"
+strtok_awesome: .asciiz "Awesome ANSI escape: \\033[1;45mHello, World!\\033[1;40m Yay!"
+
+.macro print_string(%address)
+	li $v0, 4
+	la $a0, %address
+	syscall
+.end_macro
+
+.macro print_newline
+	li $v0, 11
+	li $a0, '\n'
+	syscall
+.end_macro
+
+.macro print_space
+	li $v0, 11
+	li $a0, ' '
+	syscall
+.end_macro
+
+.macro print_int(%register)
+	li $v0, 1
+	add $a0, $zero, %register
+	syscall
+.end_macro
+
+.text
+.globl main
+
+main:
+
+	# TEST CASE for strlen
+	print_string(strlen_header)
+	print_string(str_input)
+	print_string(str_helloworld)
+	print_newline
+
+	la $a0, str_helloworld
+	jal strlen
+
+	move $t0, $v0
+	print_string(str_result)
+	print_int($t0)
+	print_newline
+
+	print_string(str_input)
+	print_string(str_abc)
+	print_newline
+
+	la $a0, str_abc
+	jal strlen
+
+	move $t0, $v0
+	print_string(str_result)
+	print_int($t0)
+	print_newline
+
+	# TEST CASE for strcmp
+	print_string(strcmp_header)
+	print_string(str_input)
+	print_string(strcmp_abc)
+	print_space
+	print_string(strcmp_ABCD)
+	print_newline
+
+	la $a0, strcmp_abc
+	la $a1, strcmp_ABCD
+	jal strcmp
+
+	move $t0, $v0
+	print_string(str_result)
+	print_int($t0)
+	print_newline
+
+	print_string(str_input)
+	print_string(strcmp_abc)
+	print_space
+	print_string(strcmp_abc)
+	print_newline
+
+	la $a0, strcmp_abc
+	la $a1, strcmp_abc
+	jal strcmp
+
+	move $t0, $v0
+	print_string(str_result)
+	print_int($t0)
+	print_newline
+
+	print_string(str_input)
+	print_string(str_abc)
+	print_space
+	print_string(strcmp_abc)
+	print_newline
+
+	la $a0, str_abc
+	la $a1, strcmp_abc
+	jal strcmp
+
+	move $t0, $v0
+	print_string(str_result)
+	print_int($t0)
+	print_newline
+
+	#  TEST CASE for strncpy
+	print_string(strncpy_header)
+	print_string(str_input)
+	print_string(str_helloworld)
+	print_newline
+	print_string(str_input)
+	print_string(strncpy_buffer)
+	print_newline
+
+	la $a0, strncpy_buffer
+	la $a1, str_helloworld
+	li $a2, 49
+	jal strncpy
+
+	move $t0, $v0
+	print_string(str_result)
+	li $v0, 4
+	move $a0, $t0
+	syscall
+	print_newline
+
+	#  TEST CASE for indexof
+	print_string(indexof_header)
+	print_string(str_input)
+	print_string(str_helloworld)
+	print_newline
+
+	la $a0, str_helloworld
+	li $a1, ','
+	jal indexOf
+
+	move $t0, $v0
+	print_string(str_result)
+	print_int($t0)
+	print_newline
+
+	#  TEST CASE for reverse string
+	print_string(reverse_header)
+	print_string(str_input)
+	print_string(str_helloworld)
+	print_newline
+
+	la $a0, str_helloworld
+	jal reverse_str
+	print_string(str_result)
+	print_string(str_helloworld)
+	print_newline
+
+	#  TEST CASE for atoi
+	print_string(atoi_header)
+	print_string(str_input)
+	print_string(atoi_str)
+	print_newline
+
+	la $a0, atoi_str
+	jal atoi
+	move $t0, $v0
+	print_string(str_result)
+	print_int($t0)
+	print_newline
+	print_string(str_input)
+	print_string(atoi_12b5)
+	print_newline
+
+	la $a0, atoi_12b5
+	jal atoi
+	move $t0, $v0
+	print_string(str_result)
+	print_int($t0)
+	print_newline
+
+	# TEST CASE for  cut
+	print_string(cut_header)
+	print_string(str_input)
+	print_string(cut_awesome)
+	print_newline
+	print_string(str_input)
+	print_string(cut_pattern_start)
+	print_newline
+	print_string(str_input)
+	print_string(cut_pattern_end)
+	print_newline
+
+
+	la $a0, cut_awesome
+	la $a1, cut_pattern_start
+	la $a2, cut_pattern_end
+	jal cut
+
+	move $t0, $v0
+	print_string(str_result)
+	move $a0, $t0
+	li $v0, 34
+	syscall
+	print_newline
+
+	print_string(str_result)
+	print_int($v1)
+	print_newline
+
+	# TEST CASE for strtok
+	print_string(strtok_header)
+	print_string(str_input)
+	print_string(strtok_awesome)
+	print_newline
+	print_string(str_input)
+	li $a0, ';'
+	li $v0, 11
+	syscall
+	print_newline
+
+	la $a0, strtok_awesome
+main_loop:
+ 	li $a1 , ';'
+	jal strtok
+
+	# if strok returns 0x0, 10 program
+	beqz $v0, quit_main
+
+	move $t0, $v0
+	print_string(str_result)
+
+	#there is a token string, print its value
+	move $a0, $t0
+	li $v0, 4
+	syscall
+
+	#set the argument to 0x0 and call strtok again
+	move $a0, $0
+	j main_loop
+
+quit_main:
+	#quit program
+	li $v0, 10
+	syscall
+
+
+
+#################################################################
+# Student defined functions will be included starting here
+#################################################################
+
+##############################################################
+# Homework #2
+# name: Neal Beeken
+# sbuid: 109069890
+##############################################################
+.text
+
+
+strlen:
+	#starting address of string in $a0
+	add $t8, $a0, $0	#copy the address
+	add $v0, $0, $0		#initialize count
+strlen_loop:
+	lb $t0, 0($t8)		#load first char of string
+	beqz $t0, end_strlen	#if 0x0 char, stop counting
+	addi $v0, $v0, 1	# count++
+	addi $t8, $t8, 1	# move address to next byte
+	j strlen_loop
+end_strlen:
+	jr $ra
+
+
+#EASY STRING FUNCTIONS
+#strcmp################################################################################################################################################################################################
+# Determines if two strings are exactly equal to each other.
+# @param str1 Address of a '\0' terminated string. $a0
+# @param str2 Address of a '\0' terminated string. $a1
+# @return Returns 1 if equal, else 0. $v0
+strcmp:
+	addi $sp, $sp, -4 		#allocate word in stack for ra
+	sw $ra, 0($sp) 			#save return address
+	beq $a0, $a1, stringsEQUAL	#if the addresses are equal return 1 for equal strings
+	addi $sp, $sp, -8 		#allocate 2 words in stack for a0,a1
+	sw $a0, 0($sp) 			#save str1 address
+	sw $a1, 4($sp) 			#save str2 address
+	jal strlen 			#find length of str1
+	move $t7, $v0 			#t6 contains the length of str1
+	move $a0, $a1 			#overwrite str1 address with str2 address
+	jal strlen 			#find length of str2 stored to $v0
+	lw $t8, 0($sp) 			#load string addresses into place for loop
+	lw $t9, 4($sp) 			#load string addresses into place for loop
+	addi $sp, $sp, 8 		#return stack space
+	bne $v0, $t7 stringsNOTequal 	#go to return 0
+	strcmploop: 				#we will loop through each char until end of strings (we have count in $t7) t7 is now loop counter
+		lb $t5, ($t8) 			#load char from str1
+		lb $t6, ($t9) 			#load char from str2
+		addi $t8, $t8, 1 		#move address to next byte
+		addi $t9, $t9, 1 		#move address to next byte
+		bne $t5, $t6, stringsNOTequal 	#if the chars don't match then go to return 0
+		addi $t7, $t7, -1 		#subtract 1 from counter
+		bnez $t7, strcmploop 		#LOOP
+	stringsEQUAL:
+		li $v0, 1 		#load 1 for equal strings
+		b strcmpreturn
+	stringsNOTequal:
+		move $v0, $zero		#load 0 for unequal strings
+	strcmpreturn:
+	lw $ra, 0($sp) 			#restore return address
+	addi $sp, $sp, 4 		#return stack space
+	jr $ra
+#strncpy###############################################################################################################################################################################################
+# Copies the string from src into dst.
+# @param dst Memory Address of space to copy string into. $a0
+# @param src Memory Address of string to copy from. $a1
+# @param n Non-negative maximum amount of bytes that can be copied from src. Maximum space allocated for dst. $a2
+# @return Returns the address of dst.
+strncpy:
+	blez $a2, invalidN
+	addi $sp, $sp, -12		#allocate word in stack for ra and dst and s0
+	sw $a0, 0($sp)			#store a0 - dst
+	sw $s0, 4($sp)			#store s0 - I want to store the length of src in it
+	sw $ra, 8($sp)			#store ra
+	move $a0, $a1			#Overwrite a0 (dst) with a1 (src)
+	jal strlen			#calculate length of src string
+	move $s0, $v0			#store length of src string
+	lw $a0, 0($sp)			#load a0 back to proper place
+	addi $sp, $sp, 4		#return stack (now: -8)
+	bgt $s0, $a2, notEnoughSpace 	#if src.length > n then no copy can be made
+	move $t1, $a0
+	plentyOfSpaceLoop:
+		lb $t0, 0($a1)			#loads char from src
+		sb $t0, 0($a0)			#stores char from src to dst
+		addi $a1, $a1, 1		#increments address by byte
+		addi $a0, $a0, 1		#increments address by byte
+		addi $s0, $s0, -1		#decrement counter
+		bnez $s0, plentyOfSpaceLoop	#LOOP
+		move $t3, $zero			#add null terminator to copy
+		sb $t3, 0($a0)			#tack on null terminator
+	notEnoughSpace:
+	lw $s0, 0($sp)			#put s0 back where it came from or so help me
+	lw $ra, 4($sp)			#load original ra
+	addi $sp, $sp, 8		#return stack space
+	move $v0, $t1			#copy address
+	invalidN:
+	jr $ra
+#indexOf###############################################################################################################################################################################################
+# Obtain the integer index of the provided character.
+# @param str Memory address of a '\0' terminated string. $a0
+# @param c ASCII character to search the string for.	 $a1
+# @return Returns the position of the first occurrence of the
+# character c if it exists, else return -1. $v0
+indexOf:
+	addi $sp, $sp, -8	#make space for return
+	sw $a0, 0($sp)		#save return address
+	sw $ra, 4($sp)		#save str address
+	jal strlen		#get str length
+	lw $a0, 0($sp)		#bring back a0 unharmed
+	addi $sp, $sp, 4	#give back stack space
+	move $t0, $v0		#move string length into t0
+	li $t1, 0		#i for forloop
+	forEachChar:
+		slt $t2, $t1, $t0		#for(int t1 = 0; t1 < str.length(t0); t1++)
+		beqz $t2, forEachCharEND	#Stop for loop with condition
+		lb $t3, 0($a0)			#load the letter from string
+		addi $a0, $a0, 1		#increment a0 address by one for next char
+		beq $t3, $a1, charIndexFound 	#if(c==charArray[t0]) goto charIndexFound
+		addi $t1, $t1, 1 		#t1++
+		li $v0, -1			#char NOT found, this will be set to -1 each loop but if the char is found then it will be skipped
+		b forEachChar
+	charIndexFound:
+		move $v0, $t1			#put index into return reg
+	forEachCharEND:
+	lw $ra, 0($sp)		#load back ra
+	addi $sp, $sp, 4	#put back stack space
+	jr $ra			#bring 'er on home
+#######################################################################################################################################################################################################
+
+
+#MEDIUM STRING FUNCTIONS
+#######################################################################################################################################################################################################
+# Reverse the contents of the string.
+# @param str Address of a `\0` terminated string.
+reverse_str:
+	addi $sp, $sp, -4	#give space for saving
+	sw $ra, 0($sp)		#save ra
+	jal strlen		#get String length
+	move $t0, $v0		#t0 contains str.length
+	move $t1, $zero		#t1 counter => 0
+	addi $t0, $t0, -1	#0 index.
+	reverseLoop:
+		add $t2, $a0, $t1	#t2 = $a0 + $t1 (a0 + counter)
+		lb $t3, 0($t2)		#load char to t3
+		add $t2, $a0, $t0	#t2 = $a0 + $t0 (a0 + length)
+		lb $t4, 0($t2)		#temp
+		sb $t3, 0($t2)		#store char to end of space
+		add $t2, $a0, $t1	#t2 = $a0 + $t1 (a0 + counter)
+		sb $t4, 0($t2)		#store char at begining of space
+		addi $t0, $t0, -1	#decrement length
+		addi $t1, $t1, 1	#increment counter
+		bgt $t0, $t1, reverseLoop
+	lw $ra, 0($sp)		#ra remains unscathed in this dangerous process
+	addi $sp, $sp, 4	#give back stack
+	jr $ra			#GO HOME
+#######################################################################################################################################################################################################
+# Converts a string to an integer.
+# @param str Address of a '\0' terminated string.
+# @return Returns the integer value of the string
+# ASCII Numbers: (48-57) ~ (0-9)
+atoi:
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	li $t1, 0	#result
+	li $t2, 0 	#lengthOfString
+	jal strlen	#calculate length of string
+	move $t0, $a0   #strAddress
+	move $t2, $v0	#put lenght of string into $t2
+	li $t8, 0	#read digit possibly char
+	li $t5, 0 	#i counter
+	li $t6, 10	#radix
+	addi $t0, $t0, -1 #move back one space so loop properly reads string
+	whileIndexLessThanLength:
+		addi $t0, $t0, 1	#increment one char
+		lb $t7, 0($t0)		#load digit(char) into $t7
+
+		blt $t7, '0', notNumber	#end loop not a digit
+		bgt $t7, '9', notNumber	#end loop not a digit
+		li, $t9, 48		#get the digit
+		sub $t8, $t7, $t9	#sub 48, cus thats zero
+
+		#FOR MULTIPLYING SHIFT LEFT 2 TO MULTIPLY BY 8 THEN ADD TWICE  HEYO *10
+		move $t9, $t1
+		sll $t1, $t1, 3
+		add $t1, $t1, $t9
+		add $t1, $t1, $t9
+
+		sub $t1, $t1, $t8	#result = result - digit;
+		addi $t5, $t5, 1	#i++
+		blt $t5, $t2, whileIndexLessThanLength #LOOP
+	notNumber:
+	neg $v0, $t1
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+jr $ra
+#######################################################################################################################################################################################################
+#HARD STRING FUNCTIONS
+
+#######################################################################################################################################################################################################
+# Search for the first occurrence of the starting and ending pattern in the source string.
+# @$a0 src Address of a '\0' terminated string to search in.
+# @$a1 ptrn_start Address of a '\0' terminated string that marks the start of the pattern to search for in src.
+# @$a2 ptrn_end Address of a '\0' terminated string that marks the end of a the search pattern.
+# @$v0 Returns the address of the pattern if found, else 0.
+# @$v1 Returns the length of the substring that was "cut", else -1.
+############################# JAVA Algorithm:
+# public int [] mipsCut(String src, String ptrn_start, String ptrn_end) {
+# int startIndex = src.indexOf(ptrn_start);
+# int endIndex = src.indexOf(ptrn_end, startIndex);
+# ($v0) return0 startIndex;
+# ($v1) return1 endIndex - startIndex;
+# }
+cut:
+	addi $sp, $sp, -36	#make space in Stack
+	sw $ra, 0($sp)		#save ra
+	sw $s0, 4($sp)		#save $s0
+	sw $s1, 8($sp)		#save $s1
+	sw $s2, 12($sp)		#save $s2
+	sw $s3, 16($sp)		#save $s3
+	sw $s4, 20($sp)		#save $s4
+	sw $s5, 24($sp)		#save $s5
+	sw $s6, 28($sp)		#save $s6
+	sw $s7, 32($sp)		#save $s7
+
+	move $s0, $a0		#copy src address for manip
+	move $s1, $a1		#copy pattern start address for manip
+	move $s2, $a2		#copy pattern end address for manip
+
+	jal strlen
+	move $s3, $v0		#src length (max)
+	move $a0, $a1		#start pattern length
+	jal strlen		#find start Pattern length
+	move $s4, $v0		#$s4 = length of start pattern
+
+	lb $t0, 0($s0)		#first char of src (first)
+	li $t1, 0		#index(i)
+	li $t5, 0		#index2 (j)
+	li $t6, 0 		#endOfPattern (end)
+	li $t7, 0		#index3 (k)
+	li $s5, 0		#char holder
+	li $s6, 0		#char holder
+	li $v0, -1
+	li $v1, -1
+
+	forIndexLthEqToMax:	#for (int i = 0; i <= max; i++)
+	add $t4, $s0, $t1	#source[i] (address)
+	lb $t2, 0($t4)		#source[i] (actual)
+		beq $t2, $t0, ifFirstEqCurrent		#if (source[i] == first)
+		b loopCondition				#while (++i <= max && source[i] != first);
+	ifFirstEqCurrent:
+		bge $t1, $s3, loopCondition		#if (i <= max) {
+		addi $t5, $t1, 1			#int j = i + 1;
+		add $t6, $t5, $s4			#int end = j + targetCount
+		addi $t6, $t6, -1			#end = j + targetCount - 1
+		forloop:
+			beq $t5, $t6, foundWholePattern
+			addi $t5, $t5, 1
+			addi $t7, $t7, 1
+			add $t4, $s0, $t5
+			lb $s5, 0($t4)
+			add $t4, $s0, $t7
+			lb $s5, 0($t4)
+			bne $s5, $s6, forloopEND
+			b forloop
+		foundWholePattern:
+			move $v0, $t1
+		forloopEND:
+	loopCondition:
+	addi $t1, $t1, 1
+	bge $t1, $s3, forIndexLthEqToMax
+	move $t5, $v0
+	move $a0, $s0
+	move $a1, $s2
+	jal indexOf
+	move $t1, $v0
+	move $v0, $t5
+	sub $v1, $t1, $v0
+
+
+	sw $s7, 32($sp)		#load $s7
+	sw $s6, 28($sp)		#load $s6
+	sw $s5, 24($sp)		#load $s5
+	sw $s4, 20($sp)		#load $s4
+	sw $s3, 16($sp)		#load $s3
+	sw $s2, 12($sp)		#load $s2
+	sw $s1, 8($sp)		#load $s1
+	sw $s0, 4($sp)		#load $s0
+	lw $ra, 0($sp)		#load ra
+	addi $sp, $sp, 36	#return stack space
+jr $ra
+#######################################################################################################################################################################################################
+strtok:
+	#Define your code here
+	############## Remove these lines of code. These lines are only here to allow for main to continue working ###########
+	add $v0, $0, $0   #this makes strtok return a 0x0
+	###################################################################################################
+
+
+	jr $ra
+#######################################################################################################################################################################################################
+
+.data
+

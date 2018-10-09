@@ -1,0 +1,4 @@
+.text
+
+func:
+    jr $ra

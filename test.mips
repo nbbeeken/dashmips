@@ -1,18 +1,42 @@
 # Sum all the numbers from 1 up to the number inputted
+.include "func.mips"
 
+.eqv QUIT 10
+
+.macro exit
+li $v0,QUIT
+syscall
+.end_macro
+
+.macro print_str (%lbl)
+	li $v0, 4
+	la $a0, %lbl
+	syscall
+.end_macro
+
+.macro create_print_str (%lbl, %str)
+	.data
+%lbl: .asciiz %str
+	.text
+	li $v0, 4
+	la $a0, %lbl
+	syscall
+.end_macro
+
+.macro print_reg (%x)
+li $v0, 1
+move $a0, %x
+syscall
+.end_macro
 
 .data
-msg1:   .asciiz "Number of integers (N)?  "
-msg2:   .asciiz "Sum="
 lf:     .asciiz "\n"
 
 .text
 # .globl main
 
 main:
-    li      $v0, 0x4                     # print_string syscall code = 4
-    la      $a0, msg1
-    syscall
+    create_print_str(askstr, "Number of integers (N)?  ")
     move   $t2, $zero
 
     # Get N from user and save
@@ -33,23 +57,10 @@ main:
         j       loop
 
 exit:
-    # Print "Sum="
-    li      $v0, 4                     # print_string syscall code = 4
-    la      $a0, msg2
-    syscall
+    create_print_str(sumstr, "Sum=")
     # Print sum value
-    li      $v0, 1                     # print_int syscall code = 1
-    move    $a0, $t2
-    syscall
+    print_reg($t2)
     # Print newline
-    li      $v0, 4                     # print_string syscall code = 4
-    la      $a0, lf
-    syscall
-    # Dump JSON
-    li      $a0, 0                     # new feature!
-    li      $v0, '-'                   # ascii 45 dump json of program state
-    syscall
+    print_str(lf)
     # Exit program
-    li      $a0, 0                     # new feature! $a0 holds exit_code
-    li      $v0, 0xA                    # exit
-    syscall
+    exit

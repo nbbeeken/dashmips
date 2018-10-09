@@ -3,6 +3,7 @@ import json
 import re
 import os.path
 import operator
+from functools import reduce
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Any, Tuple, Optional, TextIO, Iterable
 
@@ -38,6 +39,7 @@ class MipsProgram:
     source: List[SourceLine]
     memory: Memory = field(default_factory=Memory)
     registers: Registers = field(default_factory=Registers)
+    eqvs: Dict[str, str] = field(default_factory=dict)
 
     @staticmethod
     def from_dict(prg) -> 'MipsProgram':
@@ -72,7 +74,7 @@ def preprocess(file: TextIO) -> MipsProgram:
 
     labels: Dict[str, Label] = {}
     # Collect Preproccessor Directives.
-    eqvs = preprocessor_directives(linesofcode)
+    eqvs, linesofcode = preprocessor_directives(linesofcode)
 
     # Gather .data/.text sections into seperate lists
     unprocessed_labels, unprocessed_code = split_to_sections(linesofcode)
@@ -92,6 +94,7 @@ def preprocess(file: TextIO) -> MipsProgram:
         memory=memory,
         source=processed_code,
         registers=Registers({'pc': labels['main'].value}),
+        eqvs=eqvs
     )
 
 
@@ -248,37 +251,106 @@ def preprocessor_directives(lines: List[SourceLine]):
 
     :param lines: lines to compile.
     """
-    directives = ['eqv', 'macro', 'end_macro', 'include']
-
-    newlines = resolve_include(lines)
+    lines = resolve_include(lines)
+    eqvs = resolve_eqvs(lines)
+    lines = resolve_macros(lines)
+    return eqvs, lines
 
 
 def resolve_include(lines: List[SourceLine]):
     """Resolve all includes recursively."""
-    include_positions = []
-    includes = []
     for idx, srcline in enumerate(lines):
         match = re.match(r'\s*\.include\s+"(.*)"\s*', srcline.line)
         if match:
             includefilename = os.path.abspath(match[1])
             includefile = open(includefilename)
             includelines = resolve_include(process_file(includefile))
-            includes.append(includelines)
-            include_positions.append(idx)
+            lines[idx] = includelines
 
-    newlines = []
-    idx_includes = enumerate(zip(include_positions, includes))
-    for (idx, (include_position, include)) in idx_includes:
-        # Next index is either the next include's starting point
-        # OR the end of lines
-        nextidx = include_positions[idx + 1] if idx + \
-            1 < len(include_positions) else len(lines)
+    lines = flatten(lines)
 
-        spreads = [
-            *lines[0:include_position],  # Spread everything before include
-            *include,  # Spread include
-            *lines[include_position + 1:nextidx]  # Spread everything after
-        ]
-        newlines.extend(spreads)
+    return lines
 
-    return newlines
+
+def flatten(nestedlist):
+    """Flatten a nested list."""
+    newlist = []
+    for item in nestedlist:
+        if isinstance(item, list):
+            newlist.extend(flatten(item))
+        else:
+            newlist.append(item)
+    return newlist
+
+
+def resolve_eqvs(lines: List[SourceLine]):
+    """Gather eqvs to text replace throughout code."""
+    eqvs = {}
+    for idx, srcline in enumerate(lines):
+        # Check for eqv on this line
+        match = re.match(mips.RE.EQVS, srcline.line)
+        if match:
+            # Save Eqv into dict
+            eqvs[match[1]] = match[2]
+            # Delete the eqv line
+            del lines[idx]
+
+    for idx, srcline in enumerate(lines):
+        # for each line
+        for eqv in eqvs.keys():
+            # check each eqv and attempt a replacement
+            srcline.line = srcline.line.replace(eqv, eqvs[eqv])
+
+    return eqvs
+
+
+def resolve_macros(lines: List[SourceLine]):
+    """Find and substitute macros."""
+    macros: Dict[str, dict] = {}
+    found_macro = None
+    lines_to_remove = []
+    for idx, srcline in enumerate(lines):
+        if found_macro is None:
+            match = re.match(mips.RE.MACRO, srcline.line)
+            if match:
+                found_macro = match[1]
+                macros[match[1]] = {
+                    'args': [
+                        a.strip() for a in match[2].split(', ')
+                    ] if match[2] else None,
+                    'lines': []
+                }
+                lines_to_remove.append(idx)
+        else:
+            if '.end_macro' in srcline.line:
+                found_macro = None
+                lines_to_remove.append(idx)
+            else:
+                macros[found_macro]['lines'].append(srcline)
+                lines_to_remove.append(idx)
+
+    lines = [l for i, l in enumerate(lines) if i not in lines_to_remove]
+
+    for idx, srcline in enumerate(lines):
+        for macro, macroinfo in macros.items():
+            if macro in srcline.line:
+                if macroinfo['args'] is None:
+                    lines[idx] = macroinfo['lines']
+                else:
+                    macroregex = fr'{macro}\((.+)\)'
+                    match = re.match(macroregex, srcline.line)
+                    if match:
+                        values = match[1].split(', ')
+                        expanded_macro = []
+                        for macroline in macroinfo['lines']:
+                            for a, v in zip(macroinfo['args'], values):
+                                expanded_macro.append(
+                                    SourceLine(
+                                        line=macroline.line.replace(a, v),
+                                        filename=srcline.filename,
+                                        lineno=srcline.lineno,
+                                    )
+                                )
+                        lines[idx] = expanded_macro  # type: ignore
+
+    return flatten(lines)
