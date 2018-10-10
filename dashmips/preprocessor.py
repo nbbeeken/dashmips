@@ -137,9 +137,8 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory):
 
     Fill the .data section memory with user defined static data
 
-    :param labels: Dict[str:
-    :param Label]:
-    :param data_sec: List[str]:
+    :param labels:
+    :param data_sec:
     :param memory:
 
     """
@@ -332,25 +331,32 @@ def resolve_macros(lines: List[SourceLine]):
     lines = [l for i, l in enumerate(lines) if i not in lines_to_remove]
 
     for idx, srcline in enumerate(lines):
-        for macro, macroinfo in macros.items():
+        for macro, macro_info in macros.items():
             if macro in srcline.line:
-                if macroinfo['args'] is None:
-                    lines[idx] = macroinfo['lines']
+                if macro_info['args'] is None:
+                    lines[idx] = macro_info['lines']
                 else:
-                    macroregex = fr'{macro}\((.+)\)'
-                    match = re.match(macroregex, srcline.line)
-                    if match:
-                        values = match[1].split(', ')
-                        expanded_macro = []
-                        for macroline in macroinfo['lines']:
-                            for a, v in zip(macroinfo['args'], values):
-                                expanded_macro.append(
-                                    SourceLine(
-                                        line=macroline.line.replace(a, v),
-                                        filename=srcline.filename,
-                                        lineno=srcline.lineno,
-                                    )
-                                )
-                        lines[idx] = expanded_macro  # type: ignore
+                    macro_with_args(idx, lines, macro, macro_info, srcline)
 
     return flatten(lines)
+
+
+def macro_with_args(idx, lines, macro, macroinfo, srcline):
+    macroregex = fr'{macro}\((.+)\)'
+    match = re.match(macroregex, srcline.line)
+    if match:
+        values = match[1].split(', ')
+        argsmap = {
+            arg: val
+            for arg, val in zip(macroinfo['args'], values)
+        }
+        expanded_macro = []
+        for s in macroinfo['lines']:
+            modified_line = s.line
+            for a, v in argsmap.items():
+                modified_line = modified_line.replace(a, v)
+            expanded_macro.append(SourceLine(
+                line=modified_line, lineno=s.lineno,
+                filename=s.filename
+            ))
+        lines[idx] = expanded_macro  # type: ignore
