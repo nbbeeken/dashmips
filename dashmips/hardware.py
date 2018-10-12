@@ -34,6 +34,7 @@ class Registers(dict):
 
         dictionary - can be partial/full dictionary of registers
         """
+        self._pc_changed = False
         base_reg = {name: 0 for idx, name in names_enum}
         if dictionary:
             new_dict = {
@@ -47,13 +48,28 @@ class Registers(dict):
         else:
             super().__init__(base_reg)
 
+    @property
+    def pc_changed(self):
+        """Set to true if pc was changed.
+
+        Reading this value resets it.
+        """
+        val = self._pc_changed
+        self._pc_changed = False
+        return val
+
     def __setitem__(self, key, value: int):
         """
         Set register value.
 
         Accepts string or number for key
         """
-        return super().__setitem__(RegisterResolve[key], value)
+        if value > 0xFF_FF_FF_FF:
+            from dashmips.mips import MipsException
+            raise MipsException('Register value cannot exceed 32 bits')
+        key = RegisterResolve[key]
+        self._pc_changed = (key == 'pc')
+        return super().__setitem__(key, value)
 
     def __getitem__(self, key):
         """
@@ -89,7 +105,7 @@ class Registers(dict):
 class Memory(list):
     """Mips RAM."""
 
-    KIB = 1024
+    KIB = 2048
 
     def __init__(self, listish=None):
         """Create 2KB of MIPS RAM."""

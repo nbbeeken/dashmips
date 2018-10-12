@@ -40,4 +40,4 @@ def next_instruction(program):
         instruction_fn(program, args)
     else:
         # Bad arguments to instruction
-        raise MipsException(f"{line} is malformed for {instruction}")
+        raise MipsException(f"'{line}' is malformed for '{instruction}'")

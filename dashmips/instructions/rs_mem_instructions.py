@@ -4,7 +4,7 @@ from dashmips.instructions import mips_instruction, parse_int
 PTRN = r"{instr_gap}({register}){args_gap}({number}?)\(({register})\)"
 
 
-def parse(arg):
+def parse(args):
     """Register and Memory access Instructions Parser.
 
     :param arg:
@@ -12,9 +12,9 @@ def parse(arg):
     """
     offset = 0
     if args[3]:
-        offset = parse_int(arg[3])
+        offset = parse_int(args[3])
 
-    return (arg[2], offset, arg[4])
+    return (args[2], offset, args[5])
 
 
 @mips_instruction(PTRN, parse)
@@ -27,7 +27,7 @@ def lb(program, rs, num, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rs] = program.memory[num + program.registers[rt]]
 
 
 @mips_instruction(PTRN, parse)
@@ -79,7 +79,13 @@ def lw(program, rs, num, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    addr = num + program.registers[rt]
+    program.registers[rs] = (
+        program.memory[addr + 0] << 0 &
+        program.memory[addr + 1] << 8 &
+        program.memory[addr + 2] << 16 &
+        program.memory[addr + 3] << 24
+    )
 
 
 @mips_instruction(PTRN, parse)
@@ -131,7 +137,13 @@ def sw(program, rs, num, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    val = program.registers[rs]
+    program.memory[num + program.registers[rt]] = [
+        val & 0xFF_00_00_00,
+        val & 0x00_FF_00_00,
+        val & 0x00_00_FF_00,
+        val & 0x00_00_00_FF,
+    ]
 
 
 @mips_instruction(PTRN, parse)

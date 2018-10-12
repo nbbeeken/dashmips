@@ -21,4 +21,4 @@ def jr(program, rs):
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers['pc'] = program.registers[rs]

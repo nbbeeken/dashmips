@@ -31,13 +31,13 @@ class Instruction:
         if not args:
             args = tuple()
 
-        save_pc = program.registers['pc']
-        program.registers['pc'] = None  # type: ignore
         self.fn(program, *args)
-        if program.registers['pc'] is None:
-            # if not jmp/branch instruction pc will be None so we increment
+        if not program.registers.pc_changed:
+            # if not jmp/branch instruction pc
+            # wont have been changed in the instruction
             # otherwise, pc will have some value for next line of execution
-            program.registers['pc'] = save_pc + 1
+            program.registers['pc'] += 1
+            program.registers.pc_changed  # reading resets
 
     def __repr__(self):
         """Return Representation string."""

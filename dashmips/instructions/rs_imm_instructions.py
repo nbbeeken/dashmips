@@ -1,7 +1,7 @@
 """Register Immediate (Label) instructions."""
 from dashmips.instructions import mips_instruction
 
-PTRN = r"{instr_gap}({register}){args_gap}({number})"
+PTRN = r"{instr_gap}({register}){args_gap}({label})"
 
 
 def parse(arg):
@@ -10,7 +10,7 @@ def parse(arg):
     :param arg:
 
     """
-    return (arg[2], parse_int(arg[3]))
+    return (arg[2], arg[3])
 
 
 @mips_instruction(PTRN, parse, label=True)

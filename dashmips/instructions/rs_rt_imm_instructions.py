@@ -142,30 +142,3 @@ def srl(program, rs, rt, num):
 
     """
     raise NotImplementedError('TODO')
-
-
-@mips_instruction(PTRN, parse)
-def beq(program, rs, rt, address):
-    """Branch to address if Reg[rs] == Reg[rt].
-
-    :param program:
-    :param rt:
-    :param rs:
-    :param address:
-
-    """
-    if program.registers[rs] == program.registers[rt]:
-        program.registers['pc'] = address
-
-
-@mips_instruction(PTRN, parse)
-def bne(program, rs, rt, address):
-    """Branch to address if Reg[rs] != Reg[rt].
-
-    :param program:
-    :param rt:
-    :param rs:
-    :param address:
-
-    """
-    raise NotImplementedError('TODO')

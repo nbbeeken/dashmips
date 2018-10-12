@@ -88,12 +88,18 @@ def preprocess(file: TextIO) -> MipsProgram:
     # Cannot run a program without a main
     assert 'main' in labels and labels['main'].type == mips.RE.TEXT_SEC
 
+    bp = memory.malloc(512)
+    init_regs = {
+        'pc': labels['main'].value,
+        '$sp': bp, '$fp': bp, '$gp': bp
+    }
+
     return MipsProgram(
         name=filename,
         labels=labels,
         memory=memory,
         source=processed_code,
-        registers=Registers({'pc': labels['main'].value}),
+        registers=Registers(init_regs),
         eqvs=eqvs
     )
 
@@ -197,15 +203,6 @@ def code_labels(
             # Otherwise save the line as is
             text.append(srcline)
 
-    # Converting in code labels to values
-    for idx, srcline in enumerate(text):
-        for name, label in labels.items():
-            # For each label modify the string so that the
-            # label is replaced with the value
-            if name in srcline.line:
-                srcline.line = srcline.line.replace(name, str(label.value))
-                text[idx] = srcline
-
     return text
 
 
@@ -250,6 +247,9 @@ def preprocessor_directives(lines: List[SourceLine]):
 
     :param lines: lines to compile.
     """
+    for idx, srcline in enumerate(lines):
+        if '.globl' in srcline.line:
+            del lines[idx]
     lines = resolve_include(lines)
     eqvs = resolve_eqvs(lines)
     lines = resolve_macros(lines)
@@ -342,6 +342,7 @@ def resolve_macros(lines: List[SourceLine]):
 
 
 def macro_with_args(idx, lines, macro, macroinfo, srcline):
+    """Handle Parsing for macro that has arguments."""
     macroregex = fr'{macro}\((.+)\)'
     match = re.match(macroregex, srcline.line)
     if match:

@@ -28,7 +28,7 @@ class RE:
     DATA_SEC = ".data"
     TEXT_SEC = ".text"
 
-    REGISTER = (r"hi|lo|(?:\$(?:(?:t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
+    REGISTER = (r"hi|lo|(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
                 r"|zero|sp|fp|gp|ra))")
     LABEL = r"\b[\w]+\b"
     DIRECTIVE = "\\." + "|\\.".join(Directives.keys())
@@ -45,7 +45,7 @@ class RE:
     # FIXME: Cannot capture '\''
     ASCII_LITERAL = r"'([\x00-\x7F]|\\[0abfnrt\\ve])'"
 
-    DEC = r"\b(?:(?:\+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))\b"
+    DEC = r"(?:(?:\+|-)?)(?:(?:[1-9](?:_?[0-9])*)|(?:0(?:_?0)*))"
     BIN = r"\b(?:0(?:b|B)(?:_?[0-1])+)\b"
     OCT = r"\b(?:0(?:o|O)(?:_?[0-7])+)\b"
     HEX = r"\b(?:0[xX])(?:_?[0-9a-fA-F])+\b"

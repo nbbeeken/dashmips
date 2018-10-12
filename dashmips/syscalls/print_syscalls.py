@@ -20,6 +20,17 @@ def print_string(program):
     print(''.join([chr(c) for c in byte_arr]), end='')
 
 
+@mips_syscall(11)
+def print_char(program):
+    """Print string at address provided in $a0.
+
+    :param program:
+
+    """
+    character = chr(program.registers['$a0'] & 0xFF)
+    print(character, end='')
+
+
 @mips_syscall(5)
 def read_int(program):
     """Read Int from stdin.

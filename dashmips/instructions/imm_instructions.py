@@ -1,7 +1,7 @@
 """Instructions that accept a label as an argument."""
 from dashmips.instructions import mips_instruction, parse_int
 
-PTRN = r"{instr_gap}({number})"
+PTRN = r"{instr_gap}({label})"
 
 
 def parse(args):
@@ -10,26 +10,27 @@ def parse(args):
     :param args:
 
     """
-    return (parse_int(args[2]),)
+    return (args[2],)
 
 
 @mips_instruction(PTRN, parse, label=True)
-def j(program, address: int):
+def j(program, address: str):
     """Jump unconditionally to label.
 
     :param program:
-    :param address: int:
+    :param address:
 
     """
-    program.registers['pc'] = address
+    program.registers['pc'] = program.labels[address].value
 
 
 @mips_instruction(PTRN, parse, label=True)
-def jal(program, address: int):
+def jal(program, address: str):
     """Jump unconditionally to label and set $ra to current $pc.
 
     :param program:
-    :param address: int:
+    :param address:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers['$ra'] = program.registers['pc'] + 1
+    program.registers['pc'] = program.labels[address].value
