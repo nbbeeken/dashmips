@@ -88,7 +88,7 @@ def preprocess(file: TextIO) -> MipsProgram:
     # Cannot run a program without a main
     assert 'main' in labels and labels['main'].type == mips.RE.TEXT_SEC
 
-    bp = memory.malloc(512)
+    bp = memory.malloc(512) + 508
     init_regs = {
         'pc': labels['main'].value,
         '$sp': bp, '$fp': bp, '$gp': bp

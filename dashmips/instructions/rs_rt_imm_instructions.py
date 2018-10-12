@@ -119,7 +119,7 @@ def sra(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def sll(program, rs, rt, num):
+def sll(program, rd, rt, num):
     """Shift Left Logical.
 
     :param program:
@@ -128,7 +128,7 @@ def sll(program, rs, rt, num):
     :param num:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = (program.registers[rt] << num) & 0xFFFF_FFFF
 
 
 @mips_instruction(PTRN, parse)

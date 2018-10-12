@@ -81,8 +81,8 @@ def bnez(program, rd, label: str):
 
 
 @mips_instruction(
-    r"{instr_gap}({number})",
-    lambda args: tuple(args[2])
+    r"{instr_gap}({label})",
+    lambda args: (args[2],)
 )
 def b(program, label: int):
     """Branch.
@@ -95,7 +95,8 @@ def b(program, label: int):
 
 
 @mips_instruction(
-    r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})",
+    r"{instr_gap}({register}){args_gap}" +
+    r"({register}|{number}){args_gap}({label})",
     lambda args: (args[2], args[3], args[4])
 )
 def bgt(program, rd, rs, label: str):
@@ -105,12 +106,18 @@ def bgt(program, rd, rs, label: str):
     :param label:
 
     """
-    if program.registers[rd] > program.registers[rs]:
+    if rs not in program.registers:
+        rs_val = parse_int(rs)
+    else:
+        rs_val = program.registers[rs]
+
+    if program.registers[rd] > rs_val:
         program.registers['pc'] = program.labels[label].value
 
 
 @mips_instruction(
-    r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})",
+    r"{instr_gap}({register}){args_gap}" +
+    r"({register}|{number}){args_gap}({label})",
     lambda args: (args[2], args[3], args[4])
 )
 def blt(program, rd, rs, label: int):
@@ -120,7 +127,12 @@ def blt(program, rd, rs, label: int):
     :param label:
 
     """
-    if program.registers[rd] < program.registers[rs]:
+    if rs not in program.registers:
+        rs_val = parse_int(rs)
+    else:
+        rs_val = program.registers[rs]
+
+    if program.registers[rd] < rs_val:
         program.registers['pc'] = program.labels[label].value
 
 

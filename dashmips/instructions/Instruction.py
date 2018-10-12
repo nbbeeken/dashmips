@@ -37,7 +37,8 @@ class Instruction:
             # wont have been changed in the instruction
             # otherwise, pc will have some value for next line of execution
             program.registers['pc'] += 1
-            program.registers.pc_changed  # reading resets
+
+        program.registers.pc_changed = False  # reset for next loop
 
     def __repr__(self):
         """Return Representation string."""

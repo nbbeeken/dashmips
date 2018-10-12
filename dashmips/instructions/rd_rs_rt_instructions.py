@@ -145,7 +145,10 @@ def slt(program, rd, rs, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    if program.registers[rs] < program.registers[rt]:
+        program.registers[rd] = 1
+    else:
+        program.registers[rd] = 0
 
 
 @mips_instruction(PTRN, parser)
@@ -197,7 +200,7 @@ def sub(program, rd, rs, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers[rs] - program.registers[rt]
 
 
 @mips_instruction(PTRN, parser)

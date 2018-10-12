@@ -53,7 +53,7 @@ def build_body(name, pattern, label):
         replace_ct += 1
 
     if label:
-        snip = snip.replace('number', f'${{{replace_ct}:label}}')
+        snip = snip.replace('label', f'${{{replace_ct}:label}}')
         replace_ct += 1
     else:
         snip = snip.replace('number', f'${{{replace_ct}:100}}')

@@ -58,7 +58,8 @@ def blez(program, rs, label):
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    if program.registers[rs] <= 0:
+        program.registers['pc'] = program.labels[label].value
 
 
 @mips_instruction(PTRN, parse, label=True)
