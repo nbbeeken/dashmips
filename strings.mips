@@ -5,38 +5,39 @@ str_input: .asciiz "Input: "
 str_result: .asciiz "Result: "
 
 # strlen
-strlen_header: .asciiz "\n\n********* strlen *********\n"
+strlen_header: .asciiz "\n********* strlen *********\n"
 str_helloworld: .asciiz "Hello, World"
 str_abc: .asciiz "abc\n"
+str_abc_viz: .asciiz "abc\\n"
 
 # strcmp
-strcmp_header: .asciiz "\n\n********* strcmp *********\n"
+strcmp_header: .asciiz "\n********* strcmp *********\n"
 strcmp_abc: .asciiz "abc"
 strcmp_ABCD: .asciiz "ABCD"
 
 # strncpy
-strncpy_header: .asciiz "\n\n********* strncpy *********\n"
+strncpy_header: .asciiz "\n********* strncpy *********\n"
 strncpy_buffer: .asciiz "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW"
 
 # indexof
-indexof_header: .asciiz "\n\n********* indexof *********\n"
+indexof_header: .asciiz "\n********* indexof *********\n"
 
 # reverse_str
-reverse_header: .asciiz "\n\n********* reverse_str *********\n"
+reverse_header: .asciiz "\n********* reverse_str *********\n"
 
 # atoi
-atoi_header: .asciiz "\n\n********* atoi *********\n"
+atoi_header: .asciiz "\n********* atoi *********\n"
 atoi_str: .asciiz "220"
 atoi_12b5: .asciiz "12b5"
 
 # cut
-cut_header: .asciiz "\n\n********* cut *********\n"
+cut_header: .asciiz "\n********* cut *********\n"
 cut_awesome: .asciiz "Awesome ANSI escape: \\033[1;45mHello, World!\\033[1;40m Yay!"
 cut_pattern_start: .asciiz "\\033["
 cut_pattern_end: .asciiz "m"
 
 # strtok
-strtok_header: .asciiz "\n\n********* strtok *********\n"
+strtok_header: .asciiz "\n********* strtok *********\n"
 strtok_awesome: .asciiz "Awesome ANSI escape: \\033[1;45mHello, World!\\033[1;40m Yay!"
 
 .macro print_string(%address)
@@ -69,208 +70,208 @@ strtok_awesome: .asciiz "Awesome ANSI escape: \\033[1;45mHello, World!\\033[1;40
 main:
 
 	# TEST CASE for strlen
-	print_string(strlen_header)
-	print_string(str_input)
-	print_string(str_helloworld)
-	print_newline
+		print_string(strlen_header)
+		print_string(str_input)
+		print_string(str_helloworld)
+		print_newline
 
-	la $a0, str_helloworld
-	jal strlen
+		la $a0, str_helloworld
+		jal strlen
 
-	move $t0, $v0
-	print_string(str_result)
-	print_int($t0)
-	print_newline
+		move $t0, $v0
+		print_string(str_result)
+		print_int($t0)
+		print_newline
 
-	print_string(str_input)
-	print_string(str_abc)
-	print_newline
+		print_string(str_input)
+		print_string(str_abc_viz)
+		print_newline
 
-	la $a0, str_abc
-	jal strlen
+		la $a0, str_abc
+		jal strlen
 
-	move $t0, $v0
-	print_string(str_result)
-	print_int($t0)
-	print_newline
+		move $t0, $v0
+		print_string(str_result)
+		print_int($t0)
+		print_newline
 
 	# TEST CASE for strcmp
-	print_string(strcmp_header)
-	print_string(str_input)
-	print_string(strcmp_abc)
-	print_space
-	print_string(strcmp_ABCD)
-	print_newline
+		print_string(strcmp_header)
+		print_string(str_input)
+		print_string(strcmp_abc)
+		print_space
+		print_string(strcmp_ABCD)
+		print_newline
 
-	la $a0, strcmp_abc
-	la $a1, strcmp_ABCD
-	jal strcmp
+		la $a0, strcmp_abc
+		la $a1, strcmp_ABCD
+		jal strcmp
 
-	move $t0, $v0
-	print_string(str_result)
-	print_int($t0)
-	print_newline
+		move $t0, $v0
+		print_string(str_result)
+		print_int($t0)
+		print_newline
 
-	print_string(str_input)
-	print_string(strcmp_abc)
-	print_space
-	print_string(strcmp_abc)
-	print_newline
+		print_string(str_input)
+		print_string(strcmp_abc)
+		print_space
+		print_string(strcmp_abc)
+		print_newline
 
-	la $a0, strcmp_abc
-	la $a1, strcmp_abc
-	jal strcmp
+		la $a0, strcmp_abc
+		la $a1, strcmp_abc
+		jal strcmp
 
-	move $t0, $v0
-	print_string(str_result)
-	print_int($t0)
-	print_newline
+		move $t0, $v0
+		print_string(str_result)
+		print_int($t0)
+		print_newline
 
-	print_string(str_input)
-	print_string(str_abc)
-	print_space
-	print_string(strcmp_abc)
-	print_newline
+		print_string(str_input)
+		print_string(str_abc_viz)
+		print_space
+		print_string(strcmp_abc)
+		print_newline
 
-	la $a0, str_abc
-	la $a1, strcmp_abc
-	jal strcmp
+		la $a0, str_abc
+		la $a1, strcmp_abc
+		jal strcmp
 
-	move $t0, $v0
-	print_string(str_result)
-	print_int($t0)
-	print_newline
+		move $t0, $v0
+		print_string(str_result)
+		print_int($t0)
+		print_newline
 
 	#  TEST CASE for strncpy
-	print_string(strncpy_header)
-	print_string(str_input)
-	print_string(str_helloworld)
-	print_newline
-	print_string(str_input)
-	print_string(strncpy_buffer)
-	print_newline
+		print_string(strncpy_header)
+		print_string(str_input)
+		print_string(str_helloworld)
+		print_newline
+		print_string(str_input)
+		print_string(strncpy_buffer)
+		print_newline
 
-	la $a0, strncpy_buffer
-	la $a1, str_helloworld
-	li $a2, 49
-	jal strncpy
+		la $a0, strncpy_buffer
+		la $a1, str_helloworld
+		li $a2, 49
+		jal strncpy
 
-	move $t0, $v0
-	print_string(str_result)
-	li $v0, 4
-	move $a0, $t0
-	syscall
-	print_newline
+		move $t0, $v0
+		print_string(str_result)
+		li $v0, 4
+		move $a0, $t0
+		syscall
+		print_newline
 
 	#  TEST CASE for indexof
-	print_string(indexof_header)
-	print_string(str_input)
-	print_string(str_helloworld)
-	print_newline
+		print_string(indexof_header)
+		print_string(str_input)
+		print_string(str_helloworld)
+		print_newline
 
-	la $a0, str_helloworld
-	li $a1, ','
-	jal indexOf
+		la $a0, str_helloworld
+		li $a1, ','
+		jal indexOf
 
-	move $t0, $v0
-	print_string(str_result)
-	print_int($t0)
-	print_newline
+		move $t0, $v0
+		print_string(str_result)
+		print_int($t0)
+		print_newline
 
 	#  TEST CASE for reverse string
-	print_string(reverse_header)
-	print_string(str_input)
-	print_string(str_helloworld)
-	print_newline
+		print_string(reverse_header)
+		print_string(str_input)
+		print_string(str_helloworld)
+		print_newline
 
-	la $a0, str_helloworld
-	jal reverse_str
-	print_string(str_result)
-	print_string(str_helloworld)
-	print_newline
+		la $a0, str_helloworld
+		jal reverse_str
+		print_string(str_result)
+		print_string(str_helloworld)
+		print_newline
 
 	#  TEST CASE for atoi
-	print_string(atoi_header)
-	print_string(str_input)
-	print_string(atoi_str)
-	print_newline
+		print_string(atoi_header)
+		print_string(str_input)
+		print_string(atoi_str)
+		print_newline
 
-	la $a0, atoi_str
-	jal atoi
-	move $t0, $v0
-	print_string(str_result)
-	print_int($t0)
-	print_newline
-	print_string(str_input)
-	print_string(atoi_12b5)
-	print_newline
+		la $a0, atoi_str
+		jal atoi
+		move $t0, $v0
+		print_string(str_result)
+		print_int($t0)
+		print_newline
+		print_string(str_input)
+		print_string(atoi_12b5)
+		print_newline
 
-	la $a0, atoi_12b5
-	jal atoi
-	move $t0, $v0
-	print_string(str_result)
-	print_int($t0)
-	print_newline
+		la $a0, atoi_12b5
+		jal atoi
+		move $t0, $v0
+		print_string(str_result)
+		print_int($t0)
+		print_newline
 
 	# TEST CASE for  cut
-	print_string(cut_header)
-	print_string(str_input)
-	print_string(cut_awesome)
-	print_newline
-	print_string(str_input)
-	print_string(cut_pattern_start)
-	print_newline
-	print_string(str_input)
-	print_string(cut_pattern_end)
-	print_newline
+		print_string(cut_header)
+		print_string(str_input)
+		print_string(cut_awesome)
+		print_newline
+		print_string(str_input)
+		print_string(cut_pattern_start)
+		print_newline
+		print_string(str_input)
+		print_string(cut_pattern_end)
+		print_newline
 
 
-	la $a0, cut_awesome
-	la $a1, cut_pattern_start
-	la $a2, cut_pattern_end
-	jal cut
+		la $a0, cut_awesome
+		la $a1, cut_pattern_start
+		la $a2, cut_pattern_end
+		jal cut
 
-	move $t0, $v0
-	print_string(str_result)
-	move $a0, $t0
-	li $v0, 34
-	syscall
-	print_newline
+		move $t0, $v0
+		print_string(str_result)
+		move $a0, $t0
+		li $v0, 34
+		syscall
+		print_newline
 
-	print_string(str_result)
-	print_int($v1)
-	print_newline
+		print_string(str_result)
+		print_int($v1)
+		print_newline
 
 	# TEST CASE for strtok
-	print_string(strtok_header)
-	print_string(str_input)
-	print_string(strtok_awesome)
-	print_newline
-	print_string(str_input)
-	li $a0, ';'
-	li $v0, 11
-	syscall
-	print_newline
+		print_string(strtok_header)
+		print_string(str_input)
+		print_string(strtok_awesome)
+		print_newline
+		print_string(str_input)
+		li $a0, ';'
+		li $v0, 11
+		syscall
+		print_newline
 
-	la $a0, strtok_awesome
-main_loop:
- 	li $a1 , ';'
-	jal strtok
+		la $a0, strtok_awesome
+		main_loop:
+			li $a1 , ';'
+			jal strtok
 
-	# if strok returns 0x0, 10 program
-	beqz $v0, quit_main
+			# if strok returns 0x0, 10 program
+			beqz $v0, quit_main
 
-	move $t0, $v0
-	print_string(str_result)
+			move $t0, $v0
+			print_string(str_result)
 
-	#there is a token string, print its value
-	move $a0, $t0
-	li $v0, 4
-	syscall
+			#there is a token string, print its value
+			move $a0, $t0
+			li $v0, 4
+			syscall
 
-	#set the argument to 0x0 and call strtok again
-	move $a0, $0
-	j main_loop
+			#set the argument to 0x0 and call strtok again
+			move $a0, $0
+			j main_loop
 
 quit_main:
 	#quit program
@@ -325,7 +326,7 @@ strcmp:
 	lw $t8, 0($sp) 			#load string addresses into place for loop
 	lw $t9, 4($sp) 			#load string addresses into place for loop
 	addi $sp, $sp, 8 		#return stack space
-	bne $v0, $t7 stringsNOTequal 	#go to return 0
+	bne $v0, $t7, stringsNOTequal 	#go to return 0
 	strcmploop: 				#we will loop through each char until end of strings (we have count in $t7) t7 is now loop counter
 		lb $t5, ($t8) 			#load char from str1
 		lb $t6, ($t9) 			#load char from str2
@@ -343,11 +344,12 @@ strcmp:
 	lw $ra, 0($sp) 			#restore return address
 	addi $sp, $sp, 4 		#return stack space
 	jr $ra
-#strncpy###############################################################################################################################################################################################
+#strncpy#######################################################################
 # Copies the string from src into dst.
 # @param dst Memory Address of space to copy string into. $a0
 # @param src Memory Address of string to copy from. $a1
-# @param n Non-negative maximum amount of bytes that can be copied from src. Maximum space allocated for dst. $a2
+# @param n Non-negative maximum amount of bytes that can be copied from src.
+#          Maximum space allocated for dst. $a2
 # @return Returns the address of dst.
 strncpy:
 	blez $a2, invalidN
@@ -378,7 +380,7 @@ strncpy:
 	move $v0, $t1			#copy address
 	invalidN:
 	jr $ra
-#indexOf###############################################################################################################################################################################################
+#indexOf#######################################################################
 # Obtain the integer index of the provided character.
 # @param str Memory address of a '\0' terminated string. $a0
 # @param c ASCII character to search the string for.	 $a1
@@ -408,11 +410,11 @@ indexOf:
 	lw $ra, 0($sp)		#load back ra
 	addi $sp, $sp, 4	#put back stack space
 	jr $ra			#bring 'er on home
-#######################################################################################################################################################################################################
+###############################################################################
 
 
 #MEDIUM STRING FUNCTIONS
-#######################################################################################################################################################################################################
+###############################################################################
 # Reverse the contents of the string.
 # @param str Address of a `\0` terminated string.
 reverse_str:
@@ -459,7 +461,7 @@ atoi:
 
 		blt $t7, '0', notNumber	#end loop not a digit
 		bgt $t7, '9', notNumber	#end loop not a digit
-		li, $t9, 48		#get the digit
+		li  $t9, 48		#get the digit
 		sub $t8, $t7, $t9	#sub 48, cus thats zero
 
 		#FOR MULTIPLYING SHIFT LEFT 2 TO MULTIPLY BY 8 THEN ADD TWICE  HEYO *10
@@ -475,11 +477,11 @@ atoi:
 	neg $v0, $t1
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-jr $ra
-#######################################################################################################################################################################################################
+    jr $ra
+###############################################################################
 #HARD STRING FUNCTIONS
 
-#######################################################################################################################################################################################################
+###############################################################################
 # Search for the first occurrence of the starting and ending pattern in the source string.
 # @$a0 src Address of a '\0' terminated string to search in.
 # @$a1 ptrn_start Address of a '\0' terminated string that marks the start of the pattern to search for in src.
@@ -570,7 +572,7 @@ cut:
 	sw $s0, 4($sp)		#load $s0
 	lw $ra, 0($sp)		#load ra
 	addi $sp, $sp, 36	#return stack space
-jr $ra
+    jr $ra
 #######################################################################################################################################################################################################
 strtok:
 	#Define your code here
@@ -581,6 +583,3 @@ strtok:
 
 	jr $ra
 #######################################################################################################################################################################################################
-
-.data
-
