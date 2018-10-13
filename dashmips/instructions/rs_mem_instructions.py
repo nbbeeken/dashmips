@@ -84,7 +84,7 @@ def lw(program, rs, num, rt):
     val = 0
     vals = program.memory[addr:addr + 4]
     for i, b in enumerate(reversed(vals)):
-        val |= b << i * 4
+        val |= b << i * 8
     program.registers[rs] = val
 
 
@@ -139,12 +139,7 @@ def sw(program, rs, num, rt):
 
     """
     val = program.registers[rs]
-    program.memory[num + program.registers[rt]] = [
-        val & 0xFF_00_00_00,
-        val & 0x00_FF_00_00,
-        val & 0x00_00_FF_00,
-        val & 0x00_00_00_FF,
-    ]
+    program.memory[num + program.registers[rt]] = val.to_bytes(4, 'big')
 
 
 @mips_instruction(PTRN, parse)

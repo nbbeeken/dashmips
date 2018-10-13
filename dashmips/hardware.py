@@ -93,7 +93,7 @@ class Registers(dict):
 
 
 class Memory(list):
-    """Mips RAM."""
+    """Mips Big Endiean RAM."""
 
     KIB = 2048
 
@@ -120,11 +120,13 @@ class Memory(list):
             raise MipsException('NULL-ish pointer')
         try:
             for idx, val in enumerate(value):
-                # val &= 0xFF
+                if val > 0xFF:
+                    raise MipsException('Bigger than a byte {value}')
                 super().__setitem__(key + idx, val)
             return self[key]
         except TypeError:
-            # value &= 0xFF
+            if value > 0xFF:
+                raise MipsException('Bigger than a byte {value}')
             return super().__setitem__(key, value)
 
     def __repr__(self):
@@ -145,13 +147,16 @@ class Memory(list):
         return s
 
     def malloc(self, size: int) -> int:
-        """Get address of unused memory.
+        """Get aligned address of unused memory.
 
         :param size: int:
 
         """
-        old_freespace = self._freespace
-        self._freespace += size
+        pad = self._freespace % 4
+        if pad > 0:
+            self._freespace = self._freespace + (4 - pad)
+        old_freespace = self._freespace  # Aligned to 4
+        self._freespace += (size + pad)  # Allocate Aligned amount
         return old_freespace
 
     # def encoded_str(self):

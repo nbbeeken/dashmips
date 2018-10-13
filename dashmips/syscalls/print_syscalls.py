@@ -55,6 +55,16 @@ def print_int(program):
     print(program.registers['$a0'], end='')
 
 
+@mips_syscall(34)
+def print_hex_int(program):
+    """Print Int in Hex.
+
+    :param program:
+
+    """
+    print(hex(program.registers['$a0']), end='')
+
+
 @mips_syscall(10)
 def _exit(program):
     """Exit MIPS Program.
