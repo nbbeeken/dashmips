@@ -2,7 +2,7 @@
 from typing import Callable, Any, Iterable, Match
 
 import dashmips.mips as mips
-from dashmips.preprocessor import MipsProgram
+from dashmips.models import MipsProgram
 
 
 class Instruction:
@@ -26,11 +26,8 @@ class Instruction:
         self.regex = f"({self.name}){regex_ptrn}".format(**mips.RE.ALL)
         self.parser: Callable[[Match], Iterable[Any]] = parser
 
-    def __call__(self, program: MipsProgram, args: Iterable = None):
+    def __call__(self, program: MipsProgram, args: Iterable = tuple()):
         """Callable Instruction."""
-        if not args:
-            args = tuple()
-
         self.fn(program, *args)
         if not program.registers.pc_changed:
             # if not jmp/branch instruction pc

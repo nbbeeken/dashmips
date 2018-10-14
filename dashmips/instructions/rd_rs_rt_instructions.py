@@ -23,7 +23,6 @@ def add(program, rd, rs, rt):
     :param rt:
 
     """
-    # TODO: @mrunal what's the behavoir??
     program.registers[rd] = (
         (program.registers[rs] + program.registers[rt]) & 0xFFFF_FFFF
     )
@@ -54,7 +53,7 @@ def _and(program, rd, rs, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers[rs] & program.registers[rt]
 
 
 @mips_instruction(PTRN, parser)
@@ -80,7 +79,8 @@ def movz(program, rd, rs, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    if program.registers[rt] == 0:
+        program.registers[rd] = program.registers[rs]
 
 
 @mips_instruction(PTRN, parser)
@@ -106,7 +106,7 @@ def nor(program, rd, rs, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = ~(program.registers[rs] | program.registers[rt])
 
 
 @mips_instruction(PTRN, parser)
@@ -119,7 +119,7 @@ def _or(program, rd, rs, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers[rs] | program.registers[rt]
 
 
 @mips_instruction(PTRN, parser)
@@ -213,7 +213,7 @@ def subu(program, rd, rs, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers[rs] - program.registers[rt]
 
 
 @mips_instruction(PTRN, parser)
@@ -226,4 +226,4 @@ def xor(program, rd, rs, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers[rs] ^ program.registers[rt]

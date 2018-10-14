@@ -3,68 +3,11 @@ import json
 import os
 import sys
 import logging as log
-from dataclasses import dataclass, field, asdict
 from socket import socket, SOL_SOCKET, SO_REUSEADDR
 from selectors import DefaultSelector, EVENT_READ, EVENT_WRITE
 from typing import List, Optional, Tuple, TextIO
 
-from dashmips.preprocessor import MipsProgram
-
-
-@dataclass
-class DebugMessage:
-    """Format for debug messages."""
-
-    command: str
-    program: MipsProgram
-    breakpoints: List[int] = field(default_factory=list)
-    message: str = ''
-    error: bool = False
-
-    def __post_init__(self):
-        """Ensure unique breakpoints."""
-        # set to remove duplicates and sort
-        self.breakpoints = sorted(set(self.breakpoints))
-
-    def __iter__(self):
-        """Make DebugMessage castable to dict."""
-        return iter(asdict(self).items())
-
-    @staticmethod
-    def from_dict(payload: dict):
-        """Deserialize from json to DebugMessage.
-
-        :param payload: dict:
-
-        """
-        from dashmips.debugger import Commands
-
-        if not payload:
-            # Payload is Falsey
-            return None
-        if 'command' not in payload:
-            # There is no command to handle
-            return None
-        if payload['command'] not in Commands:
-            # The command does not exist
-            return None
-
-        if 'program' in payload:
-            payload['program'] = MipsProgram.from_dict(
-                payload.get('program', {})
-            )
-        else:
-            payload['program'] = None
-        return DebugMessage(**payload)
-
-
-@dataclass
-class Client:
-    """A Client for DebugServer."""
-
-    rfile: TextIO
-    wfile: TextIO
-    address: Tuple[str, int]
+from dashmips.models import MipsProgram, DebugMessage, Client
 
 
 class DebugServer:
@@ -79,6 +22,11 @@ class DebugServer:
         self.listener.setblocking(False)
         self.listener.bind(address)
         self.listener.listen(128)
+
+        log.info(
+            f'Listening on {self.listener.getsockname()}',
+            extra={'client': ''}
+        )
 
         self.sel = DefaultSelector()
         self.sel.register(self.listener, EVENT_READ)
@@ -130,7 +78,7 @@ class DebugServer:
     def handle(self, client: Client):
         """Handle Debug Request.
 
-        :param client: Client:
+        :param client: who the incoming message is from
 
         """
         from dashmips.debugger import Commands
@@ -148,9 +96,9 @@ class DebugServer:
     def respond(self, client: Client, msg: DebugMessage):
         """Send response.
 
-        :param client: Client:
-        :param msg: DebugMessage:
+        :param client: destination of response
 
+        :param msg: message to send to client
         """
         msg_to_send = json.dumps(dict(msg))
         try:

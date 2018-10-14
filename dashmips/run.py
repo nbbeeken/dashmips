@@ -3,7 +3,7 @@ import re
 
 from dashmips.mips import MipsException
 from dashmips.instructions import Instructions
-from dashmips.preprocessor import MipsProgram
+from dashmips.models import MipsProgram
 
 
 def run(program: MipsProgram, runnable=lambda p: p.registers['pc'] != -1):

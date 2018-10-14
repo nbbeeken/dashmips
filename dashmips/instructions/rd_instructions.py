@@ -21,7 +21,7 @@ def mflo(program, rd):
     :param rd:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers['lo']
 
 
 @mips_instruction(PTRN, parse)
@@ -32,7 +32,7 @@ def mfhi(program, rd):
     :param rd:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers['hi']
 
 
 @mips_instruction(PTRN, parse)
@@ -43,7 +43,7 @@ def mthi(program, rd):
     :param rd:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers['hi'] = program.registers[rd]
 
 
 @mips_instruction(PTRN, parse)
@@ -54,4 +54,4 @@ def mtlo(program, rd):
     :param rd:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers['lo'] = program.registers[rd]

@@ -1,6 +1,7 @@
 """dashmips program."""
 import json
-from dashmips.preprocessor import preprocess, MipsProgram
+from dashmips.models import MipsProgram
+from dashmips.preprocessor import preprocess
 from dashmips.debugserver import debug_mips
 from dashmips.extension import generate_snippets, instruction_name_regex
 
@@ -9,7 +10,6 @@ def main_compile(args):
     """Compile/Exec mips code.
 
     :param args:
-
     """
     program = preprocess(args.FILE)
     if args.out:

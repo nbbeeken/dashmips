@@ -10,53 +10,7 @@ from typing import List, Dict, Any, Tuple, Optional, TextIO, Iterable
 from dashmips.mips import MipsException
 import dashmips.mips as mips
 from dashmips.hardware import Memory, Registers
-
-
-@dataclass
-class SourceLine:
-    """Mips Preprocessor Label."""
-
-    filename: str
-    lineno: int
-    line: str
-
-
-@dataclass
-class Label:
-    """Mips Preprocessor Label."""
-
-    type: str
-    value: int
-    name: str
-
-
-@dataclass
-class MipsProgram:
-    """All data associated with a mips program."""
-
-    name: str
-    labels: Dict[str, Label]
-    source: List[SourceLine]
-    memory: Memory = field(default_factory=Memory)
-    registers: Registers = field(default_factory=Registers)
-    eqvs: Dict[str, str] = field(default_factory=dict)
-
-    @staticmethod
-    def from_dict(prg) -> 'MipsProgram':
-        """From Basic dictionary to MipsProgram.
-
-        :param prg:
-
-        """
-        prg['memory'] = Memory(prg['memory'])
-        prg['registers'] = Registers(prg['registers'])
-        prg['labels'] = {ln: Label(**l) for ln, l in prg['labels'].items()}
-        prg['source'] = [SourceLine(**m) for m in prg['source']]
-        return MipsProgram(**prg)
-
-    def __iter__(self):
-        """Two item iterable for dictionary making."""
-        return iter(asdict(self).items())
+from dashmips.models import MipsProgram, SourceLine, Label
 
 
 def preprocess(file: TextIO) -> MipsProgram:
@@ -65,7 +19,6 @@ def preprocess(file: TextIO) -> MipsProgram:
     Breaks the code into directive and text sections.
 
     :param file: TextIO:
-
     """
     filename = os.path.abspath(file.name)
     memory = Memory()
@@ -86,7 +39,7 @@ def preprocess(file: TextIO) -> MipsProgram:
     processed_code = code_labels(labels, unprocessed_code)
 
     # Cannot run a program without a main
-    assert 'main' in labels and labels['main'].type == mips.RE.TEXT_SEC
+    assert 'main' in labels and labels['main'].kind == mips.RE.TEXT_SEC
 
     bp = memory.malloc(512) + 508
     init_regs = {
@@ -158,7 +111,7 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory):
             labels[name] = Label(
                 name=name,
                 value=address,
-                type=mips.RE.DATA_SEC
+                kind=mips.RE.DATA_SEC
             )
 
 
@@ -182,7 +135,7 @@ def code_labels(
         if match:
             # If there's a label save it to the labels dictionary
             labels[match[1]] = Label(
-                type=mips.RE.TEXT_SEC,
+                kind=mips.RE.TEXT_SEC,
                 value=(idx - lbl_ct),
                 name=match[1]
             )

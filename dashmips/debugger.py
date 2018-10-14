@@ -28,7 +28,6 @@ def debug_step(msg: DebugMessage) -> DebugMessage:
     """
     try:
         next_instruction(msg.program)
-        # TODO: Should be doing something with breakpoints here
         if msg.program.registers['pc'] == -1:
             msg.command = 'stop'
     except MipsException as exc:
