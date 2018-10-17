@@ -57,6 +57,10 @@ class MipsProgram:
         """Two item iterable for dictionary making."""
         return iter(asdict(self).items())
 
+    @property
+    def current_line(self):
+        """Return Current Line According to PC."""
+        return self.source[self.registers['pc']]
 
 @dataclass
 class DebugMessage:

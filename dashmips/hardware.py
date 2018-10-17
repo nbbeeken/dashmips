@@ -1,6 +1,6 @@
 """Mips Hardware."""
 from base64 import a85encode, a85decode
-from typing import Dict, Union
+from typing import Dict, Union, Callable
 
 names_enum = tuple(enumerate((
     # fmt: off
@@ -95,7 +95,7 @@ class Registers(dict):
 class Memory(list):
     """Mips Big Endiean RAM."""
 
-    KIB = 2048
+    PAGE = 4096
 
     def __init__(self, listish=None):
         """Create 2KB of MIPS RAM."""
@@ -106,12 +106,18 @@ class Memory(list):
             listish = []
         else:
             listish = list(listish)
-        remaining_size = (2 * Memory.KIB) - len(listish)
+        remaining_size = (3 * Memory.PAGE) - len(listish)
+
+        self.on_change_listeners = []
 
         super().__init__([
             *listish,
             *([0] * remaining_size)
         ])
+
+    def on_change(self, cb: Callable[['Memory'], None]):
+        """Insert on_change listener."""
+        self.on_change_listeners.append(cb)
 
     def __setitem__(self, key, value):
         """Bounds checking on access."""
@@ -128,6 +134,8 @@ class Memory(list):
             if value > 0xFF:
                 raise MipsException('Bigger than a byte {value}')
             return super().__setitem__(key, value)
+        finally:
+            [cb(self) for cb in self.on_change_listeners]
 
     def __repr__(self):
         """Compacted Memory string."""

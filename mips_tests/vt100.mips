@@ -1,0 +1,38 @@
+# Do NOT modify this file.
+# This file is NOT part of your homework 2 submission.
+.data
+hello_str: .asciiz "Hello!"
+
+.eqv VT100 0x2060
+
+.macro print_string(%address)
+    la $t9, %address                    # $t9 = string address
+    li $t8, VT100                       # $t8 = vt100 address
+    li $t6, 19968                       # $t6 = black bg white fg shift up 8
+
+    __strloop:
+        lb      $t7, 0($t9)             # Load character
+        beqz    $t7, __strloopdone      # if null byte end loop
+
+        or      $t3, $t6, $t7
+        sh      $t3, 0($t8)             # store color byte at vt100
+        # sb      $t7, 1($t8)             # store char byte at vt100+1
+        # Loop!
+        addi    $t9, $t9, 1
+        addi    $t8, $t8, 2
+        b __strloop
+    __strloopdone:
+    move $t9, $zero
+.end_macro
+
+.text
+.globl main
+
+main:
+    print_string(hello_str)
+
+quit_main:
+	#quit program
+	li $v0, 10
+	syscall
+

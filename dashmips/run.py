@@ -1,5 +1,6 @@
 """MIPS Runner."""
 import re
+import sys
 
 from dashmips.mips import MipsException
 from dashmips.instructions import Instructions
@@ -13,8 +14,16 @@ def run(program: MipsProgram, runnable=lambda p: p.registers['pc'] != -1):
     :param runnable:  (Default value = lambda p: p.registers['pc'] != -1)
 
     """
-    while runnable(program):
-        next_instruction(program)
+    try:
+        while runnable(program):
+            next_instruction(program)
+    except MipsException as mips_ex:
+        print(f"{mips_ex.message} on ", file=sys.stderr, end='')
+        print(
+            f"{program.current_line.filename}:{program.current_line.lineno}",
+            file=sys.stderr
+        )
+        sys.exit()
 
 
 def next_instruction(program):

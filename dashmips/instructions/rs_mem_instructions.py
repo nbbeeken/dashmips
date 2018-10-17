@@ -178,4 +178,5 @@ def sh(program, rs, num, rt):
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    val = program.registers[rs]
+    program.memory[num + program.registers[rt]] = val.to_bytes(2, 'big')

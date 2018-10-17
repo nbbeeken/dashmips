@@ -51,10 +51,10 @@ class RE:
     HEX = r"\b(?:0[xX])(?:_?[0-9a-fA-F])+\b"
 
     NUMBERS = [
-        DEC,
+        HEX,
         BIN,
         OCT,
-        HEX,
+        DEC,
         ASCII_LITERAL
     ]
 

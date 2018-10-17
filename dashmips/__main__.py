@@ -4,6 +4,8 @@ from dashmips.models import MipsProgram
 from dashmips.preprocessor import preprocess
 from dashmips.debugserver import debug_mips
 from dashmips.extension import generate_snippets, instruction_name_regex
+from dashmips.plugins.vt100 import VT100
+from threading import Thread
 
 
 def main_compile(args):
@@ -27,7 +29,16 @@ def main_compile(args):
 
     if args.run:
         from dashmips.run import run
-        run(program)
+        plugins = []
+        if args.vt100:
+            vt = VT100()
+            program.memory.on_change(vt.push)
+            t = Thread(target=run, args=(program,))
+            t.start()
+            vt.start()
+            vt.request_close()
+        else:
+            run(program)
 
     return 0
 
@@ -71,6 +82,10 @@ def main():
     )
     compileparse.add_argument(
         '--vscode', action='store_true', help='Output json for vscode'
+    )
+    compileparse.add_argument(
+        '-t', '--vt100', action='store_true',
+        help='Start VT100 Simulator'
     )
     compileparse.set_defaults(func=main_compile)
 
