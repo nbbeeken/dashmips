@@ -238,6 +238,7 @@ def flatten(nestedlist):
 def resolve_eqvs(lines: List[SourceLine]):
     """Gather eqvs to text replace throughout code."""
     eqvs = {}
+    to_del = []
     for idx, srcline in enumerate(lines):
         # Check for eqv on this line
         match = re.match(mips.RE.EQVS, srcline.line)
@@ -245,7 +246,9 @@ def resolve_eqvs(lines: List[SourceLine]):
             # Save Eqv into dict
             eqvs[match[1]] = match[2]
             # Delete the eqv line
-            del lines[idx]
+            to_del.append(idx)
+
+    lines = [l for i, l in enumerate(lines) if i not in to_del]
 
     for idx, srcline in enumerate(lines):
         # for each line

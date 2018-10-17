@@ -1,35 +1,44 @@
 # Do NOT modify this file.
 # This file is NOT part of your homework 2 submission.
 .data
-hello_str: .asciiz "Hello!"
+hello_str: .asciiz "Hello, "
+world_str: .asciiz "World!"
 
 .eqv VT100 0x2060
-
-.macro print_string(%address)
-    la $t9, %address                    # $t9 = string address
-    li $t8, VT100                       # $t8 = vt100 address
-    li $t6, 19968                       # $t6 = black bg white fg shift up 8
-
-    __strloop:
-        lb      $t7, 0($t9)             # Load character
-        beqz    $t7, __strloopdone      # if null byte end loop
-
-        or      $t3, $t6, $t7
-        sh      $t3, 0($t8)             # store color byte at vt100
-        # sb      $t7, 1($t8)             # store char byte at vt100+1
-        # Loop!
-        addi    $t9, $t9, 1
-        addi    $t8, $t8, 2
-        b __strloop
-    __strloopdone:
-    move $t9, $zero
-.end_macro
+.eqv REDYEL 19968                       # red bg yellow fg shift up 8
+.eqv BLUMAG 7424                        # blue bg magenta fg shift up 8
 
 .text
-.globl main
+
+# ($a0 = %address, $a1 = %color, $a2 = %vt100_offset)
+display_str:
+    move $t9, $a0                       # $t9 = string address
+    move $t6, $a1                       # $t6 = color
+
+    strloop:
+        lb      $t7, 0($t9)             # Load character
+        beqz    $t7, strloopdone        # if null byte end loop
+
+        or      $t3, $t6, $t7
+        sh      $t3, 0($a2)             # store color and char at vt100
+        # Loop!
+        addi    $t9, $t9, 1             # string[$t9++]
+        addi    $a2, $a2, 2             # vt100[$a2+=2]
+        b strloop
+
+    strloopdone:
+        jr $ra
 
 main:
-    print_string(hello_str)
+    li $a2, VT100                       # $a2 = vt100 address
+
+    la $a0, hello_str
+    li $a1, REDYEL
+    jal display_str
+
+    la $a0, world_str
+    li $a1, BLUMAG
+    jal display_str
 
 quit_main:
 	#quit program
