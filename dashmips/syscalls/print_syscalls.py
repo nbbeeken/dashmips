@@ -1,27 +1,22 @@
 """Syscalls related to printing."""
 from dashmips.syscalls import mips_syscall
+from dashmips.models import MipsProgram
 
 
 @mips_syscall(4)
-def print_string(program):
+def print_string(program: MipsProgram) -> None:
     """Print string at address provided in $a0.
 
     :param program:
 
     """
     address = program.registers['$a0']
-    i = 0
-    byte_arr = []
-    value = program.memory[address + i]
-    while value != 0:
-        byte_arr.append(value)
-        i += 1
-        value = program.memory[address + i]
-    print(''.join([chr(c) for c in byte_arr]), end='')
+    string = program.memory[address:program.memory.index(0x0, address)]
+    print(''.join([chr(c) for c in string]), end='')
 
 
 @mips_syscall(11)
-def print_char(program):
+def print_char(program: MipsProgram) -> None:
     """Print string at address provided in $a0.
 
     :param program:
@@ -32,7 +27,7 @@ def print_char(program):
 
 
 @mips_syscall(5)
-def read_int(program):
+def read_int(program: MipsProgram) -> None:
     """Read Int from stdin.
 
     :param program:
@@ -46,7 +41,7 @@ def read_int(program):
 
 
 @mips_syscall(1)
-def print_int(program):
+def print_int(program: MipsProgram) -> None:
     """Print Int.
 
     :param program:
@@ -56,7 +51,7 @@ def print_int(program):
 
 
 @mips_syscall(34)
-def print_hex_int(program):
+def print_hex_int(program: MipsProgram) -> None:
     """Print Int in Hex.
 
     :param program:
@@ -66,7 +61,7 @@ def print_hex_int(program):
 
 
 @mips_syscall(10)
-def _exit(program):
+def _exit(program: MipsProgram) -> None:
     """Exit MIPS Program.
 
     :param program:
@@ -77,12 +72,11 @@ def _exit(program):
 
 
 @mips_syscall(45)
-def dump_program(program):
+def dump_program(program: MipsProgram) -> None:
     """Print json format of program.
 
     :param program:
 
     """
     import json
-    d = dict(program)
-    print(json.dumps(d, indent=4))
+    print(json.dumps(program.to_dict(), indent=4))

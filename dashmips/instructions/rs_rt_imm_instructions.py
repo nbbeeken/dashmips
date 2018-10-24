@@ -1,11 +1,14 @@
 """Two Register and Immediate instructions."""
+from typing import Tuple
+
 from dashmips.instructions import mips_instruction, parse_int
+from dashmips.models import MipsProgram
 
 
 PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({number})"
 
 
-def parse(arg):
+def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, int]:
     """Two Register and Immediate instructions Parser.
 
     :param arg:
@@ -15,7 +18,7 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def addi(program, rs, rt, num):
+def addi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """Add immediate Reg[rs]=Reg[rt]+immediate.
 
     :param program:
@@ -28,7 +31,7 @@ def addi(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def addiu(program, rs, rt, num):
+def addiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """Add immediate unsigned Reg[rs]=Reg[rt]+immediate.
 
     :param program:
@@ -41,7 +44,7 @@ def addiu(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def ori(program, rs, rt, num):
+def ori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """Or immediate Reg[rs]=Reg[rt]|immediate.
 
     :param program:
@@ -54,7 +57,7 @@ def ori(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def andi(program, rs, rt, num):
+def andi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """And immediate Reg[rs]=Reg[rt]&immediate.
 
     :param program:
@@ -67,7 +70,7 @@ def andi(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def slti(program, rs, rt, num):
+def slti(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """Set on less than immediate.
 
     :param program:
@@ -80,7 +83,7 @@ def slti(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def sltiu(program, rs, rt, num):
+def sltiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """Set on less than immediate unsigned.
 
     :param program:
@@ -93,7 +96,7 @@ def sltiu(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def xori(program, rs, rt, num):
+def xori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """Xor immediate Reg[rs]=Reg[rt]^immediate.
 
     :param program:
@@ -106,7 +109,7 @@ def xori(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def sra(program, rs, rt, num):
+def sra(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """Shift Right Arithmetic.
 
     :param program:
@@ -119,7 +122,7 @@ def sra(program, rs, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def sll(program, rd, rt, num):
+def sll(program: MipsProgram, rd: str, rt: str, num: int) -> None:
     """Shift Left Logical.
 
     :param program:
@@ -132,7 +135,7 @@ def sll(program, rd, rt, num):
 
 
 @mips_instruction(PTRN, parse)
-def srl(program, rs, rt, num):
+def srl(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     """Shift Right Logical.
 
     :param program:

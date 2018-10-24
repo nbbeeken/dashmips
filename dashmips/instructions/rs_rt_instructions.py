@@ -1,10 +1,13 @@
 """Two Register Instructions."""
+from typing import Tuple
+
 from dashmips.instructions import mips_instruction
+from dashmips.models import MipsProgram
 
 PTRN = r"{instr_gap}({register}){args_gap}({register})"
 
 
-def parse(arg):
+def parse(arg: Tuple[str, str, str, str]) -> Tuple[str, str]:
     """Two Register Instructions Parser.
 
     :param arg:
@@ -14,7 +17,7 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def jalr(program, rs, rt):
+def jalr(program: MipsProgram, rs: str, rt: str) -> None:
     """Jump and link register.
 
     :param program:
@@ -26,7 +29,7 @@ def jalr(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def madd(program, rs, rt):
+def madd(program: MipsProgram, rs: str, rt: str) -> None:
     """Multiply Add.
 
     :param program:
@@ -38,7 +41,7 @@ def madd(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def maddu(program, rs, rt):
+def maddu(program: MipsProgram, rs: str, rt: str) -> None:
     """Multiply Add Unsigned.
 
     :param program:
@@ -50,7 +53,7 @@ def maddu(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def msubu(program, rs, rt):
+def msubu(program: MipsProgram, rs: str, rt: str) -> None:
     """Multiply Subtract Unsigned.
 
     :param program:
@@ -62,7 +65,7 @@ def msubu(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def msub(program, rs, rt):
+def msub(program: MipsProgram, rs: str, rt: str) -> None:
     """Multiply Subtract.
 
     :param program:
@@ -74,7 +77,7 @@ def msub(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def multu(program, rs, rt):
+def multu(program: MipsProgram, rs: str, rt: str) -> None:
     """Multiply Unsigned.
 
     :param program:
@@ -86,7 +89,7 @@ def multu(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def mult(program, rs, rt):
+def mult(program: MipsProgram, rs: str, rt: str) -> None:
     """Multiply.
 
     :param program:
@@ -98,7 +101,7 @@ def mult(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def clo(program, rs, rt):
+def clo(program: MipsProgram, rs: str, rt: str) -> None:
     """Count number of leading ones in Reg[rt].
 
     :param program:
@@ -110,7 +113,7 @@ def clo(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def clz(program, rs, rt):
+def clz(program: MipsProgram, rs: str, rt: str) -> None:
     """Count number of leading zeros in Reg[rt].
 
     :param program:
@@ -122,7 +125,7 @@ def clz(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def div(program, rs, rt):
+def div(program: MipsProgram, rs: str, rt: str) -> None:
     """Divide.
 
     :param program:
@@ -134,7 +137,7 @@ def div(program, rs, rt):
 
 
 @mips_instruction(PTRN, parse)
-def divu(program, rs, rt):
+def divu(program: MipsProgram, rs: str, rt: str) -> None:
     """Divide unsigned.
 
     :param program:

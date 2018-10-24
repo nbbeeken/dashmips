@@ -1,10 +1,14 @@
 """Instuctions that operate on one register."""
+from typing import Tuple
+
 from dashmips.instructions import mips_instruction
+from dashmips.models import MipsProgram
+
 
 PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})"
 
 
-def parse(arg):
+def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, str]:
     """Two Register and Immediate instructions Parser.
 
     :param arg:
@@ -14,7 +18,7 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse)
-def beq(program, rs, rt, label):
+def beq(program: MipsProgram, rs: str, rt: str, label: str) -> None:
     """Branch to label if Reg[rs] == Reg[rt].
 
     :param program:
@@ -28,7 +32,7 @@ def beq(program, rs, rt, label):
 
 
 @mips_instruction(PTRN, parse)
-def bne(program, rs, rt, label):
+def bne(program: MipsProgram, rs: str, rt: str, label: str) -> None:
     """Branch to label if Reg[rs] != Reg[rt].
 
     :param program:

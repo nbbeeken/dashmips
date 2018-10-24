@@ -1,11 +1,14 @@
 """Register and Memory access Instructions."""
+from typing import Tuple
+
 from dashmips.instructions import mips_instruction, parse_int
-from functools import reduce
+from dashmips.models import MipsProgram
+
 
 PTRN = r"{instr_gap}({register}){args_gap}({number}?)\(({register})\)"
 
 
-def parse(args):
+def parse(args: Tuple[str, str, str, str, str]) -> Tuple[str, int, str]:
     """Register and Memory access Instructions Parser.
 
     :param arg:
@@ -19,20 +22,19 @@ def parse(args):
 
 
 @mips_instruction(PTRN, parse)
-def lb(program, rs, num, rt):
+def lb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Load Byte.
 
     :param program:
     :param num:
     :param rs:
     :param rt:
-
     """
     program.registers[rs] = program.memory[num + program.registers[rt]]
 
 
 @mips_instruction(PTRN, parse)
-def lbu(program, rs, num, rt):
+def lbu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Load Byte Unsigned.
 
     :param program:
@@ -45,7 +47,7 @@ def lbu(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def lh(program, rs, num, rt):
+def lh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Load half-word.
 
     :param program:
@@ -58,7 +60,7 @@ def lh(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def lhu(program, rs, num, rt):
+def lhu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Load half-word unsigned.
 
     :param program:
@@ -71,7 +73,7 @@ def lhu(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def lw(program, rs, num, rt):
+def lw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Load word.
 
     :param program:
@@ -89,7 +91,7 @@ def lw(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def lwl(program, rs, num, rt):
+def lwl(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Load Word Left: Load from 1 to 4 bytes left-justified into $t1.
 
     :param program:
@@ -102,7 +104,7 @@ def lwl(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def lwr(program, rs, num, rt):
+def lwr(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Load Word Right: Load from 1 to 4 bytes right-justified into $t1.
 
     :param program:
@@ -115,7 +117,7 @@ def lwr(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def sb(program, rs, num, rt):
+def sb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Store Byte.
 
     :param program:
@@ -129,7 +131,7 @@ def sb(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def sw(program, rs, num, rt):
+def sw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Store word.
 
     :param program:
@@ -139,11 +141,12 @@ def sw(program, rs, num, rt):
 
     """
     val = program.registers[rs]
-    program.memory[num + program.registers[rt]] = val.to_bytes(4, 'big')
+    addr = num + program.registers[rt]
+    program.memory[addr:addr + 4] = val.to_bytes(4, 'big')
 
 
 @mips_instruction(PTRN, parse)
-def swl(program, rs, num, rt):
+def swl(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Store Word Left: Load from 1 to 4 bytes left-justified into $t1.
 
     :param program:
@@ -156,7 +159,7 @@ def swl(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def swr(program, rs, num, rt):
+def swr(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Store Word Right: Load from 1 to 4 bytes right-justified into $t1.
 
     :param program:
@@ -169,7 +172,7 @@ def swr(program, rs, num, rt):
 
 
 @mips_instruction(PTRN, parse)
-def sh(program, rs, num, rt):
+def sh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """Store halfword.
 
     :param program:
@@ -179,4 +182,5 @@ def sh(program, rs, num, rt):
 
     """
     val = program.registers[rs]
-    program.memory[num + program.registers[rt]] = val.to_bytes(2, 'big')
+    addr = num + program.registers[rt]
+    program.memory[addr:addr + 2] = val.to_bytes(2, 'big')

@@ -1,25 +1,27 @@
 """dashmips program."""
+import argparse
 import json
-from dashmips.models import MipsProgram
-from dashmips.preprocessor import preprocess
+from threading import Thread
+from typing import NoReturn, List, Any
+
 from dashmips.debugserver import debug_mips
 from dashmips.extension import generate_snippets, instruction_name_regex
 from dashmips.plugins.vt100 import VT100
-from threading import Thread
+from dashmips.preprocessor import preprocess
 
 
-def main_compile(args):
+def main_compile(args: argparse.Namespace) -> int:
     """Compile/Exec mips code.
 
     :param args:
     """
     program = preprocess(args.FILE)
     if args.out:
-        json.dump(dict(program), args.out)
+        json.dump(program.to_dict(), args.out)
 
     if args.json:
         # Ending matches socket communication
-        print(json.dumps(dict(program)))
+        print(json.dumps(program.to_dict()))
 
     if args.vscode:
         snippets = generate_snippets()
@@ -29,7 +31,7 @@ def main_compile(args):
 
     if args.run:
         from dashmips.run import run
-        plugins = []
+        plugins: List[Any] = []
         if args.vt100:
             vt = VT100()
             program.memory.on_change(vt.push)
@@ -43,18 +45,18 @@ def main_compile(args):
     return 0
 
 
-def main_debug(args):
+def main_debug(args: argparse.Namespace) -> int:
     """Start debug server for mips.
 
     :param args:
 
     """
     debug_mips(host=args.host, port=args.port, should_log=args.log)
+    return 0
 
 
-def main():
+def main() -> NoReturn:
     """Entry function for Dashmips."""
-    import argparse
     import sys
     parser = argparse.ArgumentParser('dashmips')
 

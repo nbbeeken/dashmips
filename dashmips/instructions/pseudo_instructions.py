@@ -1,5 +1,6 @@
 """Instructions that are not real."""
 from dashmips.instructions import mips_instruction, parse_int
+from dashmips.models import MipsProgram
 
 
 @mips_instruction(
@@ -7,7 +8,7 @@ from dashmips.instructions import mips_instruction, parse_int
     lambda args: (args[2], args[3]),
     label=True
 )
-def la(program, rd, address):
+def la(program: MipsProgram, rd: str, address: str) -> None:
     """Load address.
 
     :param program:
@@ -22,7 +23,7 @@ def la(program, rd, address):
     r"{instr_gap}({register}){args_gap}({number})",
     lambda args: (args[2], parse_int(args[3]))
 )
-def li(program, rd, number):
+def li(program: MipsProgram, rd: str, number: int) -> None:
     """Load immediate.
 
     :param program:
@@ -37,7 +38,7 @@ def li(program, rd, number):
     r"{instr_gap}({register}){args_gap}({register})",
     lambda args: (args[2], args[3])
 )
-def move(program, rd, rs):
+def move(program: MipsProgram, rd: str, rs: str) -> None:
     """Overwrite rd with rs.
 
     :param program:
@@ -52,7 +53,7 @@ def move(program, rd, rs):
     r"{instr_gap}({register}){args_gap}({label})",
     lambda args: (args[2], args[3])
 )
-def beqz(program, rd, label: str):
+def beqz(program: MipsProgram, rd: str, label: str) -> None:
     """Branch to label if Reg[rd]==0.
 
     :param program:
@@ -68,7 +69,7 @@ def beqz(program, rd, label: str):
     r"{instr_gap}({register}){args_gap}({label})",
     lambda args: (args[2], args[3])
 )
-def bnez(program, rd, label: str):
+def bnez(program: MipsProgram, rd: str, label: str) -> None:
     """Branch to label if Reg[rd]!=0.
 
     :param program:
@@ -84,7 +85,7 @@ def bnez(program, rd, label: str):
     r"{instr_gap}({label})",
     lambda args: (args[2],)
 )
-def b(program, label: int):
+def b(program: MipsProgram, label: str) -> None:
     """Branch.
 
     :param program:
@@ -99,7 +100,7 @@ def b(program, label: int):
     r"({register}|{number}){args_gap}({label})",
     lambda args: (args[2], args[3], args[4])
 )
-def bgt(program, rd, rs, label: str):
+def bgt(program: MipsProgram, rd: str, rs: str, label: str) -> None:
     """Branch to label if Reg[rd]>Reg[rs].
 
     :param program:
@@ -120,7 +121,7 @@ def bgt(program, rd, rs, label: str):
     r"({register}|{number}){args_gap}({label})",
     lambda args: (args[2], args[3], args[4])
 )
-def blt(program, rd, rs, label: int):
+def blt(program: MipsProgram, rd: str, rs: str, label: str) -> None:
     """Branch to label if Reg[rd]<Reg[rs].
 
     :param program:
@@ -140,7 +141,7 @@ def blt(program, rd, rs, label: int):
     r"{instr_gap}({register}){args_gap}({register})",
     lambda args: (args[2], args[3])
 )
-def neg(program, rd, rs):
+def neg(program: MipsProgram, rd: str, rs: str) -> None:
     """Negate Reg[rs] and store in Reg[rd].
 
     :param program:
@@ -154,7 +155,7 @@ def neg(program, rd, rs):
     r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})",
     lambda args: (args[2], args[3], args[4])
 )
-def bge(program, rd, rs, label):
+def bge(program: MipsProgram, rd: str, rs: str, label: str) -> None:
     """Branch to label if Reg[rd]>Reg[rs].
 
     :param program:

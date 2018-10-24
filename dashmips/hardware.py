@@ -1,6 +1,6 @@
 """Mips Hardware."""
-from base64 import a85encode, a85decode
-from typing import Dict, Union, Callable
+from typing import Dict, Union, Callable, Optional
+from typing import Iterable, Tuple, List, Mapping, cast
 
 names_enum = tuple(enumerate((
     # fmt: off
@@ -20,16 +20,16 @@ names_enum = tuple(enumerate((
 )))
 
 RegisterResolve: Dict[Union[str, int], str] = {
-    **{i: name for (i, name) in names_enum},
+    # **{i: name for (i, name) in names_enum},
     **{name: name for (i, name) in names_enum},
     **{f"${i}": name for (i, name) in names_enum},
 }
 
 
-class Registers(dict):
+class Registers(Dict[str, int]):
     """Mips Register File."""
 
-    def __init__(self, dictionary=None):
+    def __init__(self, dictionary: Optional[dict] = None) -> None:
         """Intializes 32 registers to zero.
 
         dictionary - can be partial/full dictionary of registers
@@ -48,40 +48,23 @@ class Registers(dict):
         else:
             super().__init__(base_reg)
 
-    def __setitem__(self, key, value: int):
+    def __setitem__(self, key: str, value: int) -> None:
         """
         Set register value.
 
         Accepts string or number for key
         """
-        if value > 0xFF_FF_FF_FF:
-            from dashmips.mips import MipsException
-            raise MipsException('Register value cannot exceed 32 bits')
-        key = RegisterResolve[key]
-        self.pc_changed = (key == 'pc')
-        return super().__setitem__(key, value)
+        assert not value & 0x00_00_00_00, 'Reg value cannot exceed 32 bits'
+        self.pc_changed = (RegisterResolve[key] == 'pc')
+        super().__setitem__(RegisterResolve[key], value)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> int:
         """
         Get register value.
 
         Accepts string or number for key
         """
         return super().__getitem__(RegisterResolve[key])
-
-    def update(self, d, **kwargs):
-        """Resolve register names before calling dict update.
-
-        :param d:
-        :param **kwargs:
-
-        """
-        d.update(kwargs)
-        remap = {
-            RegisterResolve[k]: v
-            for k, v in d.items()
-        }
-        return super().update(remap)
 
     # def readablenum_registers(self):
     #     """ """
@@ -92,12 +75,12 @@ class Registers(dict):
     #     return None
 
 
-class Memory(list):
+class Memory(List[int]):
     """Mips Big Endiean RAM."""
 
     PAGE = 4096
 
-    def __init__(self, listish=None):
+    def __init__(self, listish: Optional[Iterable] = None) -> None:
         """Create 2KB of MIPS RAM."""
         self._freespace = 0x4
         # if isinstance(listish, bytes) or isinstance(listish, str):
@@ -108,7 +91,7 @@ class Memory(list):
             listish = list(listish)
         remaining_size = (3 * Memory.PAGE) - len(listish)
 
-        self.on_change_listeners = []
+        self.on_change_listeners: List[Callable[['Memory'], None]] = []
 
         super().__init__([
             *listish,
@@ -119,29 +102,27 @@ class Memory(list):
             self[i] = 0x0F
             self[i + 1] = ord(' ')
 
-    def on_change(self, cb: Callable[['Memory'], None]):
+    def on_change(self, cb: Callable[['Memory'], None]) -> None:
         """Insert on_change listener."""
         self.on_change_listeners.append(cb)
 
-    def __setitem__(self, key, value):
+    def __setitem__(
+        self,
+        key: Union[int, slice],
+        value: Union[int, Iterable[int]]
+    ) -> None:
         """Bounds checking on access."""
-        from dashmips.mips import MipsException
-        if 0x0 == key <= 0x3:
-            raise MipsException('NULL-ish pointer')
-        try:
-            for idx, val in enumerate(value):
-                if val > 0xFF:
-                    raise MipsException('Bigger than a byte {value}')
-                super().__setitem__(key + idx, val)
-            return self[key]
-        except TypeError:
-            if value > 0xFF:
-                raise MipsException('Bigger than a byte {value}')
-            return super().__setitem__(key, value)
-        finally:
-            [cb(self) for cb in self.on_change_listeners]
+        if isinstance(key, slice) and isinstance(value, (list, tuple)):
+            # Handle slice assignment
+            for byte in value:
+                assert not (byte & 0x00), f"0x{byte:X} is greater than a byte"
+        elif isinstance(key, int) and isinstance(value, int):
+            # Handle single index assignment
+            assert not (value & 0x00), f"0x{value:X} is greater than a byte"
 
-    def __repr__(self):
+        super().__setitem__(key, value)  # type: ignore
+
+    def __repr__(self) -> str:
         """Compacted Memory string."""
         s = '['
         zero_ct = 0

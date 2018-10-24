@@ -1,6 +1,6 @@
 """Data Models Essential to the Dashmips Ecosystem."""
 from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Tuple, TextIO
+from typing import Dict, List, Tuple, TextIO, Iterable, Any, Optional, cast
 
 
 @dataclass
@@ -41,7 +41,7 @@ class MipsProgram:
     eqvs: Dict[str, str] = field(default_factory=dict)
 
     @staticmethod
-    def from_dict(prg) -> 'MipsProgram':
+    def from_dict(prg: Dict[str, Any]) -> 'MipsProgram':
         """From Basic dictionary to MipsProgram.
 
         :param prg:
@@ -53,14 +53,16 @@ class MipsProgram:
         prg['source'] = [SourceLine(**m) for m in prg['source']]
         return MipsProgram(**prg)
 
-    def __iter__(self):
+    def to_dict(self) -> dict:
         """Two item iterable for dictionary making."""
-        return iter(asdict(self).items())
+        return asdict(self)
 
     @property
-    def current_line(self):
+    def current_line(self) -> SourceLine:
         """Return Current Line According to PC."""
-        return self.source[self.registers['pc']]
+        pc: int = self.registers['pc']
+        return self.source[pc]
+
 
 @dataclass
 class DebugMessage:
@@ -74,17 +76,17 @@ class DebugMessage:
     message: str = ''
     error: bool = False
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Ensure unique breakpoints."""
         # set to remove duplicates and sort
         self.breakpoints = sorted(set(self.breakpoints))
 
-    def __iter__(self):
+    def to_dict(self) -> dict:
         """Make DebugMessage castable to dict."""
-        return iter(asdict(self).items())
+        return asdict(self)
 
     @staticmethod
-    def from_dict(payload: dict):
+    def from_dict(payload: dict) -> Optional['DebugMessage']:
         """Deserialize from json to DebugMessage.
 
         :param payload:

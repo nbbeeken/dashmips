@@ -1,10 +1,14 @@
 """Three Register instructions."""
+from typing import Tuple
+
 from dashmips.instructions import mips_instruction
+from dashmips.models import MipsProgram
+
 
 PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({register})"
 
 
-def parser(args):
+def parse(args: Tuple[str, str, str, str, str]) -> Tuple[str, str, str]:
     """Parser for rd rs rt format instructions.
 
     :param args:
@@ -13,8 +17,8 @@ def parser(args):
     return (args[2], args[3], args[4])
 
 
-@mips_instruction(PTRN, parser)
-def add(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def add(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Add Reg[rd]=Reg[rs]+Reg[rt].
 
     :param program:
@@ -28,8 +32,8 @@ def add(program, rd, rs, rt):
     )
 
 
-@mips_instruction(PTRN, parser)
-def addu(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def addu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Add unsigned Reg[rd]=Reg[rs]+Reg[rt].
 
     :param program:
@@ -43,8 +47,8 @@ def addu(program, rd, rs, rt):
     )
 
 
-@mips_instruction(PTRN, parser)
-def _and(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def _and(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Bitwise And Reg[rd]=Reg[rs]&Reg[rt].
 
     :param program:
@@ -56,8 +60,8 @@ def _and(program, rd, rs, rt):
     program.registers[rd] = program.registers[rs] & program.registers[rt]
 
 
-@mips_instruction(PTRN, parser)
-def movn(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def movn(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Move conditional Reg[rd]=Reg[rs] if Reg[rt] != 0.
 
     :param program:
@@ -69,8 +73,8 @@ def movn(program, rd, rs, rt):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parser)
-def movz(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def movz(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Move conditional Reg[rd]=Reg[rs] if Reg[rt] == 0.
 
     :param program:
@@ -83,8 +87,8 @@ def movz(program, rd, rs, rt):
         program.registers[rd] = program.registers[rs]
 
 
-@mips_instruction(PTRN, parser)
-def mul(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def mul(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Multiplication without overflow.
 
     :param program:
@@ -96,8 +100,8 @@ def mul(program, rd, rs, rt):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parser)
-def nor(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def nor(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Bitwise Nor Reg[rd]=~(Reg[rs]|Reg[rt]).
 
     :param program:
@@ -109,8 +113,8 @@ def nor(program, rd, rs, rt):
     program.registers[rd] = ~(program.registers[rs] | program.registers[rt])
 
 
-@mips_instruction(PTRN, parser)
-def _or(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def _or(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Bitwise And Reg[rd]=Reg[rs]|Reg[rt].
 
     :param program:
@@ -122,8 +126,8 @@ def _or(program, rd, rs, rt):
     program.registers[rd] = program.registers[rs] | program.registers[rt]
 
 
-@mips_instruction(PTRN, parser)
-def sllv(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def sllv(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Shift Left Logical.
 
     :param program:
@@ -135,8 +139,8 @@ def sllv(program, rd, rs, rt):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parser)
-def slt(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def slt(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Set on less than.
 
     :param program:
@@ -151,8 +155,8 @@ def slt(program, rd, rs, rt):
         program.registers[rd] = 0
 
 
-@mips_instruction(PTRN, parser)
-def sltu(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def sltu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Set on less than unsigned.
 
     :param program:
@@ -164,8 +168,8 @@ def sltu(program, rd, rs, rt):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parser)
-def srav(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def srav(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Bitwise Shift Right Arithmetic Variable.
 
     :param program:
@@ -177,8 +181,8 @@ def srav(program, rd, rs, rt):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parser)
-def srlv(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def srlv(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Bitwise Shift Right Logical Variable.
 
     :param program:
@@ -190,8 +194,8 @@ def srlv(program, rd, rs, rt):
     raise NotImplementedError('TODO')
 
 
-@mips_instruction(PTRN, parser)
-def sub(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def sub(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Subtract Reg[rd]=Reg[rs]-Reg[rt].
 
     :param program:
@@ -203,8 +207,8 @@ def sub(program, rd, rs, rt):
     program.registers[rd] = program.registers[rs] - program.registers[rt]
 
 
-@mips_instruction(PTRN, parser)
-def subu(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def subu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Subtract unsigned Reg[rd]=Reg[rs]-Reg[rt].
 
     :param program:
@@ -216,8 +220,8 @@ def subu(program, rd, rs, rt):
     program.registers[rd] = program.registers[rs] - program.registers[rt]
 
 
-@mips_instruction(PTRN, parser)
-def xor(program, rd, rs, rt):
+@mips_instruction(PTRN, parse)
+def xor(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """Bitwise And Reg[rd]=Reg[rs]^Reg[rt].
 
     :param program:

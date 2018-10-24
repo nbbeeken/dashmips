@@ -1,19 +1,17 @@
 """Mips Debug Server."""
 import json
-import os
-import sys
 import logging as log
+from selectors import DefaultSelector, EVENT_READ
 from socket import socket, SOL_SOCKET, SO_REUSEADDR
-from selectors import DefaultSelector, EVENT_READ, EVENT_WRITE
-from typing import List, Optional, Tuple, TextIO
+from typing import List, Optional, Tuple
 
-from dashmips.models import MipsProgram, DebugMessage, Client
+from dashmips.models import DebugMessage, Client
 
 
 class DebugServer:
     """DebugServer."""
 
-    def __init__(self, address):
+    def __init__(self, address: Tuple[str, int]) -> None:
         """Create DebugServer."""
         self.clients: List[Client] = []
 
@@ -31,7 +29,7 @@ class DebugServer:
         self.sel = DefaultSelector()
         self.sel.register(self.listener, EVENT_READ)
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         """Shutdown Server."""
         for c in self.clients:
             c.rfile.close()
@@ -40,7 +38,7 @@ class DebugServer:
         self.sel.close()
         log.warning("Shutdown", extra={'client': ''})
 
-    def find_client(self, fd):
+    def find_client(self, fd: int) -> Optional[Client]:
         """Find client by rfile fd.
 
         :param fd:
@@ -51,7 +49,7 @@ class DebugServer:
                 return c
         return None  # This cannot happen
 
-    def run(self):
+    def run(self) -> None:
         """Run select loop."""
         while True:
             events = self.sel.select()
@@ -60,9 +58,10 @@ class DebugServer:
                     self.accept()
                 else:
                     client = self.find_client(key.fd)
-                    self.handle(client)
+                    if client:
+                        self.handle(client)
 
-    def accept(self):
+    def accept(self) -> None:
         """Accept New Client."""
         client_socket, client_address = self.listener.accept()
         client_socket.setblocking(False)
@@ -72,10 +71,10 @@ class DebugServer:
             client_address
         )
         self.clients.append(client)
-        self.sel.register(client.rfile, EVENT_READ)
+        self.sel.register(client.rfile.fileno(), EVENT_READ)
         log.debug('Added to clients', extra={'client': client.address})
 
-    def handle(self, client: Client):
+    def handle(self, client: Client) -> None:
         """Handle Debug Request.
 
         :param client: who the incoming message is from
@@ -87,20 +86,18 @@ class DebugServer:
 
         msg = self.receive(client)
 
-        if msg is None:
+        if msg is not None:
             # Nothing to handle
-            return
+            self.respond(client, Commands[msg.command](msg))
 
-        self.respond(client, Commands[msg.command](msg))
-
-    def respond(self, client: Client, msg: DebugMessage):
+    def respond(self, client: Client, msg: DebugMessage) -> None:
         """Send response.
 
         :param client: destination of response
 
         :param msg: message to send to client
         """
-        msg_to_send = json.dumps(dict(msg))
+        msg_to_send = json.dumps(msg.to_dict())
         try:
             client.wfile.write(msg_to_send + '\n')
             client.wfile.flush()
@@ -116,7 +113,7 @@ class DebugServer:
             )
             self.remove_client(client)
 
-    def receive(self, client: Client):
+    def receive(self, client: Client) -> Optional[DebugMessage]:
         """Receive Client Command.
 
         :param client: Client:
@@ -133,12 +130,20 @@ class DebugServer:
                 self.remove_client(client)
                 return None
 
-            msg = DebugMessage.from_dict(json.loads(txt))
-            log.debug(
-                f"Receive {msg.command}" +
-                f"{(' - ' + msg.message) if msg.message else ''}",
-                extra={'client': client.address}
+            msg: Optional[DebugMessage] = DebugMessage.from_dict(
+                json.loads(txt)
             )
+            if msg:
+                log.debug(
+                    f"Receive {msg.command}" +
+                    f"{(' - ' + msg.message) if msg.message else ''}",
+                    extra={'client': client.address}
+                )
+            else:
+                log.debug(
+                    f"Receive Unparsable \"{txt}\"",
+                    extra={'client': client.address}
+                )
             return msg
         except json.JSONDecodeError:
             log.error(
@@ -155,7 +160,7 @@ class DebugServer:
             self.remove_client(client)
             return None
 
-    def remove_client(self, client):
+    def remove_client(self, client: Client) -> None:
         """Remove client from list.
 
         :param client:
@@ -163,7 +168,7 @@ class DebugServer:
         """
         self.clients.remove(client)
         try:
-            self.sel.unregister(client.rfile)
+            self.sel.unregister(client.rfile.fileno())
             client.rfile.close()
             client.wfile.close()
             log.warning(
@@ -177,7 +182,11 @@ class DebugServer:
             )
 
 
-def debug_mips(host='localhost', port=9999, should_log=False):
+def debug_mips(
+    host: str = 'localhost',
+    port: int = 9999,
+    should_log: bool = False
+) -> None:
     """Create a debugging instance of mips.
 
     :param host:  (Default value = 'localhost')

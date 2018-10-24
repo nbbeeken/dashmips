@@ -1,10 +1,13 @@
 """Instructions that accept a label as an argument."""
-from dashmips.instructions import mips_instruction, parse_int
+from typing import Tuple
+
+from dashmips.instructions import mips_instruction
+from dashmips.models import MipsProgram
 
 PTRN = r"{instr_gap}({label})"
 
 
-def parse(args):
+def parse(args: Tuple[str, str, str]) -> Tuple[str]:
     """Parse label to pass to instruction function.
 
     :param args:
@@ -14,7 +17,7 @@ def parse(args):
 
 
 @mips_instruction(PTRN, parse, label=True)
-def j(program, address: str):
+def j(program: MipsProgram, address: str) -> None:
     """Jump unconditionally to label.
 
     :param program:
@@ -25,7 +28,7 @@ def j(program, address: str):
 
 
 @mips_instruction(PTRN, parse, label=True)
-def jal(program, address: str):
+def jal(program: MipsProgram, address: str) -> None:
     """Jump unconditionally to label and set $ra to current $pc.
 
     :param program:

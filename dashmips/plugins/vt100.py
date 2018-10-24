@@ -1,12 +1,8 @@
 """VT100 Simulator using MMIO."""
-import sys
 import tkinter as tk
-import tkinter.font as tkfont
-from tkinter import ttk
-from pprint import pprint as pretty
-from threading import Thread
-from itertools import tee
+from typing import Any
 
+from dashmips.hardware import Memory
 from dashmips.plugins import Plugin
 
 VGA_COLORS = {
@@ -50,19 +46,23 @@ class VT100(Plugin):
     SIZE = (80 * 25) * 2
     BASE_ADDR = 0x2060  # 8288
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Construct VT100."""
         super(VT100, self).__init__(name='VT100')
         self.root = tk.Tk()
         self.root.title("VT100")
 
-        self.content = tk.Variable(self.root, b'', 'content')
+        self.content = tk.Variable(self.root, b'', 'content')  # type: ignore
         self.content.trace_add('write', self.pull)
 
-        self.quit_request = tk.BooleanVar(self.root, False, 'quit_request')
+        self.quit_request = tk.BooleanVar(  # type: ignore
+            self.root, False, 'quit_request'
+        )
         self.quit_request.trace_add('write', self.close)
 
-        self.vt = tk.Text(self.root, state='disabled', width=80, height=25)
+        self.vt = tk.Text(  # type: ignore
+            self.root, state='disabled', width=80, height=25
+        )
         self.vt.configure({
             'fg': 'white',
             'bg': 'black',
@@ -76,14 +76,14 @@ class VT100(Plugin):
 
         self.screen: bytes = b'\x0F ' * VT100.SIZE
 
-    def start(self):
+    def start(self) -> None:
         """Run simulator FUNCTION BLOCKS."""
         try:
-            self.root.mainloop()
+            self.root.mainloop()  # type: ignore
         except KeyboardInterrupt:
             pass
 
-    def add_tags(self):
+    def add_tags(self) -> None:
         """Add Color Tags to vt widget."""
         bold = ('Courier', 12, 'bold')
         normal = ('Courier', 12, 'normal')
@@ -95,26 +95,26 @@ class VT100(Plugin):
             )
 
     @staticmethod
-    def get_tagname(num):
+    def get_tagname(num: int) -> str:
         """Get Tag name based on vga byte."""
         bgcolor = VGA_COLORS[(num & 0b1111_0000) >> 4]
         fgcolor = VGA_COLORS[(num & 0b0000_1111) >> 0]
         return f'{bgcolor}_{fgcolor}'
 
     @staticmethod
-    def get_index(idx):
+    def get_index(idx: int) -> str:
         """From index into byte array return tk.Text position string."""
         return f'{(idx // VT100.WIDTH) + 1}.{idx % VT100.WIDTH}'
 
-    def close(self, *a):
+    def close(self, *a: Any) -> None:
         """Close the VT100 Window."""
-        self.root.quit()
+        self.root.quit()  # type: ignore
 
-    def request_close(self):
+    def request_close(self) -> None:
         """Request to close the VT100 Window."""
         self.quit_request.set(True)
 
-    def pull(self, *changes):
+    def pull(self, *changes: Any) -> None:
         """Pull Updated Screen."""
         vga_memory: bytes = self.content.get()
 
@@ -132,7 +132,7 @@ class VT100(Plugin):
 
         self.vt['state'] = 'disabled'
 
-    def push(self, memory):
+    def push(self, memory: Memory) -> None:
         """Push a new memory text layout."""
         mmio = bytes(memory[VT100.BASE_ADDR:VT100.BASE_ADDR + VT100.SIZE])
         if mmio == self.screen:

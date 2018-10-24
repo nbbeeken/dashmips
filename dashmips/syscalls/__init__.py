@@ -3,14 +3,15 @@
 NOTE: If you add a new file/module to this package *YOU MUST*
 import the file to `dashmips/__init__.py`
 """
-from typing import Dict
+from typing import Dict, Callable
 
 from dashmips.syscalls.Syscall import Syscall
+from dashmips.models import MipsProgram
 
 Syscalls: Dict[int, Syscall] = {}
 
 
-def mips_syscall(number):
+def mips_syscall(number: int) -> Callable:
     """Make a Syscall object from decorated function.
 
     Note: If you use this to make a new instruction
@@ -19,7 +20,7 @@ def mips_syscall(number):
     :param number:
 
     """
-    def decorator(function):
+    def decorator(function: Callable[[MipsProgram], None]) -> Syscall:
         """Syscall Decorator wrapper.
 
         :param function:

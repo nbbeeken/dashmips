@@ -1,10 +1,13 @@
 """Instuctions that operate on one register."""
+from typing import Tuple
 from dashmips.instructions import mips_instruction
+from dashmips.models import MipsProgram
+
 
 PTRN = r"{instr_gap}({register})"
 
 
-def parse(args):
+def parse(args: Tuple[str, str, str]) -> tuple:
     """Parser for single register instructions.
 
     :param args:
@@ -14,7 +17,7 @@ def parse(args):
 
 
 @mips_instruction(PTRN, parse)
-def mflo(program, rd):
+def mflo(program: MipsProgram, rd: str) -> None:
     """Move from lo register to Reg[rd].
 
     :param program:
@@ -25,7 +28,7 @@ def mflo(program, rd):
 
 
 @mips_instruction(PTRN, parse)
-def mfhi(program, rd):
+def mfhi(program: MipsProgram, rd: str) -> None:
     """Move from hi register to Reg[rd].
 
     :param program:
@@ -36,7 +39,7 @@ def mfhi(program, rd):
 
 
 @mips_instruction(PTRN, parse)
-def mthi(program, rd):
+def mthi(program: MipsProgram, rd: str) -> None:
     """Move to hi register from Reg[rd].
 
     :param program:
@@ -47,7 +50,7 @@ def mthi(program, rd):
 
 
 @mips_instruction(PTRN, parse)
-def mtlo(program, rd):
+def mtlo(program: MipsProgram, rd: str) -> None:
     """Move to lo register from Reg[rd].
 
     :param program:

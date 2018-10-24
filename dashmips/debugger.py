@@ -1,12 +1,12 @@
 """Mips Debugger."""
-import re
-import os
 import logging as log
+import os
 from typing import Dict, Callable, Optional
 
 from dashmips.debugserver import DebugMessage
-from dashmips.run import next_instruction, run
 from dashmips.mips import MipsException
+from dashmips.run import next_instruction, run
+from dashmips.models import MipsProgram
 
 
 def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
@@ -45,7 +45,7 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
     """
     starting_pc = msg.program.registers['pc']
 
-    def breaking_condition(program):
+    def breaking_condition(program: MipsProgram) -> bool:
         """Condition function to stop execution.
 
         :param program:

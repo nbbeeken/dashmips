@@ -1,15 +1,12 @@
 """Preprocessor for mips assembly."""
-import json
-import re
 import os.path
-import operator
-from functools import reduce
-from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Any, Tuple, Optional, TextIO, Iterable
+import re
+from typing import List, Dict, Any, Tuple
+from typing import Optional, TextIO, Iterable
 
-from dashmips.mips import MipsException
 import dashmips.mips as mips
 from dashmips.hardware import Memory, Registers
+from dashmips.mips import MipsException
 from dashmips.models import MipsProgram, SourceLine, Label
 
 
@@ -91,7 +88,11 @@ def split_to_sections(code: List[SourceLine]) -> sectionsType:
     return sections[mips.RE.DATA_SEC], sections[mips.RE.TEXT_SEC]
 
 
-def data_labels(labels: Dict[str, Label], data_sec: List[str], memory):
+def data_labels(
+    labels: Dict[str, Label],
+    data_sec: List[str],
+    memory: Memory
+) -> None:
     """Construct the .data section to spec.
 
     Fill the .data section memory with user defined static data
@@ -159,7 +160,7 @@ def code_labels(
     return text
 
 
-def process_file(file):
+def process_file(file: TextIO) -> List[SourceLine]:
     """Process Mips File.
 
     :param file: Mips source file
@@ -182,7 +183,7 @@ def process_file(file):
         nocomments
     )
 
-    def manyspaces_to_onespace(ln: SourceLine):
+    def manyspaces_to_onespace(ln: SourceLine) -> SourceLine:
         ln.line = ' '.join(ln.line.split())
         return ln
 
@@ -195,7 +196,9 @@ def process_file(file):
     return linesofcode
 
 
-def preprocessor_directives(lines: List[SourceLine]):
+def preprocessor_directives(
+    lines: List[SourceLine]
+) -> Tuple[Dict[str, str], List[SourceLine]]:
     """Preprocessor Directives handler.
 
     :param lines: lines to compile.
@@ -209,7 +212,7 @@ def preprocessor_directives(lines: List[SourceLine]):
     return eqvs, lines
 
 
-def resolve_include(lines: List[SourceLine]):
+def resolve_include(lines: List[SourceLine]) -> List[SourceLine]:
     """Resolve all includes recursively."""
     for idx, srcline in enumerate(lines):
         match = re.match(r'\s*\.include\s+"(.*)"\s*', srcline.line)
@@ -217,14 +220,14 @@ def resolve_include(lines: List[SourceLine]):
             includefilename = os.path.abspath(match[1])
             includefile = open(includefilename)
             includelines = resolve_include(process_file(includefile))
-            lines[idx] = includelines
+            lines[idx] = includelines  # type: ignore
 
     lines = flatten(lines)
 
     return lines
 
 
-def flatten(nestedlist):
+def flatten(nestedlist: Iterable) -> List:
     """Flatten a nested list."""
     newlist = []
     for item in nestedlist:
@@ -235,7 +238,7 @@ def flatten(nestedlist):
     return newlist
 
 
-def resolve_eqvs(lines: List[SourceLine]):
+def resolve_eqvs(lines: List[SourceLine]) -> Dict[str, str]:
     """Gather eqvs to text replace throughout code."""
     eqvs = {}
     to_del = []
@@ -259,7 +262,7 @@ def resolve_eqvs(lines: List[SourceLine]):
     return eqvs
 
 
-def resolve_macros(lines: List[SourceLine]):
+def resolve_macros(lines: List[SourceLine]) -> List[SourceLine]:
     """Find and substitute macros."""
     macros: Dict[str, dict] = {}
     found_macro = None
@@ -297,7 +300,13 @@ def resolve_macros(lines: List[SourceLine]):
     return flatten(lines)
 
 
-def macro_with_args(idx, lines, macro, macroinfo, srcline):
+def macro_with_args(
+    idx: int,
+    lines: List[SourceLine],
+    macro: str,
+    macroinfo: dict,
+    srcline: SourceLine,
+) -> None:
     """Handle Parsing for macro that has arguments."""
     macroregex = fr'{macro}\((.+)\)'
     match = re.match(macroregex, srcline.line)

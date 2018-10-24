@@ -1,10 +1,14 @@
-"""Register Immediate (Label) instructions."""
+"""Register Immediate (label: str) instructions."""
+from typing import Tuple
+
 from dashmips.instructions import mips_instruction
+from dashmips.models import MipsProgram
+
 
 PTRN = r"{instr_gap}({register}){args_gap}({label})"
 
 
-def parse(arg):
+def parse(arg: Tuple[str, str, str, str]) -> Tuple[str, str]:
     """Parser for reg imm insructions.
 
     :param arg:
@@ -14,7 +18,7 @@ def parse(arg):
 
 
 @mips_instruction(PTRN, parse, label=True)
-def bgez(program, rs, label):
+def bgez(program: MipsProgram, rs: str, label: str) -> None:
     """Branch if Reg[rs] >= 0.
 
     :param program:
@@ -26,7 +30,7 @@ def bgez(program, rs, label):
 
 
 @mips_instruction(PTRN, parse, label=True)
-def bgezal(program, rs, label):
+def bgezal(program: MipsProgram, rs: str, label: str) -> None:
     """Branch if Reg[rs] >= 0 and link.
 
     :param program:
@@ -38,7 +42,7 @@ def bgezal(program, rs, label):
 
 
 @mips_instruction(PTRN, parse, label=True)
-def bgtz(program, rs, label):
+def bgtz(program: MipsProgram, rs: str, label: str) -> None:
     """Branch if Reg[rs] > 0.
 
     :param program:
@@ -50,7 +54,7 @@ def bgtz(program, rs, label):
 
 
 @mips_instruction(PTRN, parse, label=True)
-def blez(program, rs, label):
+def blez(program: MipsProgram, rs: str, label: str) -> None:
     """Branch if Reg[rs] <= 0.
 
     :param program:
@@ -63,7 +67,7 @@ def blez(program, rs, label):
 
 
 @mips_instruction(PTRN, parse, label=True)
-def bltz(program, rs, label):
+def bltz(program: MipsProgram, rs: str, label: str) -> None:
     """Branch if Reg[rs] < 0.
 
     :param program:
@@ -75,7 +79,7 @@ def bltz(program, rs, label):
 
 
 @mips_instruction(PTRN, parse, label=True)
-def bltzal(program, rs, label):
+def bltzal(program: MipsProgram, rs: str, label: str) -> None:
     """Branch if Reg[rs] < 0 and link.
 
     :param program:

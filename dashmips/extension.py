@@ -1,7 +1,7 @@
 """Vscode extension helpers."""
-import re
-from dashmips.instructions import Instructions
+from typing import Dict
 
+from dashmips.instructions import Instructions
 
 snippet_part = '${{{count}:{filler}}}'
 
@@ -16,7 +16,7 @@ SNIPPET_REPLACEMENTS = {
 REG_ARGS = ['t0', 't1', 't2']
 
 
-def generate_snippets():
+def generate_snippets() -> Dict[str, Dict[str, str]]:
     """Generate Instruction snippets."""
     snippets = {}
     names = sorted(Instructions.keys())
@@ -34,7 +34,7 @@ def generate_snippets():
     return snippets
 
 
-def build_body(name, pattern, label):
+def build_body(name: str, pattern: str, label: bool) -> str:
     """Create snippet body.
 
     :param name: Instruction name
@@ -62,7 +62,7 @@ def build_body(name, pattern, label):
     return snip
 
 
-def instruction_name_regex():
+def instruction_name_regex() -> str:
     """Generate big or capture regex for all instruction names."""
     names = sorted(Instructions.keys())
     return f"\\\\b({'|'.join(names)})\\\\b"

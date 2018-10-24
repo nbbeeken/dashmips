@@ -2,12 +2,19 @@
 import re
 import sys
 
-from dashmips.mips import MipsException
+from typing import Callable
+
 from dashmips.instructions import Instructions
+from dashmips.mips import MipsException
 from dashmips.models import MipsProgram
 
+DEFAULT_RUN_CONDITION = (lambda p: p.registers['pc'] != -1)
 
-def run(program: MipsProgram, runnable=lambda p: p.registers['pc'] != -1):
+
+def run(
+    program: MipsProgram,
+    runnable: Callable[[MipsProgram], bool]=DEFAULT_RUN_CONDITION
+) -> None:
     """Execute Preprocessed Mips.
 
     :param program: MipsProgram:
@@ -26,7 +33,7 @@ def run(program: MipsProgram, runnable=lambda p: p.registers['pc'] != -1):
         sys.exit()
 
 
-def next_instruction(program):
+def next_instruction(program: MipsProgram) -> None:
     """Execute One Instruction.
 
     :param program:
