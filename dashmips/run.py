@@ -8,12 +8,12 @@ from dashmips.instructions import Instructions
 from dashmips.mips import MipsException
 from dashmips.models import MipsProgram
 
-DEFAULT_RUN_CONDITION = (lambda p: p.registers['pc'] != -1)
+RUN_COND: Callable[[MipsProgram], bool] = (lambda p: p.registers['pc'] != -1)
 
 
 def run(
     program: MipsProgram,
-    runnable: Callable[[MipsProgram], bool]=DEFAULT_RUN_CONDITION
+    runnable: Callable[[MipsProgram], bool]=RUN_COND
 ) -> None:
     """Execute Preprocessed Mips.
 
