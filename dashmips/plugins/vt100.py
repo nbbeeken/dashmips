@@ -74,6 +74,8 @@ class VT100(Plugin):
 
         self.root.protocol('WM_DELETE_WINDOW', self.close)
 
+        self.screen: bytes = b'\x0F ' * VT100.SIZE
+
     def start(self):
         """Run simulator FUNCTION BLOCKS."""
         try:
@@ -133,4 +135,6 @@ class VT100(Plugin):
     def push(self, memory):
         """Push a new memory text layout."""
         mmio = bytes(memory[VT100.BASE_ADDR:VT100.BASE_ADDR + VT100.SIZE])
+        if mmio == self.screen:
+            return
         self.content.set(mmio)

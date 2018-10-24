@@ -115,6 +115,10 @@ class Memory(list):
             *([0] * remaining_size)
         ])
 
+        for i in range(0x2060, 0x2060 + ((80 * 25) * 2), 2):
+            self[i] = 0x0F
+            self[i + 1] = ord(' ')
+
     def on_change(self, cb: Callable[['Memory'], None]):
         """Insert on_change listener."""
         self.on_change_listeners.append(cb)
