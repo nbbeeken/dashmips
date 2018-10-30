@@ -1,5 +1,9 @@
 """VT100 Simulator using MMIO."""
-import tkinter as tk
+try:
+    import tkinter as tk
+except ImportError:
+    # We expect the user to know they have a version of python without tkinter
+    pass  # So we do nothing
 from typing import Any
 
 from dashmips.hardware import Memory

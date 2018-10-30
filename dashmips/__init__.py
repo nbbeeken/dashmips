@@ -1,15 +1,35 @@
 """dashmips package."""
 
-import dashmips.instructions.imm_instructions
-import dashmips.instructions.pseudo_instructions
-import dashmips.instructions.rd_imm_instructions
-import dashmips.instructions.rd_instructions
-import dashmips.instructions.rd_rs_rt_instructions
-import dashmips.instructions.rs_imm_instructions
-import dashmips.instructions.rs_instructions
-import dashmips.instructions.rs_mem_instructions
-import dashmips.instructions.rs_rt_imm_instructions
-import dashmips.instructions.rs_rt_instructions
-import dashmips.instructions.rd_rs_lbl_instructions
-import dashmips.instructions.special_instructions
-import dashmips.syscalls.print_syscalls
+import os
+import os.path
+from importlib import import_module
+
+# Import all instructions
+
+instruction_modules = [
+    f'dashmips.instructions.{s[:-3]}'
+    for s in os.listdir(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), 'instructions'
+        )
+    )
+    if s.endswith('_instructions.py')
+]
+
+for im in instruction_modules:
+    import_module(im)
+
+# Import all syscalls
+
+syscall_modules = [
+    f'dashmips.syscalls.{s[:-3]}'
+    for s in os.listdir(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), 'syscalls'
+        )
+    )
+    if s.endswith('_syscalls.py')
+]
+
+for sm in syscall_modules:
+    import_module(sm)
