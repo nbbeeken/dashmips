@@ -18,8 +18,9 @@ class SourceLine:
 class Label:
     """Mips Preprocessor Label."""
 
-    __slots__ = ('kind', 'value', 'name')
+    __slots__ = ('location', 'kind', 'value', 'name')
 
+    location: str
     kind: str
     value: int
     name: str

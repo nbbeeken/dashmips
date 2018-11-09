@@ -14,8 +14,9 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='dashmips',
-    version='0.0.6',
+    version='0.0.7',
     author='Neal Beeken',
+    url='https://gitlab.com/nbbeeken/dashmips',
     packages=find_packages(),
     description='Mips Interpreter',
     long_description=long_description,

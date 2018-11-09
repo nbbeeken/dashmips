@@ -36,7 +36,7 @@ def preprocess(file: TextIO) -> MipsProgram:
     processed_code = code_labels(labels, unprocessed_code)
 
     # Cannot run a program without a main
-    assert 'main' in labels and labels['main'].kind == mips.RE.TEXT_SEC
+    assert 'main' in labels and labels['main'].location == mips.RE.TEXT_SEC
 
     bp = memory.malloc(512) + 508
     init_regs = {
@@ -112,7 +112,8 @@ def data_labels(
             labels[name] = Label(
                 name=name,
                 value=address,
-                kind=mips.RE.DATA_SEC
+                location=mips.RE.DATA_SEC,
+                kind=match[2][1:],
             )
 
 
@@ -136,9 +137,10 @@ def code_labels(
         if match:
             # If there's a label save it to the labels dictionary
             labels[match[1]] = Label(
-                kind=mips.RE.TEXT_SEC,
+                location=mips.RE.TEXT_SEC,
                 value=(idx - lbl_ct),
-                name=match[1]
+                name=match[1],
+                kind='text'
             )
             if len(srcline.line) > len(match[0]):
                 # If the line is longer than what was matched, lets assume
