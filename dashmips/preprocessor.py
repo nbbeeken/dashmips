@@ -10,7 +10,7 @@ from dashmips.mips import MipsException
 from dashmips.models import MipsProgram, SourceLine, Label
 
 
-def preprocess(file: TextIO) -> MipsProgram:
+def preprocess(file: TextIO, args: List[str] = None) -> MipsProgram:
     """Prepare Mips for running.
 
     Breaks the code into directive and text sections.
@@ -43,6 +43,8 @@ def preprocess(file: TextIO) -> MipsProgram:
         'pc': labels['main'].value,
         '$sp': bp, '$fp': bp, '$gp': bp
     }
+
+    load_args(init_regs, memory, [file.name, *args])
 
     return MipsProgram(
         name=filename,
@@ -328,3 +330,25 @@ def macro_with_args(
                 filename=s.filename
             ))
         lines[idx] = expanded_macro  # type: ignore
+
+
+def load_args(init_regs: dict, memory: Memory, args: List[str]):
+    """Load arguments on to the stack and sets argc."""
+    init_regs['$a0'] = len(args)  # argc
+
+    argv: List[int] = []
+    for arg in args:
+        ptr = memory.malloc(len(arg) + 1)
+        # str ending in null
+        memory[ptr:ptr + len(arg) + 1] = [*[ord(c) for c in arg], 0]
+        argv.append(ptr)
+
+    argv.append(0)  # NULL to end pointer array
+    argvbp = 0
+    for ptr in argv:
+        space = memory.malloc(4)
+        if argvbp == 0:
+            argvbp = space
+        memory[space:space + 4] = ptr.to_bytes(4, 'big')
+
+    init_regs['$a1'] = argvbp  # argv

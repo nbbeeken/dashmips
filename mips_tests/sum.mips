@@ -1,5 +1,5 @@
 # Sum all the numbers from 1 up to the number inputted
-.include "func.mips"
+.data
 
 .eqv QUIT 10
 
@@ -29,7 +29,6 @@ syscall
     syscall
 .end_macro
 
-.data
 lf:     .asciiz "\n"
 
 .text

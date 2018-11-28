@@ -19,15 +19,15 @@ names_enum = tuple(enumerate((
     # fmt: on
 )))
 
-RegisterResolve: Dict[Union[str, int], str] = {
-    # **{i: name for (i, name) in names_enum},
-    **{name: name for (i, name) in names_enum},
-    **{f"${i}": name for (i, name) in names_enum},
-}
-
 
 class Registers(Dict[str, int]):
     """Mips Register File."""
+
+    Resolve: Dict[Union[str, int], str] = {
+        # **{i: name for (i, name) in names_enum},
+        **{name: name for (i, name) in names_enum},
+        **{f"${i}": name for (i, name) in names_enum},
+    }
 
     def __init__(self, dictionary: Optional[dict] = None) -> None:
         """Intializes 32 registers to zero.
@@ -38,7 +38,7 @@ class Registers(Dict[str, int]):
         base_reg = {name: 0 for idx, name in names_enum}
         if dictionary:
             new_dict = {
-                RegisterResolve[regname]: value
+                Registers.Resolve[regname]: value
                 for regname, value in dict(dictionary).items()
             }
             super().__init__({
@@ -55,8 +55,8 @@ class Registers(Dict[str, int]):
         Accepts string or number for key
         """
         assert not value & 0x00_00_00_00, 'Reg value cannot exceed 32 bits'
-        self.pc_changed = (RegisterResolve[key] == 'pc')
-        super().__setitem__(RegisterResolve[key], value)
+        self.pc_changed = (Registers.Resolve[key] == 'pc')
+        super().__setitem__(Registers.Resolve[key], value)
 
     def __getitem__(self, key: str) -> int:
         """
@@ -64,7 +64,7 @@ class Registers(Dict[str, int]):
 
         Accepts string or number for key
         """
-        return super().__getitem__(RegisterResolve[key])
+        return super().__getitem__(Registers.Resolve[key])
 
     # def readablenum_registers(self):
     #     """ """

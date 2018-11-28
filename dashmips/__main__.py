@@ -29,20 +29,23 @@ def main_compile(args: argparse.Namespace) -> int:
         print('\n\n\n')
         print(instruction_name_regex())
 
-    if args.run:
-        from dashmips.run import run
-        plugins: List[Any] = []
-        if args.vt100:
-            vt = VT100()
-            program.memory.on_change(vt.push)
-            t = Thread(target=run, args=(program,))
-            t.start()
-            vt.start()
-            vt.request_close()
-        else:
-            run(program)
-
     return 0
+
+
+def main_run(args: argparse.Namespace):
+    """Run for exec-ing mips program."""
+    from dashmips.run import run
+    program = preprocess(args.FILE, args=args.mips_args)
+    plugins: List[Any] = []
+    if args.vt100:
+        vt = VT100()
+        program.memory.on_change(vt.push)
+        t = Thread(target=run, args=(program,))
+        t.start()
+        vt.start()
+        vt.request_close()
+    else:
+        run(program)
 
 
 def main_debug(args: argparse.Namespace) -> int:
@@ -66,14 +69,12 @@ def main() -> NoReturn:
         title='commands', dest='command', required=True
     )
     compileparse = sbp.add_parser('compile', aliases=['c'])
+    runparse = sbp.add_parser('run', aliases=['r'])
     debugparse = sbp.add_parser('debug', aliases=['d'])
 
     compileparse.add_argument(
-        'FILE',
+        '-f', '--file',
         type=argparse.FileType('r', encoding='utf8'), help='Input file',
-    )
-    compileparse.add_argument(
-        '-r', '--run', action='store_true', help='Exec input file'
     )
     compileparse.add_argument(
         '-o', '--out',
@@ -85,11 +86,21 @@ def main() -> NoReturn:
     compileparse.add_argument(
         '--vscode', action='store_true', help='Output json for vscode'
     )
-    compileparse.add_argument(
+    compileparse.set_defaults(func=main_compile)
+
+    runparse.add_argument(
+        'FILE',
+        type=argparse.FileType('r', encoding='utf8'), help='Input file',
+    )
+    runparse.add_argument(
+        '-a', '--args', dest='mips_args',
+        nargs='*', help='Arguments to pass into the mips main',
+    )
+    runparse.add_argument(
         '-t', '--vt100', action='store_true',
         help='Start VT100 Simulator'
     )
-    compileparse.set_defaults(func=main_compile)
+    runparse.set_defaults(func=main_run)
 
     debugparse.add_argument(
         '-p', '--port', type=int, default=9999, help='run debugger on port'

@@ -1,0 +1,45 @@
+
+.text
+
+.macro print_num (%reg)
+	li $v0, 1
+	move $a0, %reg
+	syscall
+.end_macro
+
+.macro print_newline
+	li $v0, 11
+	li $a0, '\n'
+	syscall
+.end_macro
+
+main:  # main($a0 = argc, $a1 = argv)
+
+    # It's important to note the format of argv is an array of pointers
+    # enumerated by argc, each pointer is an argument in the form of a
+    # null terminated string
+
+    print_num($a0)  # argc
+    print_newline
+
+    move $s0, $a0  # save argc
+
+    li   $t0, 1
+    move $t2, $a1  # argv
+    loop:
+        beq     $t0, $s0, end_loop
+        addi    $t0, $t0, 1
+
+        lw      $t1, 0($t2)
+        addi    $t2, $t2, 4  # next argv
+
+        move    $a0, $t1  # move str address into a0
+        li $v0, 4
+        syscall # print str
+
+        print_newline
+
+        j loop
+    end_loop:
+        li $v0, 10
+        syscall
