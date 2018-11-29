@@ -12,7 +12,7 @@ sleep(0.1)  # Should be plenty of time to start and bind
 
 
 def compile_file(filename):
-    """run compiler on filename."""
+    """Run compiler on filename."""
     proc = run(split(f"python -m dashmips c {filename} -j"),
                capture_output=True, encoding='utf8')
     return json.loads(proc.stdout.strip())
@@ -48,7 +48,6 @@ class TestMipsDebugServer(unittest.TestCase):
 
     def test_start(self):
         """Test start command."""
-
         program = compile_file('test.mips')
 
         resp = communicate({'command': 'start', 'program': program})

@@ -112,10 +112,16 @@ class Memory(List[int]):
         value: Union[int, Iterable[int]]
     ) -> None:
         """Bounds checking on access."""
-        if isinstance(key, slice) and isinstance(value, (list, tuple)):
+        if isinstance(key, slice) and isinstance(value, (list, tuple, bytes)):
             # Handle slice assignment
             for byte in value:
                 assert not (byte & 0x00), f"0x{byte:X} is greater than a byte"
+
+        elif isinstance(key, slice) and isinstance(value, str):
+            for char in value:
+                byte = ord(char)
+                assert not (byte & 0x00), f"0x{byte:X} is greater than a byte"
+
         elif isinstance(key, int) and isinstance(value, int):
             # Handle single index assignment
             assert not (value & 0x00), f"0x{value:X} is greater than a byte"

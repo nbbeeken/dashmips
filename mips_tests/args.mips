@@ -1,3 +1,11 @@
+.data
+
+argc_str: .asciiz   "argc = "
+argv_opstr: .asciiz "argv["
+argv_clstr: .asciiz "] is "
+eq_str: .asciiz     " = "
+ptr_str: .asciiz    " -> "
+at_str: .asciiz     " @ "
 
 .text
 
@@ -13,32 +21,52 @@
 	syscall
 .end_macro
 
+.macro print_str (%lbl)
+	li $v0, 4
+	la $a0, %lbl
+	syscall
+.end_macro
+
 main:  # main($a0 = argc, $a1 = argv)
 
     # It's important to note the format of argv is an array of pointers
     # enumerated by argc, each pointer is an argument in the form of a
     # null terminated string
 
-    print_num($a0)  # argc
-    print_newline
-
     move $s0, $a0  # save argc
 
-    li   $t0, 1
-    move $t2, $a1  # argv
+    # print ] =
+    la      $a0, argc_str
+    li      $v0, 4
+    syscall
+
+    print_num($s0)  # argc in s0
+    print_newline
+
+    move   $t0, $zero
+    move   $s1, $a1  # argv in s1
+    move   $t2, $s1
     loop:
         beq     $t0, $s0, end_loop
-        addi    $t0, $t0, 1
 
-        lw      $t1, 0($t2)
-        addi    $t2, $t2, 4  # next argv
+        lw      $t1, 0($t2)  # load pointer to string
+
+        print_str(argv_opstr)
+        print_num($t0)  # index into argv
+        print_str(argv_clstr)
+        print_num($t2)  # argv offset address
+        print_str(eq_str)
+        print_num($t1)  # string address
+        print_str(ptr_str)
 
         move    $a0, $t1  # move str address into a0
-        li $v0, 4
-        syscall # print str
+        li      $v0, 4
+        syscall           # print str
 
         print_newline
 
+        addi    $t0, $t0, 1  # counter to next index
+        addi    $t2, $t2, 4  # next argv
         j loop
     end_loop:
         li $v0, 10

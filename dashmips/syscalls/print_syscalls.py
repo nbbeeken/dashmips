@@ -11,8 +11,9 @@ def print_string(program: MipsProgram) -> None:
 
     """
     address = program.registers['$a0']
-    string = program.memory[address:program.memory.index(0x0, address)]
-    print(''.join([chr(c) for c in string]), end='')
+    bstring = program.memory[address:program.memory.index(0x0, address)]
+    string = ''.join([chr(c) for c in bstring])
+    print(string, end='')
 
 
 @mips_syscall(11)

@@ -20,6 +20,10 @@ def preprocess(file: TextIO, args: List[str] = None) -> MipsProgram:
     filename = os.path.abspath(file.name)
     memory = Memory()
 
+    argv = [filename]
+    if args:
+        argv.extend(args)
+
     linesofcode: List[SourceLine] = process_file(file)
 
     labels: Dict[str, Label] = {}
@@ -44,7 +48,7 @@ def preprocess(file: TextIO, args: List[str] = None) -> MipsProgram:
         '$sp': bp, '$fp': bp, '$gp': bp
     }
 
-    load_args(init_regs, memory, [file.name, *args])
+    load_args(init_regs, memory, argv)
 
     return MipsProgram(
         name=filename,
@@ -344,11 +348,12 @@ def load_args(init_regs: dict, memory: Memory, args: List[str]):
         argv.append(ptr)
 
     argv.append(0)  # NULL to end pointer array
-    argvbp = 0
-    for ptr in argv:
-        space = memory.malloc(4)
-        if argvbp == 0:
-            argvbp = space
-        memory[space:space + 4] = ptr.to_bytes(4, 'big')
+
+    # Malloc all at once this time for contiguous memory
+    argvbp = memory.malloc(len(argv) * 4)
+
+    for idx, ptr in enumerate(argv):
+        store_addr = argvbp + idx * 4
+        memory[store_addr:store_addr + 4] = ptr.to_bytes(4, 'big')
 
     init_regs['$a1'] = argvbp  # argv

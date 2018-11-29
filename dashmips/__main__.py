@@ -15,7 +15,7 @@ def main_compile(args: argparse.Namespace) -> int:
 
     :param args:
     """
-    program = preprocess(args.FILE)
+    program = preprocess(args.file)
     if args.out:
         json.dump(program.to_dict(), args.out)
 
