@@ -1,9 +1,13 @@
+#! /usr/bin/env dashmips
+# Support for shebang
+
 # Sum all the numbers from 1 up to the number inputted
 .data
 
 .eqv QUIT 10
 
 .macro exit
+li $a0, 0  # set exit code
 li $v0, QUIT
 syscall
 .end_macro

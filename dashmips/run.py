@@ -14,7 +14,7 @@ RUN_COND: Callable[[MipsProgram], bool] = (lambda p: p.registers['pc'] != -1)
 def run(
     program: MipsProgram,
     runnable: Callable[[MipsProgram], bool]=RUN_COND
-) -> None:
+) -> int:
     """Execute Preprocessed Mips.
 
     :param program: MipsProgram:
@@ -31,6 +31,8 @@ def run(
             file=sys.stderr
         )
         sys.exit()
+
+    return program.registers['$a0']  # should hold program exit code
 
 
 def next_instruction(program: MipsProgram) -> None:

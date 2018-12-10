@@ -23,10 +23,20 @@ dashmips
 To compile or run a mips program you run:
 
 ```sh
-dashmips compile --run FILE.mips
+dashmips compile -f FILE.mips
 ```
 
 What "compilation" means in dashmips is a conversion of the source file to a json format that is better understood by the program. You can use this json format to inspect the internals of how your mips program is interpretted by dashmips.
+
+## Running
+
+This one's easy:
+
+```sh
+dashmips run FILE.mips
+```
+
+> Note: FILE is a positional argument in the run subcommand
 
 ## Debugging
 

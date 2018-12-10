@@ -15,7 +15,8 @@ def main_compile(args: argparse.Namespace) -> int:
 
     :param args:
     """
-    program = preprocess(args.file)
+    if args.file:
+        program = preprocess(args.file)
     if args.out:
         json.dump(program.to_dict(), args.out)
 
@@ -32,7 +33,7 @@ def main_compile(args: argparse.Namespace) -> int:
     return 0
 
 
-def main_run(args: argparse.Namespace):
+def main_run(args: argparse.Namespace) -> int:
     """Run for exec-ing mips program."""
     from dashmips.run import run
     program = preprocess(args.FILE, args=args.mips_args)
@@ -44,8 +45,9 @@ def main_run(args: argparse.Namespace):
         t.start()
         vt.start()
         vt.request_close()
+        return 0
     else:
-        run(program)
+        return run(program)
 
 
 def main_debug(args: argparse.Namespace) -> int:
@@ -62,6 +64,13 @@ def main() -> NoReturn:
     """Entry function for Dashmips."""
     import sys
     parser = argparse.ArgumentParser('dashmips')
+
+    if (len(sys.argv) == 2 and
+        sys.argv[1][0] != '-' and
+            sys.argv[1] not in 'runcompiledebug'):
+        # should be ['dashmips', 'file']
+        # when just a file is provided we want to default to run
+        sys.argv = [sys.argv[0], 'run', sys.argv[1]]
 
     parser.add_argument('-v', '--version', action='version', version='0.0.1')
 
