@@ -1,8 +1,9 @@
 """Setup for Dashmips."""
 import sys
-from setuptools import setup, find_packages
-from os import path
 from io import open
+from os import path
+
+from setuptools import find_packages, setup
 
 here = path.abspath(path.dirname(__file__))
 
@@ -14,7 +15,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='dashmips',
-    version='0.0.7',
+    version='0.0.8',
     author='Neal Beeken',
     url='https://gitlab.com/nbbeeken/dashmips',
     packages=find_packages(),
