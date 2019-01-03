@@ -23,7 +23,7 @@ def generate_snippets() -> Dict[str, Dict[str, str]]:
     for name in names:
         ins = Instructions[name]
         body = build_body(ins.name, ins.pattern, ins.label)
-        desc = ins.fn.__doc__.split('\n')[0] if ins.fn.__doc__ else ''
+        desc = ins.description
 
         snippets[name] = {
             'prefix': name,

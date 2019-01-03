@@ -60,6 +60,34 @@ def main_debug(args: argparse.Namespace) -> int:
     return 0
 
 
+def main_docs(args: argparse.Namespace) -> int:
+    """Display information about mips."""
+    from dashmips.instructions import Instructions
+    from dashmips.syscalls import Syscalls
+
+    # Syscall printer
+    print('Syscalls')
+    print(f"{'name':15}{'number':<10}{'description'}")
+    print(f"{'----':15}{'------':<10}{'-----------'}")
+    syscalls_list = list(Syscalls.items())
+    syscalls_list.sort(key=lambda i: i[0])
+    for sysnum, syscall in syscalls_list:
+        print(f'{syscall.name:15}{sysnum:<10}{syscall.description}')
+
+    print()
+
+    # Instructions printer
+    print('Instructions')
+    print(f"{'name':10}{'description'}")
+    print(f"{'----':10}{'-----------'}")
+    instr_list = list(Instructions.items())
+    instr_list.sort(key=lambda i: i[0])
+    for instrname, instruction in instr_list:
+        print(f'{instrname:10}{instruction.description}')
+
+    return 0
+
+
 def main() -> NoReturn:
     """Entry function for Dashmips."""
     import sys
@@ -67,7 +95,7 @@ def main() -> NoReturn:
 
     if (len(sys.argv) == 2 and
         sys.argv[1][0] != '-' and
-            sys.argv[1] not in 'runcompiledebug'):
+            sys.argv[1] not in 'runcompiledebugdocsh'):
         # should be ['dashmips', 'file']
         # when just a file is provided we want to default to run
         sys.argv = [sys.argv[0], 'run', sys.argv[1]]
@@ -80,6 +108,7 @@ def main() -> NoReturn:
     compileparse = sbp.add_parser('compile', aliases=['c'])
     runparse = sbp.add_parser('run', aliases=['r'])
     debugparse = sbp.add_parser('debug', aliases=['d'])
+    docsparse = sbp.add_parser('docs', aliases=['h'])
 
     compileparse.add_argument(
         '-f', '--file',
@@ -122,6 +151,14 @@ def main() -> NoReturn:
         action='store_true', help='Log all network traffic'
     )
     debugparse.set_defaults(func=main_debug)
+
+    docsparse.add_argument(
+        '-s', '--syscalls', action='store_true', help='Show syscall table'
+    )
+    docsparse.add_argument(
+        '-i', '--instr', action='store_true', help='Show instruction table'
+    )
+    docsparse.set_defaults(func=main_docs)
 
     prog_args = parser.parse_args()
     sys.exit(prog_args.func(prog_args))

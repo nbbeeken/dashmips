@@ -70,7 +70,8 @@ def movn(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    if program.registers[rt] != 0:
+        program.registers[rd] = program.registers[rs]
 
 
 @mips_instruction(PTRN, parse)

@@ -20,12 +20,17 @@ class Instruction:
 
         Adds itself to list upon instanciation.
         """
-        self.fn = fn
+        self.function = fn
 
-        name = self.fn.__name__
+        name = fn.__name__
         if name.startswith('_'):
             name = name[1:]
         self.name = name
+
+        if fn.__doc__:
+            self.description = fn.__doc__.split('\n')[0]
+        else:
+            self.description = ""
 
         self.label = label
         self.pattern = regex_ptrn
@@ -34,7 +39,7 @@ class Instruction:
 
     def __call__(self, program: MipsProgram, args: Iterable = tuple()) -> None:
         """Callable Instruction."""
-        self.fn(program, *args)
+        self.function(program, *args)
         if not program.registers.pc_changed:
             # if not jmp/branch instruction pc
             # wont have been changed in the instruction

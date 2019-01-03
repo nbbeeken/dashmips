@@ -13,7 +13,15 @@ class Syscall:
     ) -> None:
         """Create Syscall."""
         self.function = function
-        self.name = self.function.__name__
+        if function.__doc__:
+            self.description = function.__doc__.split('\n')[0]
+        else:
+            self.description = ""
+
+        name = self.function.__name__
+        if name.startswith('_'):
+            name = name[1:]
+        self.name = name
         self.number = number
 
     def __call__(self, program: MipsProgram) -> None:
