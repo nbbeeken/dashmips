@@ -100,7 +100,7 @@ def main() -> NoReturn:
         # when just a file is provided we want to default to run
         sys.argv = [sys.argv[0], 'run', sys.argv[1]]
 
-    parser.add_argument('-v', '--version', action='version', version='0.0.1')
+    parser.add_argument('-v', '--version', action='version', version='0.0.10')
 
     sbp = parser.add_subparsers(
         title='commands', dest='command', required=True
