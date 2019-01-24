@@ -4,7 +4,6 @@ from typing import Tuple
 from dashmips.instructions import mips_instruction, parse_int
 from dashmips.models import MipsProgram
 
-
 PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({number})"
 
 
@@ -40,7 +39,9 @@ def addiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param num:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rs] = (
+        abs(program.registers[rt]) + abs(num)
+    ) & 0xFFFF_FFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -66,7 +67,7 @@ def andi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param num:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rs] = program.registers[rt] & num
 
 
 @mips_instruction(PTRN, parse)
@@ -79,7 +80,10 @@ def slti(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param num:
 
     """
-    raise NotImplementedError('TODO')
+    if program.registers[rt] < num:
+        program.registers[rs] = 1
+    else:
+        program.registers[rs] = 0
 
 
 @mips_instruction(PTRN, parse)
@@ -92,7 +96,10 @@ def sltiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param num:
 
     """
-    raise NotImplementedError('TODO')
+    if abs(program.registers[rt]) < abs(num):
+        program.registers[rs] = 1
+    else:
+        program.registers[rs] = 0
 
 
 @mips_instruction(PTRN, parse)
@@ -105,20 +112,22 @@ def xori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param num:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rs] = program.registers[rt] ^ num
 
 
 @mips_instruction(PTRN, parse)
-def sra(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+def sra(program: MipsProgram, rd: str, rs: str, num: int) -> None:
     """Shift Right Arithmetic.
 
     :param program:
-    :param rt:
+    :param rd:
     :param rs:
     :param num:
 
     """
-    raise NotImplementedError('TODO')
+    msb = program.registers[rs] & 0x8000_0000
+    program.registers[rd] = program.registers[rs] << num
+    program.registers[rd] |= msb
 
 
 @mips_instruction(PTRN, parse)
@@ -135,7 +144,7 @@ def sll(program: MipsProgram, rd: str, rt: str, num: int) -> None:
 
 
 @mips_instruction(PTRN, parse)
-def srl(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+def srl(program: MipsProgram, rd: str, rt: str, num: int) -> None:
     """Shift Right Logical.
 
     :param program:
@@ -144,4 +153,4 @@ def srl(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param num:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = (program.registers[rt] >> num) & 0xFFFF_FFFF

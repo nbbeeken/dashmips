@@ -1,6 +1,6 @@
 """Mips Hardware."""
-from typing import Dict, Union, Callable, Optional
-from typing import Iterable, Tuple, List, Mapping, cast
+from typing import (Callable, Dict, Iterable, List, Mapping, Optional, Tuple,
+                    Union, cast)
 
 names_enum = tuple(enumerate((
     # fmt: off
@@ -29,7 +29,7 @@ class Registers(Dict[str, int]):
         **{f"${i}": name for (i, name) in names_enum},
     }
 
-    def __init__(self, dictionary: Optional[dict] = None) -> None:
+    def __init__(self, dictionary: Optional[Dict[str, int]] = None) -> None:
         """Intializes 32 registers to zero.
 
         dictionary - can be partial/full dictionary of registers

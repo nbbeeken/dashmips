@@ -1,13 +1,13 @@
 """Instuctions that operate on one register."""
 from typing import Tuple
+
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
-
 
 PTRN = r"{instr_gap}({register})"
 
 
-def parse(args: Tuple[str, str, str]) -> tuple:
+def parse(args: Tuple[str, str, str]) -> Tuple[str]:
     """Parser for single register instructions.
 
     :param args:

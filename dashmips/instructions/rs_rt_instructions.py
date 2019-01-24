@@ -85,7 +85,9 @@ def multu(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    product = abs(program.registers[rs]) * abs(program.registers[rt])
+    program.registers['hi'] = product & 0xFFFFFFFF_00000000
+    program.registers['lo'] = product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -97,7 +99,9 @@ def mult(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    product = program.registers[rs] * program.registers[rt]
+    program.registers['hi'] = product & 0xFFFFFFFF_00000000
+    program.registers['lo'] = product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -133,7 +137,10 @@ def div(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    quotient = program.registers[rs] / program.registers[rt]
+    remainder = program.registers[rs] % program.registers[rt]
+    program.registers['hi'] = remainder
+    program.registers['lo'] = int(quotient)
 
 
 @mips_instruction(PTRN, parse)
@@ -145,4 +152,7 @@ def divu(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    quotient = abs(program.registers[rs]) / abs(program.registers[rt])
+    remainder = abs(program.registers[rs]) % abs(program.registers[rt])
+    program.registers['hi'] = remainder
+    program.registers['lo'] = int(quotient)

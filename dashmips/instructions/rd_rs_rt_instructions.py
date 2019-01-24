@@ -4,7 +4,6 @@ from typing import Tuple
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
 
-
 PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({register})"
 
 
@@ -137,7 +136,7 @@ def sllv(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers[rs] << program.registers[rt]
 
 
 @mips_instruction(PTRN, parse)
@@ -166,7 +165,10 @@ def sltu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    if abs(program.registers[rs]) < abs(program.registers[rt]):
+        program.registers[rd] = 1
+    else:
+        program.registers[rd] = 0
 
 
 @mips_instruction(PTRN, parse)
@@ -179,7 +181,9 @@ def srav(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    msb = program.registers[rs] & 0x8000_0000
+    program.registers[rd] = program.registers[rs] << program.registers[rt]
+    program.registers[rd] |= msb
 
 
 @mips_instruction(PTRN, parse)
@@ -192,7 +196,7 @@ def srlv(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rd] = program.registers[rs] >> program.registers[rt]
 
 
 @mips_instruction(PTRN, parse)

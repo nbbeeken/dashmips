@@ -4,7 +4,6 @@ from typing import Tuple
 from dashmips.instructions import mips_instruction, parse_int
 from dashmips.models import MipsProgram
 
-
 PTRN = r"{instr_gap}({register}){args_gap}({number}?)\(({register})\)"
 
 
@@ -43,7 +42,7 @@ def lbu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rs] = abs(program.memory[num + program.registers[rt]])
 
 
 @mips_instruction(PTRN, parse)
