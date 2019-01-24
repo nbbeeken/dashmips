@@ -2,7 +2,7 @@
 import argparse
 import json
 from threading import Thread
-from typing import NoReturn, List, Any
+from typing import Any, List, NoReturn
 
 from dashmips.debugserver import debug_mips
 from dashmips.extension import generate_snippets, instruction_name_regex
@@ -100,7 +100,7 @@ def main() -> NoReturn:
         # when just a file is provided we want to default to run
         sys.argv = [sys.argv[0], 'run', sys.argv[1]]
 
-    parser.add_argument('-v', '--version', action='version', version='0.0.10')
+    parser.add_argument('-v', '--version', action='version', version='0.0.11')
 
     sbp = parser.add_subparsers(
         title='commands', dest='command', required=True
