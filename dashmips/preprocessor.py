@@ -1,16 +1,15 @@
 """Preprocessor for mips assembly."""
 import os.path
 import re
-from typing import List, Dict, Any, Tuple
-from typing import Optional, TextIO, Iterable
+from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple, TypeVar
 
 import dashmips.mips as mips
 from dashmips.hardware import Memory, Registers
 from dashmips.mips import MipsException
-from dashmips.models import MipsProgram, SourceLine, Label
+from dashmips.models import Label, MipsProgram, SourceLine
 
 
-def preprocess(file: TextIO, args: List[str] = None) -> MipsProgram:
+def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     """Prepare Mips for running.
 
     Breaks the code into directive and text sections.
@@ -215,7 +214,7 @@ def preprocessor_directives(
         if '.globl' in srcline.line:
             del lines[idx]
     lines = resolve_include(lines)
-    eqvs = resolve_eqvs(lines)
+    lines, eqvs = resolve_eqvs(lines)
     lines = resolve_macros(lines)
     return eqvs, lines
 
@@ -235,7 +234,10 @@ def resolve_include(lines: List[SourceLine]) -> List[SourceLine]:
     return lines
 
 
-def flatten(nestedlist: Iterable) -> List:
+T = TypeVar('T')
+
+
+def flatten(nestedlist: Iterable[T]) -> List[T]:
     """Flatten a nested list."""
     newlist = []
     for item in nestedlist:
@@ -246,7 +248,9 @@ def flatten(nestedlist: Iterable) -> List:
     return newlist
 
 
-def resolve_eqvs(lines: List[SourceLine]) -> Dict[str, str]:
+def resolve_eqvs(
+    lines: List[SourceLine]
+) -> Tuple[List[SourceLine], Dict[str, str]]:
     """Gather eqvs to text replace throughout code."""
     eqvs = {}
     to_del = []
@@ -267,12 +271,12 @@ def resolve_eqvs(lines: List[SourceLine]) -> Dict[str, str]:
             # check each eqv and attempt a replacement
             srcline.line = srcline.line.replace(eqv, eqvs[eqv])
 
-    return eqvs
+    return lines, eqvs
 
 
 def resolve_macros(lines: List[SourceLine]) -> List[SourceLine]:
     """Find and substitute macros."""
-    macros: Dict[str, dict] = {}
+    macros: Dict[str, Dict[str, Any]] = {}
     found_macro = None
     lines_to_remove = []
     for idx, srcline in enumerate(lines):
@@ -312,7 +316,7 @@ def macro_with_args(
     idx: int,
     lines: List[SourceLine],
     macro: str,
-    macroinfo: dict,
+    macroinfo: Dict[str, Any],
     srcline: SourceLine,
 ) -> None:
     """Handle Parsing for macro that has arguments."""
@@ -336,7 +340,9 @@ def macro_with_args(
         lines[idx] = expanded_macro  # type: ignore
 
 
-def load_args(init_regs: dict, memory: Memory, args: List[str]):
+def load_args(
+    init_regs: Dict[str, int], memory: Memory, args: List[str]
+) -> None:
     """Load arguments on to the stack and sets argc."""
     init_regs['$a0'] = len(args)  # argc
 

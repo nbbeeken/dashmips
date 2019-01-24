@@ -1,6 +1,6 @@
 """Mips Management."""
 import inspect
-from typing import Dict, Callable, Any
+from typing import Any, Callable, Dict
 
 import dashmips.directives as directives
 from dashmips.hardware import Memory

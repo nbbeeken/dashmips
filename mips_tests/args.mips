@@ -1,3 +1,10 @@
+.eqv QUIT 10
+
+.macro exit
+li $v0, QUIT
+syscall
+.end_macro
+
 .data
 
 argc_str: .asciiz   "argc = "

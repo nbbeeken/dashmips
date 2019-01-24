@@ -1,6 +1,6 @@
 """Mips Hardware."""
-from typing import (Callable, Dict, Iterable, List, Mapping, Optional, Tuple,
-                    Union, cast)
+from typing import (Any, Callable, Dict, Iterable, List, Mapping, Optional,
+                    Tuple, Union, cast)
 
 names_enum = tuple(enumerate((
     # fmt: off
@@ -80,7 +80,7 @@ class Memory(List[int]):
 
     PAGE = 4096
 
-    def __init__(self, listish: Optional[Iterable] = None) -> None:
+    def __init__(self, listish: Optional[Iterable[Any]] = None) -> None:
         """Create 2KB of MIPS RAM."""
         self._freespace = 0x4
         # if isinstance(listish, bytes) or isinstance(listish, str):

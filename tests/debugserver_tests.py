@@ -1,11 +1,11 @@
 """Tests for Mips Debug Server."""
+import json
 import unittest
-from subprocess import Popen, run, PIPE
+from pprint import pformat
 from shlex import split
 from socket import socket
-import json
+from subprocess import PIPE, Popen, run
 from time import sleep
-from pprint import pformat
 
 SERVER = Popen(split("python -m dashmips debug -l"))
 sleep(0.1)  # Should be plenty of time to start and bind
@@ -46,7 +46,7 @@ def recv():
 class TestMipsDebugServer(unittest.TestCase):
     """Testing for mips debug server."""
 
-    def test_start(self):
+    def test_start(self) -> None:
         """Test start command."""
         program = compile_file('test.mips')
 
@@ -69,7 +69,7 @@ class TestMipsDebugServer(unittest.TestCase):
         )
         self.stop_debugging()
 
-    def stop_debugging(self):
+    def stop_debugging(self) -> None:
         """Send a proper stop command to the debugger."""
         SERVER.kill()
 
