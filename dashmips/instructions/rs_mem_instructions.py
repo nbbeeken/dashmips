@@ -55,7 +55,13 @@ def lh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    # FIXME: This does not sign extend correctly
+    addr = num + program.registers[rt]
+    val = 0
+    vals = program.memory[addr:addr + 2]
+    for i, b in enumerate(reversed(vals)):
+        val |= b << i * 8
+    program.registers[rs] = val
 
 
 @mips_instruction(PTRN, parse)
@@ -68,7 +74,12 @@ def lhu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    addr = num + program.registers[rt]
+    val = 0
+    vals = program.memory[addr:addr + 2]
+    for i, b in enumerate(reversed(vals)):
+        val |= b << i * 8
+    program.registers[rs] = val
 
 
 @mips_instruction(PTRN, parse)

@@ -97,7 +97,10 @@ def mul(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    # FIXME: Correctness check.
+    product = program.registers[rs] * program.registers[rt]
+    program.registers['hi'] = product & 0xFFFFFFFF_00000000
+    program.registers['lo'] = product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)

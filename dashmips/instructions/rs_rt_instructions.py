@@ -18,14 +18,15 @@ def parse(arg: Tuple[str, str, str, str]) -> Tuple[str, str]:
 
 @mips_instruction(PTRN, parse)
 def jalr(program: MipsProgram, rs: str, rt: str) -> None:
-    """Jump and link register.
+    """Jump and link register. Store pc into rs, jump to rt.
 
     :param program:
     :param rt:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    program.registers[rs] = program.registers['pc']
+    program.registers['pc'] = program.registers[rt]
 
 
 @mips_instruction(PTRN, parse)
@@ -37,7 +38,9 @@ def madd(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    product = program.registers[rs] * program.registers[rt]
+    program.registers['hi'] += product & 0xFFFFFFFF_00000000
+    program.registers['lo'] += product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -49,7 +52,9 @@ def maddu(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    product = abs(program.registers[rs]) * abs(program.registers[rt])
+    program.registers['hi'] += product & 0xFFFFFFFF_00000000
+    program.registers['lo'] += product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -61,7 +66,9 @@ def msubu(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    product = abs(program.registers[rs]) * abs(program.registers[rt])
+    program.registers['hi'] -= product & 0xFFFFFFFF_00000000
+    program.registers['lo'] -= product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -73,7 +80,9 @@ def msub(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    product = program.registers[rs] * program.registers[rt]
+    program.registers['hi'] -= product & 0xFFFFFFFF_00000000
+    program.registers['lo'] -= product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -113,7 +122,13 @@ def clo(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    bit_to_check = 1 << 32
+    val = program.registers[rt]
+    count = 0
+    while (val & bit_to_check) == 1 and bit_to_check > 0:
+        count += 1
+        bit_to_check >>= 1
+    program.registers[rs] = count
 
 
 @mips_instruction(PTRN, parse)
@@ -125,7 +140,13 @@ def clz(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    raise NotImplementedError('TODO')
+    bit_to_check = 1 << 32
+    val = program.registers[rt]
+    count = 0
+    while (val & bit_to_check) == 0 and bit_to_check > 0:
+        count += 1
+        bit_to_check >>= 1
+    program.registers[rs] = count
 
 
 @mips_instruction(PTRN, parse)
