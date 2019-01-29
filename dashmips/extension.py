@@ -16,7 +16,7 @@ SNIPPET_REPLACEMENTS = {
 REG_ARGS = ['t0', 't1', 't2']
 
 
-def generate_snippets() -> Dict[str, Dict[str, str]]:
+def generate_snippets(examples=False) -> Dict[str, Dict[str, str]]:
     """Generate Instruction snippets."""
     snippets = {}
     names = sorted(Instructions.keys())
@@ -31,6 +31,9 @@ def generate_snippets() -> Dict[str, Dict[str, str]]:
             'description': desc,
             'scope': 'mips',
         }
+        if examples:
+            example = build_example(ins.name, ins.pattern, ins.label)
+            snippets[name]['example'] = example
     return snippets
 
 
@@ -58,6 +61,24 @@ def build_body(name: str, pattern: str, label: bool) -> str:
     else:
         snip = snip.replace('number', f'${{{replace_ct}:100}}')
         replace_ct += 1
+
+    return snip
+
+
+def build_example(name: str, pattern: str, label: bool):
+    """Generate an example usage of the instruction."""
+    snip = f'{name:7s}' + pattern.format(**SNIPPET_REPLACEMENTS)
+
+    snip = snip.replace('(', '')
+    snip = snip.replace(')', '')
+    snip = snip.replace('number?\\\\$reg\\', 'number(\\$reg)')
+
+    reg_ct = snip.count('reg')
+    for i in range(0, reg_ct):
+        snip = snip.replace('\$reg', f'${REG_ARGS[i]}', 1)
+
+    snip = snip.replace('label', 'mylabel')
+    snip = snip.replace('number', '100')
 
     return snip
 

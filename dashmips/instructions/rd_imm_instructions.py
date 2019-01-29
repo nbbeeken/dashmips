@@ -18,7 +18,7 @@ def parse(args: Tuple[str, str, str, str]) -> Tuple[str, int]:
 
 @mips_instruction(PTRN, parse)
 def lui(program: MipsProgram, rd: str, immediate: int) -> None:
-    """Load upper immediate, NOT LOAD FROM MEMORY.
+    """Load upper immediate, NOT A LOAD FROM MEMORY.
 
     :param program:
     :param rd:

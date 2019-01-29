@@ -78,12 +78,16 @@ def main_docs(args: argparse.Namespace) -> int:
 
     # Instructions printer
     print('Instructions')
-    print(f"{'name':10}{'description'}")
-    print(f"{'----':10}{'-----------'}")
+    print(f"{'format':<35}{'description'}")
+    print(f"{'------':<35}{'-----------'}")
+    snips = generate_snippets(examples=True)
     instr_list = list(Instructions.items())
     instr_list.sort(key=lambda i: i[0])
     for instrname, instruction in instr_list:
-        print(f'{instrname:10}{instruction.description}')
+        ex_str = snips[instrname]['example']
+        desc = snips[instrname]['description']
+        print(f'{ex_str:35}# ', end='')
+        print(f'{desc}')
 
     return 0
 

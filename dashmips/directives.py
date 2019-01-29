@@ -43,7 +43,7 @@ def _ascii(name: str, data: str, memory: Memory) -> int:
     return address
 
 
-def byte(name: str, data: str, memory: Memory) -> None:
+def byte(name: str, data: str, memory: Memory) -> int:
     """Byte directive.
 
     :param name: str:
@@ -51,10 +51,15 @@ def byte(name: str, data: str, memory: Memory) -> None:
     :param memory: Memory:
 
     """
-    return None
+    value = int(data)
+    if value > 0xFF:
+        raise Exception('You cannot store a value greater than 2^8')
+    address = memory.malloc(1)
+    memory[address] = value.to_bytes(1, 'big')
+    return address
 
 
-def half(name: str, data: str, memory: Memory) -> None:
+def half(name: str, data: str, memory: Memory) -> int:
     """Half directive.
 
     :param name: str:
@@ -62,10 +67,15 @@ def half(name: str, data: str, memory: Memory) -> None:
     :param memory: Memory:
 
     """
-    return None
+    value = int(data)
+    if value > 0xFFFF:
+        raise Exception('You cannot store a value greater than 2^16')
+    address = memory.malloc(2)
+    memory[address:address + 2] = value.to_bytes(2, 'big')
+    return address
 
 
-def space(name: str, data: str, memory: Memory) -> None:
+def space(name: str, data: str, memory: Memory) -> int:
     """Space directive.
 
     :param name: str:
@@ -73,10 +83,14 @@ def space(name: str, data: str, memory: Memory) -> None:
     :param memory: Memory:
 
     """
-    return None
+    value = int(data)
+    if value > 0xFFFF_FFFF:
+        raise Exception('Please use less memory...')
+    address = memory.malloc(value)
+    return address
 
 
-def word(name: str, data: str, memory: Memory) -> None:
+def word(name: str, data: str, memory: Memory) -> int:
     """Word directive.
 
     :param name: str:
@@ -84,4 +98,9 @@ def word(name: str, data: str, memory: Memory) -> None:
     :param memory: Memory:
 
     """
-    return None
+    value = int(data)
+    if value > 0xFFFF_FFFF:
+        raise Exception('You cannot store a value greater than 2^32')
+    address = memory.malloc(4)
+    memory[address:address + 4] = value.to_bytes(4, 'big')
+    return address
