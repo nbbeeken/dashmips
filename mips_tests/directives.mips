@@ -1,0 +1,56 @@
+.macro exit(%code)
+li $a0, %code
+li $v0, 10
+syscall
+.end_macro
+
+.macro print_num (%reg)
+	li $v0, 1
+	move $a0, %reg
+	syscall
+.end_macro
+
+.macro print_newline
+	li $v0, 11
+	li $a0, '\n'
+	syscall
+.end_macro
+
+.macro print_str (%lbl)
+	li $v0, 4
+	la $a0, %lbl
+	syscall
+.end_macro
+
+.data
+
+w1: .word 5
+w2: .word 500
+
+h1: .half 0xFFFF
+
+b1: .byte 255
+
+.text
+main:
+    la      $t0, w1
+    lw      $t0, 0($t0)
+
+    la      $t1, w2
+    lw      $t1, 0($t1)
+
+    la      $t2, h1
+    lh      $t2, 0($t2)
+
+    la      $t3, b1
+    lb      $t3, 0($t3)
+
+    print_num($t0)
+    print_newline
+    print_num($t1)
+    print_newline
+    print_num($t2)
+    print_newline
+    print_num($t3)
+    print_newline
+    exit(0)
