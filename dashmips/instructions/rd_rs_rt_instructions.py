@@ -18,7 +18,7 @@ def parse(args: Tuple[str, str, str, str, str]) -> Tuple[str, str, str]:
 
 @mips_instruction(PTRN, parse)
 def add(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Add Reg[rd]=Reg[rs]+Reg[rt].
+    """Add Reg[rd] = Reg[rs] + Reg[rt].
 
     :param program:
     :param rs:
@@ -33,7 +33,7 @@ def add(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def addu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Add unsigned Reg[rd]=Reg[rs]+Reg[rt].
+    """Add unsigned Reg[rd] = Reg[rs] + Reg[rt].
 
     :param program:
     :param rs:
@@ -48,7 +48,7 @@ def addu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def _and(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Bitwise And Reg[rd]=Reg[rs]&Reg[rt].
+    """Bitwise And Reg[rd] = Reg[rs] & Reg[rt].
 
     :param program:
     :param rs:
@@ -61,7 +61,7 @@ def _and(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def movn(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Move conditional Reg[rd]=Reg[rs] if Reg[rt] != 0.
+    """Move conditional Reg[rd] = Reg[rs] if Reg[rt] != 0.
 
     :param program:
     :param rs:
@@ -75,7 +75,7 @@ def movn(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def movz(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Move conditional Reg[rd]=Reg[rs] if Reg[rt] == 0.
+    """Move conditional Reg[rd] = Reg[rs] if Reg[rt] == 0.
 
     :param program:
     :param rs:
@@ -105,7 +105,7 @@ def mul(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def nor(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Bitwise Nor Reg[rd]=~(Reg[rs]|Reg[rt]).
+    """Bitwise Nor Reg[rd] = ~(Reg[rs] | Reg[rt]).
 
     :param program:
     :param rs:
@@ -118,7 +118,7 @@ def nor(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def _or(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Bitwise And Reg[rd]=Reg[rs]|Reg[rt].
+    """Bitwise And Reg[rd] = Reg[rs] | Reg[rt].
 
     :param program:
     :param rs:
@@ -204,7 +204,7 @@ def srlv(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def sub(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Subtract Reg[rd]=Reg[rs]-Reg[rt].
+    """Subtract Reg[rd] = Reg[rs] - Reg[rt].
 
     :param program:
     :param rs:
@@ -217,7 +217,7 @@ def sub(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def subu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Subtract unsigned Reg[rd]=Reg[rs]-Reg[rt].
+    """Subtract unsigned Reg[rd] = Reg[rs] - Reg[rt].
 
     :param program:
     :param rs:
@@ -230,7 +230,7 @@ def subu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def xor(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
-    """Bitwise And Reg[rd]=Reg[rs]^Reg[rt].
+    """Bitwise And Reg[rd] = Reg[rs] ^ Reg[rt].
 
     :param program:
     :param rs:

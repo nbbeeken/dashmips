@@ -75,7 +75,7 @@ def build_example(name: str, pattern: str, label: bool):
 
     reg_ct = snip.count('reg')
     for i in range(0, reg_ct):
-        snip = snip.replace('\$reg', f'${REG_ARGS[i]}', 1)
+        snip = snip.replace('\\$reg', f'${REG_ARGS[i]}', 1)
 
     snip = snip.replace('label', 'mylabel')
     snip = snip.replace('number', '100')

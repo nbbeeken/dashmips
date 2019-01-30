@@ -13,7 +13,7 @@ class Instruction:
         fn: Callable[[MipsProgram, Iterable[Any]], None],
         regex_ptrn: str,
         parser: Callable[[Match], Iterable[Any]],
-        label: bool=False
+        label: bool = False
     ) -> None:
         """
         Regex and argument parser for instruction.

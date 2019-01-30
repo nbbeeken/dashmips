@@ -57,12 +57,12 @@ class VT100(Plugin):
         self.root.title("VT100")
 
         self.content = tk.Variable(self.root, b'', 'content')  # type: ignore
-        self.content.trace_add('write', self.pull)
+        self.content.trace_add('write', self.pull)  # type: ignore
 
         self.quit_request = tk.BooleanVar(  # type: ignore
             self.root, False, 'quit_request'
         )
-        self.quit_request.trace_add('write', self.close)
+        self.quit_request.trace_add('write', self.close)  # type: ignore
 
         self.vt = tk.Text(  # type: ignore
             self.root, state='disabled', width=80, height=25

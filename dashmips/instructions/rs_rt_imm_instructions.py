@@ -18,7 +18,7 @@ def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, int]:
 
 @mips_instruction(PTRN, parse)
 def addi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
-    """Add immediate Reg[rs]=Reg[rt]+immediate.
+    """Add immediate Reg[rs] = Reg[rt] + immediate.
 
     :param program:
     :param rt:
@@ -31,7 +31,7 @@ def addi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
 
 @mips_instruction(PTRN, parse)
 def addiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
-    """Add immediate unsigned Reg[rs]=Reg[rt]+immediate.
+    """Add immediate unsigned Reg[rs] = Reg[rt] + immediate.
 
     :param program:
     :param rt:
@@ -46,7 +46,7 @@ def addiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
 
 @mips_instruction(PTRN, parse)
 def ori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
-    """Or immediate Reg[rs]=Reg[rt]|immediate.
+    """Or immediate Reg[rs] = Reg[rt] | immediate.
 
     :param program:
     :param rt:
@@ -59,7 +59,7 @@ def ori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
 
 @mips_instruction(PTRN, parse)
 def andi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
-    """And immediate Reg[rs]=Reg[rt]&immediate.
+    """And immediate Reg[rs] = Reg[rt] & immediate.
 
     :param program:
     :param rt:
@@ -104,7 +104,7 @@ def sltiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
 
 @mips_instruction(PTRN, parse)
 def xori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
-    """Xor immediate Reg[rs]=Reg[rt]^immediate.
+    """Xor immediate Reg[rs] = Reg[rt] ^ immediate.
 
     :param program:
     :param rt:

@@ -54,7 +54,7 @@ def move(program: MipsProgram, rd: str, rs: str) -> None:
     lambda args: (args[2], args[3])
 )
 def beqz(program: MipsProgram, rd: str, label: str) -> None:
-    """Branch to label if Reg[rd]==0.
+    """Branch to label if Reg[rd] == 0.
 
     :param program:
     :param rd:
@@ -70,7 +70,7 @@ def beqz(program: MipsProgram, rd: str, label: str) -> None:
     lambda args: (args[2], args[3])
 )
 def bnez(program: MipsProgram, rd: str, label: str) -> None:
-    """Branch to label if Reg[rd]!=0.
+    """Branch to label if Reg[rd] != 0.
 
     :param program:
     :param rd:

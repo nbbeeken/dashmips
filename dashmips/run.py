@@ -13,7 +13,7 @@ RUN_COND: Callable[[MipsProgram], bool] = (lambda p: p.registers['pc'] != -1)
 
 def run(
     program: MipsProgram,
-    runnable: Callable[[MipsProgram], bool]=RUN_COND
+    runnable: Callable[[MipsProgram], bool] = RUN_COND
 ) -> int:
     """Execute Preprocessed Mips.
 
