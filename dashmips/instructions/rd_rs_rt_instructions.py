@@ -26,9 +26,7 @@ def add(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rt:
 
     """
-    program.registers[rd] = (
-        (program.registers[rs] + program.registers[rt]) & 0xFFFF_FFFF
-    )
+    program.registers[rd] = program.registers[rs] + program.registers[rt]
 
 
 @mips_instruction(PTRN, parse)
@@ -41,9 +39,7 @@ def addu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rt:
 
     """
-    program.registers[rd] = (
-        (program.registers[rs] + program.registers[rt]) & 0xFFFF_FFFF
-    )
+    program.registers[rd] = program.registers[rs] + program.registers[rt]
 
 
 @mips_instruction(PTRN, parse)

@@ -39,7 +39,8 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     processed_code = code_labels(labels, unprocessed_code)
 
     # Cannot run a program without a main
-    assert 'main' in labels and labels['main'].location == mips.RE.TEXT_SEC
+    if not ('main' in labels and labels['main'].location == mips.RE.TEXT_SEC):
+        raise Exception(f'Cannot locate main in {filename}')
 
     bp = memory.malloc(512) + 508
     init_regs = {
