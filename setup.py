@@ -17,7 +17,7 @@ setup(
     name='dashmips',
     version='0.0.11',
     author='Neal Beeken',
-    url='https://gitlab.com/nbbeeken/dashmips',
+    url='https://github.com/nbbeeken/dashmips',
     packages=find_packages(),
     description='Mips Interpreter',
     long_description=long_description,

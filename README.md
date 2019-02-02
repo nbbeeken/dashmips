@@ -2,6 +2,11 @@
 
 Dashmips is a Mips Interpreter CLI Program.
 
+## Requirements
+
+Dashmips has no dependencies beyond requiring `python 3.7`.
+There is a dataclasses module for python 3.6 that may make this module work but it is untested.
+
 ## Install
 
 The recommended way to install dashmips is with pip:
