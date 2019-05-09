@@ -164,3 +164,18 @@ def bge(program: MipsProgram, rd: str, rs: str, label: str) -> None:
     """
     if program.registers[rd] > program.registers[rs]:
         program.registers['pc'] = program.labels[label].value
+
+
+@mips_instruction(
+    r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})",
+    lambda args: (args[2], args[3], args[4])
+)
+def ble(program: MipsProgram, rd: str, rs: str, label: str) -> None:
+    """Branch to label if Reg[rd]<Reg[rs].
+
+    :param program:
+    :param label:
+
+    """
+    if program.registers[rd] < program.registers[rs]:
+        program.registers['pc'] = program.labels[label].value
