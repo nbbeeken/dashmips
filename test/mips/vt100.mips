@@ -1,5 +1,4 @@
-# Do NOT modify this file.
-# This file is NOT part of your homework 2 submission.
+# python -m dashmips run --vt100 tests/mips/vt100.mips
 .data
 hello_str: .asciiz "Hello, "
 world_str: .asciiz "World!"
@@ -44,4 +43,3 @@ quit_main:
 	#quit program
 	li $v0, 10
 	syscall
-

@@ -9,3 +9,6 @@ test.mips.json
 *.egg-info
 build/
 dist/
+dashmips-env/
+testout/
+.pytest_cache/

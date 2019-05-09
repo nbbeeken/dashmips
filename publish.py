@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 """Run Publish Commands."""
 import shutil
 import sys
@@ -12,6 +13,8 @@ shutil.rmtree('dashmips/syscalls/__pycache__', ignore_errors=True)
 shutil.rmtree('dashmips/instructions/__pycache__', ignore_errors=True)
 shutil.rmtree('dashmips/plugins/__pycache__', ignore_errors=True)
 shutil.rmtree('.mypy_cache', ignore_errors=True)
+shutil.rmtree('testout', ignore_errors=True)
+shutil.rmtree('.pytest_cache', ignore_errors=True)
 
 
 if 'clean' in sys.argv:
