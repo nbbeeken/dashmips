@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple, TextIO, Iterable, Any, Optional, cast
 class SourceLine:
     """Mips Preprocessor Label."""
 
-    __slots__ = ('filename', 'lineno', 'line')
+    __slots__ = ("filename", "lineno", "line")
 
     filename: str
     lineno: int
@@ -18,7 +18,7 @@ class SourceLine:
 class Label:
     """Mips Preprocessor Label."""
 
-    __slots__ = ('location', 'kind', 'value', 'name')
+    __slots__ = ("location", "kind", "value", "name")
 
     location: str
     kind: str
@@ -32,7 +32,7 @@ class MipsProgram:
 
     from dashmips.hardware import Memory, Registers
 
-    __slots__ = ('name', 'labels', 'source', '__dict__')
+    __slots__ = ("name", "labels", "source", "__dict__")
 
     name: str
     labels: Dict[str, Label]
@@ -42,16 +42,17 @@ class MipsProgram:
     eqvs: Dict[str, str] = field(default_factory=dict)
 
     @staticmethod
-    def from_dict(prg: Dict[str, Any]) -> 'MipsProgram':
+    def from_dict(prg: Dict[str, Any]) -> "MipsProgram":
         """From Basic dictionary to MipsProgram.
 
         :param prg:
         """
         from dashmips.hardware import Memory, Registers
-        prg['memory'] = Memory(prg['memory'])
-        prg['registers'] = Registers(prg['registers'])
-        prg['labels'] = {ln: Label(**l) for ln, l in prg['labels'].items()}
-        prg['source'] = [SourceLine(**m) for m in prg['source']]
+
+        prg["memory"] = Memory(prg["memory"])
+        prg["registers"] = Registers(prg["registers"])
+        prg["labels"] = {ln: Label(**l) for ln, l in prg["labels"].items()}
+        prg["source"] = [SourceLine(**m) for m in prg["source"]]
         return MipsProgram(**prg)
 
     def to_dict(self) -> dict:
@@ -61,7 +62,7 @@ class MipsProgram:
     @property
     def current_line(self) -> SourceLine:
         """Return Current Line According to PC."""
-        pc: int = self.registers['pc']
+        pc: int = self.registers["pc"]
         return self.source[pc]
 
 
@@ -69,12 +70,12 @@ class MipsProgram:
 class DebugMessage:
     """Format for debug messages."""
 
-    __slots__ = ('command', 'program', '__dict__')
+    __slots__ = ("command", "program", "__dict__")
 
     command: str
     program: MipsProgram
     breakpoints: List[int] = field(default_factory=list)
-    message: str = ''
+    message: str = ""
     error: bool = False
 
     def __post_init__(self) -> None:
@@ -87,7 +88,7 @@ class DebugMessage:
         return asdict(self)
 
     @staticmethod
-    def from_dict(payload: dict) -> Optional['DebugMessage']:
+    def from_dict(payload: dict) -> Optional["DebugMessage"]:
         """Deserialize from json to DebugMessage.
 
         :param payload:
@@ -98,19 +99,18 @@ class DebugMessage:
         if not payload:
             # Payload is Falsey
             return None
-        if 'command' not in payload:
+        if "command" not in payload:
             # There is no command to handle
             return None
-        if payload['command'] not in Commands:
+        if payload["command"] not in Commands:
             # The command does not exist
             return None
 
-        if 'program' in payload:
-            payload['program'] = MipsProgram.from_dict(
-                payload.get('program', {})
-            )
+        if "program" in payload:
+            payload["program"] = MipsProgram.from_dict(
+                payload.get("program", {}))
         else:
-            payload['program'] = None
+            payload["program"] = None
         return DebugMessage(**payload)
 
 
@@ -118,7 +118,7 @@ class DebugMessage:
 class Client:
     """A Client for DebugServer."""
 
-    __slots__ = ('rfile', 'wfile', 'address')
+    __slots__ = ("rfile", "wfile", "address")
 
     rfile: TextIO
     wfile: TextIO

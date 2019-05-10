@@ -1,5 +1,5 @@
 """Two Register and Immediate instructions."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction, parse_int
 from dashmips.models import MipsProgram
@@ -40,8 +40,7 @@ def addiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
 
     """
     program.registers[rs] = (
-        abs(program.registers[rt]) + abs(num)
-    ) & 0xFFFF_FFFF
+        abs(program.registers[rt]) + abs(num)) & 0xFFFF_FFFF
 
 
 @mips_instruction(PTRN, parse)

@@ -1,23 +1,37 @@
 """Mips Hardware."""
-from typing import (Any, Callable, Dict, Iterable, List, Mapping, Optional,
-                    Tuple, Union, cast)
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
 
-names_enum = tuple(enumerate((
-    # fmt: off
-    "$zero",
-    "$at",
-    "$v0", "$v1",
-    "$a0", "$a1", "$a2", "$a3",
-    "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7",
-    "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7",
-    "$t8", "$t9",
-    "$k0", "$k1",
-    "$gp", "$sp", "$fp", "$ra",
-    "pc",
-    "hi",
-    "lo",
-    # fmt: on
-)))
+names_enum = tuple(
+    enumerate(
+        (
+            # fmt: off
+            "$zero",
+            "$at",
+            "$v0", "$v1",
+            "$a0", "$a1", "$a2", "$a3",
+            "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7",
+            "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7",
+            "$t8", "$t9",
+            "$k0", "$k1",
+            "$gp", "$sp", "$fp", "$ra",
+            "pc",
+            "hi",
+            "lo",
+            # fmt: on
+        )
+    )
+)
 
 
 class Registers(Dict[str, int]):
@@ -41,10 +55,7 @@ class Registers(Dict[str, int]):
                 Registers.Resolve[regname]: value
                 for regname, value in dict(dictionary).items()
             }
-            super().__init__({
-                **base_reg,
-                **new_dict
-            })
+            super().__init__({**base_reg, **new_dict})
         else:
             super().__init__(base_reg)
 
@@ -54,8 +65,8 @@ class Registers(Dict[str, int]):
 
         Accepts string or number for key
         """
-        assert not value & 0x00_00_00_00, 'Reg value cannot exceed 32 bits'
-        self.pc_changed = (Registers.Resolve[key] == 'pc')
+        assert not value & 0x00_00_00_00, "Reg value cannot exceed 32 bits"
+        self.pc_changed = Registers.Resolve[key] == "pc"
         super().__setitem__(Registers.Resolve[key], value)
 
     def __getitem__(self, key: str) -> int:
@@ -91,25 +102,20 @@ class Memory(List[int]):
             listish = list(listish)
         remaining_size = (3 * Memory.PAGE) - len(listish)
 
-        self.on_change_listeners: List[Callable[['Memory'], None]] = []
+        self.on_change_listeners: List[Callable[["Memory"], None]] = []
 
-        super().__init__([
-            *listish,
-            *([0] * remaining_size)
-        ])
+        super().__init__([*listish, *([0] * remaining_size)])
 
         for i in range(0x2060, 0x2060 + ((80 * 25) * 2), 2):
             self[i] = 0x0F
-            self[i + 1] = ord(' ')
+            self[i + 1] = ord(" ")
 
-    def on_change(self, cb: Callable[['Memory'], None]) -> None:
+    def on_change(self, cb: Callable[["Memory"], None]) -> None:
         """Insert on_change listener."""
         self.on_change_listeners.append(cb)
 
     def __setitem__(
-        self,
-        key: Union[int, slice],
-        value: Union[int, Iterable[int]]
+        self, key: Union[int, slice], value: Union[int, Iterable[int]]
     ) -> None:
         """Bounds checking on access."""
         if isinstance(key, slice) and isinstance(value, (list, tuple, bytes)):
@@ -130,19 +136,19 @@ class Memory(List[int]):
 
     def __repr__(self) -> str:
         """Compacted Memory string."""
-        s = '['
+        s = "["
         zero_ct = 0
         for v in self:
             if v == 0:
                 zero_ct += 1
             else:
                 if zero_ct != 0:
-                    s += f'<0 repeats {zero_ct} times>, '
+                    s += f"<0 repeats {zero_ct} times>, "
                     zero_ct = 0
-                s += str(v) + ', '
+                s += str(v) + ", "
         if zero_ct != 0:
-            s += f'<0 repeats {zero_ct} times>, '
-        s += ']'
+            s += f"<0 repeats {zero_ct} times>, "
+        s += "]"
         return s
 
     def malloc(self, size: int) -> int:
@@ -155,7 +161,7 @@ class Memory(List[int]):
         if pad > 0:
             self._freespace = self._freespace + (4 - pad)
         old_freespace = self._freespace  # Aligned to 4
-        self._freespace += (size + pad)  # Allocate Aligned amount
+        self._freespace += size + pad  # Allocate Aligned amount
         return old_freespace
 
     # def encoded_str(self):

@@ -16,9 +16,8 @@ class MipsException(Exception):
 
 
 Directives: Dict[str, Callable[[str, Any, Memory], int]] = {
-    directive.replace('_', ''): fn
-    for directive, fn in
-    inspect.getmembers(directives, inspect.isfunction)
+    directive.replace("_", ""): fn
+    for directive, fn in inspect.getmembers(directives, inspect.isfunction)
 }
 
 
@@ -28,14 +27,16 @@ class RE:
     DATA_SEC = ".data"
     TEXT_SEC = ".text"
 
-    REGISTER = (r"hi|lo|(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
-                r"|zero|sp|fp|gp|ra))")
+    REGISTER = (
+        r"hi|lo|(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
+        r"|zero|sp|fp|gp|ra))"
+    )
     LABEL = r"\b[\w]+\b"
     DIRECTIVE = "\\." + "|\\.".join(Directives.keys())
 
-    MACRO = r'\.macro\s+(\w+)\s*(?:\((.+)\))?'
-    END_MACRO = r'\.end_macro'
-    EQVS = r'\.eqv\s+(\w+)\s+(.+)'
+    MACRO = r"\.macro\s+(\w+)\s*(?:\((.+)\))?"
+    END_MACRO = r"\.end_macro"
+    EQVS = r"\.eqv\s+(\w+)\s+(.+)"
 
     COMMENT = r"\#.*"
 
@@ -50,20 +51,14 @@ class RE:
     OCT = r"\b(?:0(?:o|O)(?:_?[0-7])+)\b"
     HEX = r"\b(?:0[xX])(?:_?[0-9a-fA-F])+\b"
 
-    NUMBERS = [
-        HEX,
-        BIN,
-        OCT,
-        DEC,
-        ASCII_LITERAL
-    ]
+    NUMBERS = [HEX, BIN, OCT, DEC, ASCII_LITERAL]
 
     NUMBER = "(?:" + "|".join(NUMBERS) + ")"
 
     ALL = {
-        'register': REGISTER,
-        'label': LABEL,
-        'number': NUMBER,
-        'instr_gap': INSTRGAP,
-        'args_gap': ARGSGAP,
+        "register": REGISTER,
+        "label": LABEL,
+        "number": NUMBER,
+        "instr_gap": INSTRGAP,
+        "args_gap": ARGSGAP,
     }

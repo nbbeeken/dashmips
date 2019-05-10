@@ -8,12 +8,11 @@ from dashmips.instructions import Instructions
 from dashmips.mips import MipsException
 from dashmips.models import MipsProgram
 
-RUN_COND: Callable[[MipsProgram], bool] = (lambda p: p.registers['pc'] != -1)
+RUN_COND: Callable[[MipsProgram], bool] = (lambda p: p.registers["pc"] != -1)
 
 
 def run(
-    program: MipsProgram,
-    runnable: Callable[[MipsProgram], bool] = RUN_COND
+    program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_COND
 ) -> int:
     """Execute Preprocessed Mips.
 
@@ -25,14 +24,14 @@ def run(
         while runnable(program):
             next_instruction(program)
     except MipsException as mips_ex:
-        print(f"{mips_ex.message} on ", file=sys.stderr, end='')
+        print(f"{mips_ex.message} on ", file=sys.stderr, end="")
         print(
             f"{program.current_line.filename}:{program.current_line.lineno}",
-            file=sys.stderr
+            file=sys.stderr,
         )
         sys.exit()
 
-    return program.registers['$a0']  # should hold program exit code
+    return program.registers["$a0"]  # should hold program exit code
 
 
 def next_instruction(program: MipsProgram) -> None:
@@ -41,13 +40,13 @@ def next_instruction(program: MipsProgram) -> None:
     :param program:
 
     """
-    current_pc = program.registers['pc']
+    current_pc = program.registers["pc"]
     if len(program.source) < current_pc:
         # We jumped or executed beyond available text
-        raise MipsException(f'Bad pc value {current_pc}')
+        raise MipsException(f"Bad pc value {current_pc}")
 
     line = program.source[current_pc].line  # line to execute
-    instruction = line.split(' ')[0]  # Grab the instruction name
+    instruction = line.split(" ")[0]  # Grab the instruction name
 
     instruction_fn = Instructions[instruction]  # relevant Instruction()
 

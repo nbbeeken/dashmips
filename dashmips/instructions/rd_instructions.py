@@ -1,5 +1,5 @@
 """Instuctions that operate on one register."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
@@ -24,7 +24,7 @@ def mflo(program: MipsProgram, rd: str) -> None:
     :param rd:
 
     """
-    program.registers[rd] = program.registers['lo']
+    program.registers[rd] = program.registers["lo"]
 
 
 @mips_instruction(PTRN, parse)
@@ -35,7 +35,7 @@ def mfhi(program: MipsProgram, rd: str) -> None:
     :param rd:
 
     """
-    program.registers[rd] = program.registers['hi']
+    program.registers[rd] = program.registers["hi"]
 
 
 @mips_instruction(PTRN, parse)
@@ -46,7 +46,7 @@ def mthi(program: MipsProgram, rd: str) -> None:
     :param rd:
 
     """
-    program.registers['hi'] = program.registers[rd]
+    program.registers["hi"] = program.registers[rd]
 
 
 @mips_instruction(PTRN, parse)
@@ -57,4 +57,4 @@ def mtlo(program: MipsProgram, rd: str) -> None:
     :param rd:
 
     """
-    program.registers['lo'] = program.registers[rd]
+    program.registers["lo"] = program.registers[rd]

@@ -1,5 +1,5 @@
 """Two Register Instructions."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
@@ -25,8 +25,8 @@ def jalr(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
 
     """
-    program.registers[rs] = program.registers['pc']
-    program.registers['pc'] = program.registers[rt]
+    program.registers[rs] = program.registers["pc"]
+    program.registers["pc"] = program.registers[rt]
 
 
 @mips_instruction(PTRN, parse)
@@ -39,8 +39,8 @@ def madd(program: MipsProgram, rs: str, rt: str) -> None:
 
     """
     product = program.registers[rs] * program.registers[rt]
-    program.registers['hi'] += product & 0xFFFFFFFF_00000000
-    program.registers['lo'] += product & 0x00000000_FFFFFFFF
+    program.registers["hi"] += product & 0xFFFFFFFF_00000000
+    program.registers["lo"] += product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -53,8 +53,8 @@ def maddu(program: MipsProgram, rs: str, rt: str) -> None:
 
     """
     product = abs(program.registers[rs]) * abs(program.registers[rt])
-    program.registers['hi'] += product & 0xFFFFFFFF_00000000
-    program.registers['lo'] += product & 0x00000000_FFFFFFFF
+    program.registers["hi"] += product & 0xFFFFFFFF_00000000
+    program.registers["lo"] += product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -67,8 +67,8 @@ def msubu(program: MipsProgram, rs: str, rt: str) -> None:
 
     """
     product = abs(program.registers[rs]) * abs(program.registers[rt])
-    program.registers['hi'] -= product & 0xFFFFFFFF_00000000
-    program.registers['lo'] -= product & 0x00000000_FFFFFFFF
+    program.registers["hi"] -= product & 0xFFFFFFFF_00000000
+    program.registers["lo"] -= product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -81,8 +81,8 @@ def msub(program: MipsProgram, rs: str, rt: str) -> None:
 
     """
     product = program.registers[rs] * program.registers[rt]
-    program.registers['hi'] -= product & 0xFFFFFFFF_00000000
-    program.registers['lo'] -= product & 0x00000000_FFFFFFFF
+    program.registers["hi"] -= product & 0xFFFFFFFF_00000000
+    program.registers["lo"] -= product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -95,8 +95,8 @@ def multu(program: MipsProgram, rs: str, rt: str) -> None:
 
     """
     product = abs(program.registers[rs]) * abs(program.registers[rt])
-    program.registers['hi'] = product & 0xFFFFFFFF_00000000
-    program.registers['lo'] = product & 0x00000000_FFFFFFFF
+    program.registers["hi"] = product & 0xFFFFFFFF_00000000
+    program.registers["lo"] = product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -109,8 +109,8 @@ def mult(program: MipsProgram, rs: str, rt: str) -> None:
 
     """
     product = program.registers[rs] * program.registers[rt]
-    program.registers['hi'] = product & 0xFFFFFFFF_00000000
-    program.registers['lo'] = product & 0x00000000_FFFFFFFF
+    program.registers["hi"] = product & 0xFFFFFFFF_00000000
+    program.registers["lo"] = product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)
@@ -160,8 +160,8 @@ def div(program: MipsProgram, rs: str, rt: str) -> None:
     """
     quotient = program.registers[rs] / program.registers[rt]
     remainder = program.registers[rs] % program.registers[rt]
-    program.registers['hi'] = remainder
-    program.registers['lo'] = int(quotient)
+    program.registers["hi"] = remainder
+    program.registers["lo"] = int(quotient)
 
 
 @mips_instruction(PTRN, parse)
@@ -175,5 +175,5 @@ def divu(program: MipsProgram, rs: str, rt: str) -> None:
     """
     quotient = abs(program.registers[rs]) / abs(program.registers[rt])
     remainder = abs(program.registers[rs]) % abs(program.registers[rt])
-    program.registers['hi'] = remainder
-    program.registers['lo'] = int(quotient)
+    program.registers["hi"] = remainder
+    program.registers["lo"] = int(quotient)

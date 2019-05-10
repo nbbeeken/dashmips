@@ -1,5 +1,5 @@
 """Register Immediate (label: str) instructions."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
@@ -27,7 +27,7 @@ def bgez(program: MipsProgram, rs: str, label: str) -> None:
 
     """
     if program.registers[rs] >= 0:
-            program.registers['pc'] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value
 
 
 @mips_instruction(PTRN, parse, label=True)
@@ -40,7 +40,7 @@ def bgezal(program: MipsProgram, rs: str, label: str) -> None:
 
     """
     if program.registers[rs] >= 0:
-        program.registers['pc'] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value
 
 
 @mips_instruction(PTRN, parse, label=True)
@@ -53,7 +53,7 @@ def bgtz(program: MipsProgram, rs: str, label: str) -> None:
 
     """
     if program.registers[rs] > 0:
-        program.registers['pc'] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value
 
 
 @mips_instruction(PTRN, parse, label=True)
@@ -66,7 +66,7 @@ def blez(program: MipsProgram, rs: str, label: str) -> None:
 
     """
     if program.registers[rs] <= 0:
-        program.registers['pc'] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value
 
 
 @mips_instruction(PTRN, parse, label=True)
@@ -79,7 +79,7 @@ def bltz(program: MipsProgram, rs: str, label: str) -> None:
 
     """
     if program.registers[rs] < 0:
-        program.registers['pc'] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value
 
 
 @mips_instruction(PTRN, parse, label=True)
@@ -92,5 +92,5 @@ def bltzal(program: MipsProgram, rs: str, label: str) -> None:
 
     """
     if program.registers[rs] < 0:
-        program.registers['$ra'] = program.registers['pc']
-        program.registers['pc'] = program.labels[label].value
+        program.registers["$ra"] = program.registers["pc"]
+        program.registers["pc"] = program.labels[label].value

@@ -1,5 +1,5 @@
 """Three Register instructions."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
@@ -95,8 +95,8 @@ def mul(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     """
     # FIXME: Correctness check.
     product = program.registers[rs] * program.registers[rt]
-    program.registers['hi'] = product & 0xFFFFFFFF_00000000
-    program.registers['lo'] = product & 0x00000000_FFFFFFFF
+    program.registers["hi"] = product & 0xFFFFFFFF_00000000
+    program.registers["lo"] = product & 0x00000000_FFFFFFFF
 
 
 @mips_instruction(PTRN, parse)

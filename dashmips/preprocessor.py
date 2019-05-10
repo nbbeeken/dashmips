@@ -39,14 +39,11 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     processed_code = code_labels(labels, unprocessed_code)
 
     # Cannot run a program without a main
-    if not ('main' in labels and labels['main'].location == mips.RE.TEXT_SEC):
-        raise Exception(f'Cannot locate main in {filename}')
+    if not ("main" in labels and labels["main"].location == mips.RE.TEXT_SEC):
+        raise Exception(f"Cannot locate main in {filename}")
 
     bp = memory.malloc(512) + 508
-    init_regs = {
-        'pc': labels['main'].value,
-        '$sp': bp, '$fp': bp, '$gp': bp
-    }
+    init_regs = {"pc": labels["main"].value, "$sp": bp, "$fp": bp, "$gp": bp}
 
     load_args(init_regs, memory, argv)
 
@@ -56,7 +53,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
         memory=memory,
         source=processed_code,
         registers=Registers(init_regs),
-        eqvs=eqvs
+        eqvs=eqvs,
     )
 
 
@@ -94,11 +91,8 @@ def split_to_sections(code: List[SourceLine]) -> sectionsType:
     return sections[mips.RE.DATA_SEC], sections[mips.RE.TEXT_SEC]
 
 
-def data_labels(
-    labels: Dict[str, Label],
-    data_sec: List[str],
-    memory: Memory
-) -> None:
+def data_labels(labels: Dict[str, Label],
+                data_sec: List[str], memory: Memory) -> None:
     """Construct the .data section to spec.
 
     Fill the .data section memory with user defined static data
@@ -115,12 +109,10 @@ def data_labels(
             name = match[1]
             directive = mips.Directives[match[2][1:]]
             address = directive(name, match[3], memory)
-            labels[name] = Label(
-                name=name,
-                value=address,
-                location=mips.RE.DATA_SEC,
-                kind=match[2][1:],
-            )
+            labels[name] = Label(name=name,
+                                 value=address,
+                                 location=mips.RE.DATA_SEC,
+                                 kind=match[2][1:])
 
 
 def code_labels(
@@ -146,7 +138,7 @@ def code_labels(
                 location=mips.RE.TEXT_SEC,
                 value=(idx - lbl_ct),
                 name=match[1],
-                kind='text'
+                kind="text",
             )
             if len(srcline.line) > len(match[0]):
                 # If the line is longer than what was matched, lets assume
@@ -158,7 +150,7 @@ def code_labels(
                 # To offset the previously removed label lines
                 lbl_ct += 1
         else:
-            instruction = srcline.line.split(' ')[0]
+            instruction = srcline.line.split(" ")[0]
             if instruction not in Instructions:
                 print(f'Error line {idx}: "{instruction}" invalid')
                 exit(1)
@@ -179,27 +171,21 @@ def process_file(file: TextIO) -> List[SourceLine]:
     # remove comments
     nocomments: Iterable[SourceLine] = map(
         lambda ln: SourceLine(
-            filename,
-            ln[0] + 1,
-            re.sub(mips.RE.COMMENT, '', ln[1]).strip()
+            filename, ln[0] + 1, re.sub(mips.RE.COMMENT, "", ln[1]).strip()
         ),
-        linenumbers
+        linenumbers,
     )
     # drop lines that are empty
     noemptylines: Iterable[SourceLine] = filter(
-        lambda ln: ln.line != '',
-        nocomments
-    )
+        lambda ln: ln.line != "", nocomments)
 
     def manyspaces_to_onespace(ln: SourceLine) -> SourceLine:
-        ln.line = ' '.join(ln.line.split())
+        ln.line = " ".join(ln.line.split())
         return ln
 
     # make every white space just one space
-    linesofcode: List[SourceLine] = list(map(
-        manyspaces_to_onespace,
-        noemptylines
-    ))
+    linesofcode: List[SourceLine] = list(
+        map(manyspaces_to_onespace, noemptylines))
 
     return linesofcode
 
@@ -212,7 +198,7 @@ def preprocessor_directives(
     :param lines: lines to compile.
     """
     for idx, srcline in enumerate(lines):
-        if '.globl' in srcline.line:
+        if ".globl" in srcline.line:
             del lines[idx]
     lines = resolve_include(lines)
     lines, eqvs = resolve_eqvs(lines)
@@ -235,7 +221,7 @@ def resolve_include(lines: List[SourceLine]) -> List[SourceLine]:
     return lines
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def flatten(nestedlist: Iterable[T]) -> List[T]:
@@ -249,9 +235,8 @@ def flatten(nestedlist: Iterable[T]) -> List[T]:
     return newlist
 
 
-def resolve_eqvs(
-    lines: List[SourceLine]
-) -> Tuple[List[SourceLine], Dict[str, str]]:
+def resolve_eqvs(lines: List[SourceLine]
+                 ) -> Tuple[List[SourceLine], Dict[str, str]]:
     """Gather eqvs to text replace throughout code."""
     eqvs = {}
     to_del = []
@@ -286,18 +271,18 @@ def resolve_macros(lines: List[SourceLine]) -> List[SourceLine]:
             if match:
                 found_macro = match[1]
                 macros[match[1]] = {
-                    'args': [
-                        a.strip() for a in match[2].split(', ')
-                    ] if match[2] else None,
-                    'lines': []
+                    "args": [a.strip() for a in match[2].split(", ")]
+                    if match[2]
+                    else None,
+                    "lines": [],
                 }
                 lines_to_remove.append(idx)
         else:
-            if '.end_macro' in srcline.line:
+            if ".end_macro" in srcline.line:
                 found_macro = None
                 lines_to_remove.append(idx)
             else:
-                macros[found_macro]['lines'].append(srcline)
+                macros[found_macro]["lines"].append(srcline)
                 lines_to_remove.append(idx)
 
     lines = [l for i, l in enumerate(lines) if i not in lines_to_remove]
@@ -305,8 +290,8 @@ def resolve_macros(lines: List[SourceLine]) -> List[SourceLine]:
     for idx, srcline in enumerate(lines):
         for macro, macro_info in macros.items():
             if macro in srcline.line:
-                if macro_info['args'] is None:
-                    lines[idx] = macro_info['lines']
+                if macro_info["args"] is None:
+                    lines[idx] = macro_info["lines"]
                 else:
                     macro_with_args(idx, lines, macro, macro_info, srcline)
 
@@ -321,37 +306,34 @@ def macro_with_args(
     srcline: SourceLine,
 ) -> None:
     """Handle Parsing for macro that has arguments."""
-    macroregex = fr'{macro}\((.+)\)'
+    macroregex = fr"{macro}\((.+)\)"
     match = re.match(macroregex, srcline.line)
     if match:
-        values = match[1].split(', ')
-        argsmap = {
-            arg: val
-            for arg, val in zip(macroinfo['args'], values)
-        }
+        values = match[1].split(", ")
+        argsmap = {arg: val for arg, val in zip(macroinfo["args"], values)}
         expanded_macro = []
-        for s in macroinfo['lines']:
+        for s in macroinfo["lines"]:
             modified_line = s.line
             for a, v in argsmap.items():
                 modified_line = modified_line.replace(a, v)
-            expanded_macro.append(SourceLine(
-                line=modified_line, lineno=s.lineno,
-                filename=s.filename
-            ))
+            expanded_macro.append(
+                SourceLine(
+                    line=modified_line,
+                    lineno=s.lineno,
+                    filename=s.filename))
         lines[idx] = expanded_macro  # type: ignore
 
 
-def load_args(
-    init_regs: Dict[str, int], memory: Memory, args: List[str]
-) -> None:
+def load_args(init_regs: Dict[str, int],
+              memory: Memory, args: List[str]) -> None:
     """Load arguments on to the stack and sets argc."""
-    init_regs['$a0'] = len(args)  # argc
+    init_regs["$a0"] = len(args)  # argc
 
     argv: List[int] = []
     for arg in args:
         ptr = memory.malloc(len(arg) + 1)
         # str ending in null
-        memory[ptr:ptr + len(arg) + 1] = [*[ord(c) for c in arg], 0]
+        memory[ptr: ptr + len(arg) + 1] = [*[ord(c) for c in arg], 0]
         argv.append(ptr)
 
     argv.append(0)  # NULL to end pointer array
@@ -361,6 +343,6 @@ def load_args(
 
     for idx, ptr in enumerate(argv):
         store_addr = argvbp + idx * 4
-        memory[store_addr:store_addr + 4] = ptr.to_bytes(4, 'big')
+        memory[store_addr: store_addr + 4] = ptr.to_bytes(4, "big")
 
-    init_regs['$a1'] = argvbp  # argv
+    init_regs["$a1"] = argvbp  # argv

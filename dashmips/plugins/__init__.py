@@ -13,9 +13,9 @@ class Plugin(ABC):
     @abstractmethod
     def pull(self, *changes: Any) -> None:
         """Call to react to changed variables."""
-        raise NotImplementedError('Abstract method.')
+        raise NotImplementedError("Abstract method.")
 
     @abstractmethod
     def push(self, changes: Any) -> None:
         """Call to change variables."""
-        raise NotImplementedError('Abstract method.')
+        raise NotImplementedError("Abstract method.")

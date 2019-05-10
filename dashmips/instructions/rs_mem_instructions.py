@@ -1,5 +1,5 @@
 """Register and Memory access Instructions."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction, parse_int
 from dashmips.models import MipsProgram
@@ -58,7 +58,7 @@ def lh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     # FIXME: This does not sign extend correctly
     addr = num + program.registers[rt]
     val = 0
-    vals = program.memory[addr:addr + 2]
+    vals = program.memory[addr: addr + 2]
     for i, b in enumerate(reversed(vals)):
         val |= b << i * 8
     program.registers[rs] = val
@@ -76,7 +76,7 @@ def lhu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """
     addr = num + program.registers[rt]
     val = 0
-    vals = program.memory[addr:addr + 2]
+    vals = program.memory[addr: addr + 2]
     for i, b in enumerate(reversed(vals)):
         val |= b << i * 8
     program.registers[rs] = val
@@ -94,7 +94,7 @@ def lw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """
     addr = num + program.registers[rt]
     val = 0
-    vals = program.memory[addr:addr + 4]
+    vals = program.memory[addr: addr + 4]
     for i, b in enumerate(reversed(vals)):
         val |= b << i * 8
     program.registers[rs] = val
@@ -110,7 +110,7 @@ def lwl(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    raise NotImplementedError("TODO")
 
 
 @mips_instruction(PTRN, parse)
@@ -123,7 +123,7 @@ def lwr(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    raise NotImplementedError("TODO")
 
 
 @mips_instruction(PTRN, parse)
@@ -152,7 +152,7 @@ def sw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """
     val = program.registers[rs]
     addr = num + program.registers[rt]
-    program.memory[addr:addr + 4] = val.to_bytes(4, 'big')
+    program.memory[addr: addr + 4] = val.to_bytes(4, "big")
 
 
 @mips_instruction(PTRN, parse)
@@ -165,7 +165,7 @@ def swl(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    raise NotImplementedError("TODO")
 
 
 @mips_instruction(PTRN, parse)
@@ -178,7 +178,7 @@ def swr(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param rt:
 
     """
-    raise NotImplementedError('TODO')
+    raise NotImplementedError("TODO")
 
 
 @mips_instruction(PTRN, parse)
@@ -193,4 +193,4 @@ def sh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """
     val = program.registers[rs]
     addr = num + program.registers[rt]
-    program.memory[addr:addr + 2] = val.to_bytes(2, 'big')
+    program.memory[addr: addr + 2] = val.to_bytes(2, "big")

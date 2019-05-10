@@ -15,7 +15,7 @@ def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
     :param msg: DebugMessage:
 
     """
-    msg.program.registers['pc'] = msg.program.labels['main'].value
+    msg.program.registers["pc"] = msg.program.labels["main"].value
     msg.message = str(os.getpid())
     return msg
 
@@ -28,8 +28,8 @@ def debug_step(msg: DebugMessage) -> DebugMessage:
     """
     try:
         next_instruction(msg.program)
-        if msg.program.registers['pc'] == -1:
-            msg.command = 'stop'
+        if msg.program.registers["pc"] == -1:
+            msg.command = "stop"
     except MipsException as exc:
         msg.error = True
         msg.message = exc.message
@@ -43,7 +43,7 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
     :param msg: DebugMessage:
 
     """
-    starting_pc = msg.program.registers['pc']
+    starting_pc = msg.program.registers["pc"]
 
     def breaking_condition(program: MipsProgram) -> bool:
         """Condition function to stop execution.
@@ -52,22 +52,22 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
 
         """
         nonlocal starting_pc
-        log.info(f"bps: {msg.breakpoints}", extra={'client': ''})
-        if program.registers['pc'] == starting_pc:
+        log.info(f"bps: {msg.breakpoints}", extra={"client": ""})
+        if program.registers["pc"] == starting_pc:
             # current instruction will execute even if on breakpoint
             # b/c we would have broken on it last time.
             return True
-        if program.registers['pc'] in msg.breakpoints:
+        if program.registers["pc"] in msg.breakpoints:
             return False
-        if program.registers['pc'] == -1:
+        if program.registers["pc"] == -1:
             return False
         return True
 
     try:
         run(msg.program, breaking_condition)
-        if msg.program.registers['pc'] == -1:
+        if msg.program.registers["pc"] == -1:
             # Exited
-            msg.command = 'stop'
+            msg.command = "stop"
     except MipsException as exc:
         msg.error = True
         msg.message = exc.message
@@ -85,8 +85,8 @@ def debug_stop(msg: DebugMessage) -> DebugMessage:
 
 
 Commands: Dict[str, Callable] = {
-    'start': debug_start,
-    'step': debug_step,
-    'continue': debug_continue,
-    'stop': debug_stop,
+    "start": debug_start,
+    "step": debug_step,
+    "continue": debug_continue,
+    "stop": debug_stop,
 }

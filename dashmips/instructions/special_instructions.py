@@ -1,5 +1,5 @@
 """Special Instructions."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
@@ -15,7 +15,7 @@ def parse(arg: Tuple[str, str]) -> Tuple:
     return tuple()
 
 
-@mips_instruction('', parse)
+@mips_instruction("", parse)
 def nop(program: MipsProgram) -> None:
     """Do nothing.
 
@@ -24,10 +24,10 @@ def nop(program: MipsProgram) -> None:
     pass
 
 
-@mips_instruction('', parse)
+@mips_instruction("", parse)
 def syscall(program: MipsProgram) -> None:
     """Call syscall specified in $v0.
 
     :param program:
     """
-    return Syscalls[program.registers['$v0']](program)
+    return Syscalls[program.registers["$v0"]](program)

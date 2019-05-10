@@ -1,5 +1,5 @@
 """Instructions that accept a register and immediate as an argument."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction, parse_int
 from dashmips.models import MipsProgram

@@ -1,5 +1,5 @@
 """Instuctions that operate on one register."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
@@ -28,7 +28,7 @@ def beq(program: MipsProgram, rs: str, rt: str, label: str) -> None:
 
     """
     if program.registers[rs] == program.registers[rt]:
-        program.registers['pc'] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value
 
 
 @mips_instruction(PTRN, parse)
@@ -42,4 +42,4 @@ def bne(program: MipsProgram, rs: str, rt: str, label: str) -> None:
 
     """
     if program.registers[rs] != program.registers[rt]:
-        program.registers['pc'] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value

@@ -1,5 +1,5 @@
 """Single Register insructions."""
-from typing import Tuple
+from typing import Tuple, cast
 
 from dashmips.instructions import mips_instruction
 from dashmips.models import MipsProgram
@@ -25,4 +25,4 @@ def jr(program: MipsProgram, rs: str) -> None:
     :param rs:
 
     """
-    program.registers['pc'] = program.registers[rs]
+    program.registers["pc"] = program.registers[rs]

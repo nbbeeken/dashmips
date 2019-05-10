@@ -1,4 +1,6 @@
 """Tests for Mips Debug Server."""
+from typing import Dict, Any, cast
+
 import json
 import unittest
 from pprint import pformat
@@ -11,14 +13,14 @@ SERVER = Popen(split("python -m dashmips debug -l"))
 sleep(0.1)  # Should be plenty of time to start and bind
 
 
-def compile_file(filename):
+def compile_file(filename: str) -> Dict[str, Any]:
     """Run compiler on filename."""
     proc = run(split(f"python -m dashmips c {filename} -j"),
                capture_output=True, encoding='utf8')
-    return json.loads(proc.stdout.strip())
+    return cast(Dict[str, Any], json.loads(proc.stdout.strip()))
 
 
-def communicate(msg):
+def communicate(msg: Dict[str, Any]) -> Any:
     """Send json encoded message."""
     s = socket()
     s.connect(('localhost', 9999))
@@ -32,7 +34,7 @@ def communicate(msg):
     return resp
 
 
-def recv():
+def recv() -> Dict[str, Any]:
     """Recv json encoded message."""
     s = socket()
     s.connect(('localhost', 9999))
@@ -40,7 +42,7 @@ def recv():
     recvd = rfile.readline().strip()
     resp = json.loads(recvd)
     s.close()
-    return resp
+    return cast(Dict[str, Any], resp)
 
 
 class TestMipsDebugServer(unittest.TestCase):

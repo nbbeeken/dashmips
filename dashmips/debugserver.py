@@ -22,9 +22,9 @@ class DebugServer:
         self.listener.listen(128)
 
         log.info(
-            f'Listening on {self.listener.getsockname()}',
-            extra={'client': ''}
-        )
+            f"Listening on {self.listener.getsockname()}",
+            extra={
+                "client": ""})
 
         self.sel = DefaultSelector()
         self.sel.register(self.listener, EVENT_READ)
@@ -36,7 +36,7 @@ class DebugServer:
             c.wfile.close()
         self.listener.close()
         self.sel.close()
-        log.warning("Shutdown", extra={'client': ''})
+        log.warning("Shutdown", extra={"client": ""})
 
     def find_client(self, fd: int) -> Optional[Client]:
         """Find client by rfile fd.
@@ -66,13 +66,13 @@ class DebugServer:
         client_socket, client_address = self.listener.accept()
         client_socket.setblocking(False)
         client = Client(
-            client_socket.makefile('r', encoding='utf8'),
-            client_socket.makefile('w', encoding='utf8'),
-            client_address
+            client_socket.makefile("r", encoding="utf8"),
+            client_socket.makefile("w", encoding="utf8"),
+            client_address,
         )
         self.clients.append(client)
         self.sel.register(client.rfile.fileno(), EVENT_READ)
-        log.debug('Added to clients', extra={'client': client.address})
+        log.debug("Added to clients", extra={"client": client.address})
 
     def handle(self, client: Client) -> None:
         """Handle Debug Request.
@@ -82,7 +82,7 @@ class DebugServer:
         """
         from dashmips.debugger import Commands
 
-        log.debug('Handle', extra={'client': client.address})
+        log.debug("Handle", extra={"client": client.address})
 
         msg = self.receive(client)
 
@@ -99,18 +99,17 @@ class DebugServer:
         """
         msg_to_send = json.dumps(msg.to_dict())
         try:
-            client.wfile.write(msg_to_send + '\n')
+            client.wfile.write(msg_to_send + "\n")
             client.wfile.flush()
             log.debug(
-                f"Respond {msg.command}" +
-                f"{(' - ' + msg.message) if msg.message else ''}",
-                extra={'client': client.address}
+                f"Respond {msg.command}"
+                + f"{(' - ' + msg.message) if msg.message else ''}",
+                extra={"client": client.address},
             )
         except ConnectionError:
             log.error(
-                'Could not respond to client',
-                extra={'client': client.address}
-            )
+                "Could not respond to client", extra={
+                    "client": client.address})
             self.remove_client(client)
 
     def receive(self, client: Client) -> Optional[DebugMessage]:
@@ -122,41 +121,37 @@ class DebugServer:
         try:
             txt = client.rfile.readline().strip()
 
-            if txt == '':
+            if txt == "":
                 # Client is closed.
                 log.warning(
-                    'Closed Connection', extra={'client': client.address}
-                )
+                    "Closed Connection", extra={
+                        "client": client.address})
                 self.remove_client(client)
                 return None
 
             msg: Optional[DebugMessage] = DebugMessage.from_dict(
-                json.loads(txt)
-            )
+                json.loads(txt))
             if msg:
                 log.debug(
-                    f"Receive {msg.command}" +
-                    f"{(' - ' + msg.message) if msg.message else ''}",
-                    extra={'client': client.address}
+                    f"Receive {msg.command}"
+                    + f"{(' - ' + msg.message) if msg.message else ''}",
+                    extra={"client": client.address},
                 )
             else:
                 log.debug(
-                    f"Receive Unparsable \"{txt}\"",
-                    extra={'client': client.address}
-                )
+                    f'Receive Unparsable "{txt}"', extra={
+                        "client": client.address})
             return msg
         except json.JSONDecodeError:
             log.error(
-                'Could not decode JSON from client',
-                extra={'client': client.address}
-            )
+                "Could not decode JSON from client", extra={
+                    "client": client.address})
             self.remove_client(client)
             return None
         except ConnectionError:
             log.error(
-                'Could not receive from client',
-                extra={'client': client.address}
-            )
+                "Could not receive from client", extra={
+                    "client": client.address})
             self.remove_client(client)
             return None
 
@@ -172,20 +167,16 @@ class DebugServer:
             client.rfile.close()
             client.wfile.close()
             log.warning(
-                'Removed from client list',
-                extra={'client': client.address}
-            )
+                "Removed from client list", extra={
+                    "client": client.address})
         except (IOError, KeyError):
             log.warning(
-                f'Failed to close down client',
-                extra={'client': client.address}
-            )
+                f"Failed to close down client", extra={
+                    "client": client.address})
 
 
 def debug_mips(
-    host: str = 'localhost',
-    port: int = 9999,
-    should_log: bool = False
+    host: str = "localhost", port: int = 9999, should_log: bool = False
 ) -> None:
     """Create a debugging instance of mips.
 
@@ -195,7 +186,7 @@ def debug_mips(
 
     """
     log.basicConfig(
-        format='%(asctime)-15s %(levelname)-7s %(client)s: %(message)s',
+        format="%(asctime)-15s %(levelname)-7s %(client)s: %(message)s",
         level=log.DEBUG if should_log else log.CRITICAL,
     )
     address = (host, port)

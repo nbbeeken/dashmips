@@ -75,7 +75,20 @@ The server is designed to be stateless so it can handle many clients at once.
 
 ## Contributing
 
+### Getting Setup
+
+If you want to contribute to the dashmips project you will need the following:
+
+- [Poetry](https://poetry.eustace.io/docs/) is used for dependencies, it will help get you up and running
+- After installing Poetry, and cloning this repository:
+- `poetry install` - will install the dashmips dependencies in a virtual environment that won't harm your global set up.
+- `poetry run X` - can run X command in the correct python environment
+- Try `poetry run pytest --mypy --docstyle --codestyle` to ensure all tests are passing correctly
+
+
 ### Adding Syscalls / Adding Instructions
 
 You can add to the existing files in the `dashmips/instructions` and `dashmips/syscalls` directories using the relevant decorator (`@`).
 If you add instructions or syscalls to a new file in these subdirectories ensure that the new file is named with the pattern: `*_instructions.py` or `*_syscalls.py` where `*` is whatever identifier you choose.
+
+Happy coding!
