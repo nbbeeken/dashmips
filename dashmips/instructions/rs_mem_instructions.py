@@ -22,7 +22,7 @@ def parse(args: Tuple[str, str, str, str, str]) -> Tuple[str, int, str]:
 
 @mips_instruction(PTRN, parse)
 def lb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Load Byte.
+    """Load Byte from memory.
 
     :param program:
     :param num:
@@ -34,7 +34,7 @@ def lb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def lbu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Load Byte Unsigned.
+    """Load Byte Unsigned from memory.
 
     :param program:
     :param num:
@@ -47,7 +47,7 @@ def lbu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def lh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Load half-word.
+    """Load half-word from memory.
 
     :param program:
     :param num:
@@ -66,7 +66,7 @@ def lh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def lhu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Load half-word unsigned.
+    """Load half-word unsigned from memory.
 
     :param program:
     :param num:
@@ -84,7 +84,7 @@ def lhu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def lw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Load word.
+    """Load word from memory.
 
     :param program:
     :param num:
@@ -101,34 +101,8 @@ def lw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
 
 
 @mips_instruction(PTRN, parse)
-def lwl(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Load Word Left: Load from 1 to 4 bytes left-justified into $t1.
-
-    :param program:
-    :param num:
-    :param rs:
-    :param rt:
-
-    """
-    raise NotImplementedError("TODO")
-
-
-@mips_instruction(PTRN, parse)
-def lwr(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Load Word Right: Load from 1 to 4 bytes right-justified into $t1.
-
-    :param program:
-    :param num:
-    :param rs:
-    :param rt:
-
-    """
-    raise NotImplementedError("TODO")
-
-
-@mips_instruction(PTRN, parse)
 def sb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Store Byte.
+    """Store Byte to memory.
 
     :param program:
     :param num:
@@ -142,7 +116,7 @@ def sb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
 
 @mips_instruction(PTRN, parse)
 def sw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Store word.
+    """Store word to memory.
 
     :param program:
     :param num:
@@ -156,34 +130,8 @@ def sw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
 
 
 @mips_instruction(PTRN, parse)
-def swl(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Store Word Left: Load from 1 to 4 bytes left-justified into $t1.
-
-    :param program:
-    :param num:
-    :param rs:
-    :param rt:
-
-    """
-    raise NotImplementedError("TODO")
-
-
-@mips_instruction(PTRN, parse)
-def swr(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Store Word Right: Load from 1 to 4 bytes right-justified into $t1.
-
-    :param program:
-    :param num:
-    :param rs:
-    :param rt:
-
-    """
-    raise NotImplementedError("TODO")
-
-
-@mips_instruction(PTRN, parse)
 def sh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
-    """Store halfword.
+    """Store halfword to memory.
 
     :param program:
     :param num:
@@ -194,3 +142,55 @@ def sh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     val = program.registers[rs]
     addr = num + program.registers[rt]
     program.memory[addr: addr + 2] = val.to_bytes(2, "big")
+
+# These instructions are being excluded on purpose
+# @mips_instruction(PTRN, parse)
+# def lwl(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+#     """Load Word Left: Load from 1 to 4 bytes left-justified into $t1.
+
+#     :param program:
+#     :param num:
+#     :param rs:
+#     :param rt:
+
+#     """
+#     raise NotImplementedError("")
+
+
+# @mips_instruction(PTRN, parse)
+# def lwr(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+#     """Load Word Right: Load from 1 to 4 bytes right-justified into $t1.
+
+#     :param program:
+#     :param num:
+#     :param rs:
+#     :param rt:
+
+#     """
+#     raise NotImplementedError("")
+
+
+# @mips_instruction(PTRN, parse)
+# def swl(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+#     """Store Word Left: Load from 1 to 4 bytes left-justified into $t1.
+
+#     :param program:
+#     :param num:
+#     :param rs:
+#     :param rt:
+
+#     """
+#     raise NotImplementedError("")
+
+
+# @mips_instruction(PTRN, parse)
+# def swr(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+#     """Store Word Right: Load from 1 to 4 bytes right-justified into $t1.
+
+#     :param program:
+#     :param num:
+#     :param rs:
+#     :param rt:
+
+#     """
+#     raise NotImplementedError("")

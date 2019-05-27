@@ -9,7 +9,7 @@ from dashmips.models import MipsProgram
     label=True,
 )
 def la(program: MipsProgram, rd: str, address: str) -> None:
-    """Load address.
+    """Load address from immediate.
 
     :param program:
     :param address:
