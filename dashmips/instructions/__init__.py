@@ -18,13 +18,11 @@ def mips_instruction(
 
     :param pattern: param parser:
     :param parser:
-
     """
     def decorator(function: Callable) -> Instruction:
         """Instruction Decorator wrapper.
 
         :param function:
-
         """
         instr = Instruction(function, pattern, parser, label=label)
         Instructions[instr.name] = instr

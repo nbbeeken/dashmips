@@ -13,7 +13,6 @@ def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
     """Debug start.
 
     :param msg: DebugMessage:
-
     """
     msg.program.registers["pc"] = msg.program.labels["main"].value
     msg.message = str(os.getpid())
@@ -24,7 +23,6 @@ def debug_step(msg: DebugMessage) -> DebugMessage:
     """Debug step.
 
     :param msg: DebugMessage:
-
     """
     try:
         next_instruction(msg.program)
@@ -41,7 +39,6 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
     """Debug continue.
 
     :param msg: DebugMessage:
-
     """
     starting_pc = msg.program.registers["pc"]
 
@@ -49,7 +46,6 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
         """Condition function to stop execution.
 
         :param program:
-
         """
         nonlocal starting_pc
         log.info(f"bps: {msg.breakpoints}", extra={"client": ""})
@@ -79,7 +75,6 @@ def debug_stop(msg: DebugMessage) -> DebugMessage:
     """Stop messages incoming mean nothing to a server.
 
     :param msg: DebugMessage:
-
     """
     return msg
 

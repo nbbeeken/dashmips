@@ -11,7 +11,6 @@ def parse(args: Tuple[str, str, str, str, str]) -> Tuple[str, str, str]:
     """Parser for rd rs rt format instructions.
 
     :param args:
-
     """
     return (args[2], args[3], args[4])
 
@@ -24,7 +23,6 @@ def add(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] + program.registers[rt]
 
@@ -37,7 +35,6 @@ def addu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] + program.registers[rt]
 
@@ -50,7 +47,6 @@ def _and(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] & program.registers[rt]
 
@@ -63,7 +59,6 @@ def movn(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     if program.registers[rt] != 0:
         program.registers[rd] = program.registers[rs]
@@ -77,7 +72,6 @@ def movz(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     if program.registers[rt] == 0:
         program.registers[rd] = program.registers[rs]
@@ -91,7 +85,6 @@ def mul(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     # FIXME: Correctness check.
     product = program.registers[rs] * program.registers[rt]
@@ -107,7 +100,6 @@ def nor(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = ~(program.registers[rs] | program.registers[rt])
 
@@ -120,7 +112,6 @@ def _or(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] | program.registers[rt]
 
@@ -133,7 +124,6 @@ def sllv(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] << program.registers[rt]
 
@@ -146,7 +136,6 @@ def slt(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     if program.registers[rs] < program.registers[rt]:
         program.registers[rd] = 1
@@ -162,7 +151,6 @@ def sltu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     if abs(program.registers[rs]) < abs(program.registers[rt]):
         program.registers[rd] = 1
@@ -178,7 +166,6 @@ def srav(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     msb = program.registers[rs] & 0x8000_0000
     program.registers[rd] = program.registers[rs] << program.registers[rt]
@@ -193,7 +180,6 @@ def srlv(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] >> program.registers[rt]
 
@@ -206,7 +192,6 @@ def sub(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] - program.registers[rt]
 
@@ -219,7 +204,6 @@ def subu(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] - program.registers[rt]
 
@@ -232,6 +216,5 @@ def xor(program: MipsProgram, rd: str, rs: str, rt: str) -> None:
     :param rs:
     :param rd:
     :param rt:
-
     """
     program.registers[rd] = program.registers[rs] ^ program.registers[rt]

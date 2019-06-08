@@ -12,7 +12,6 @@ def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, str]:
     """Two Register and Immediate instructions Parser.
 
     :param arg:
-
     """
     return (arg[2], arg[3], arg[4])
 
@@ -25,7 +24,6 @@ def beq(program: MipsProgram, rs: str, rt: str, label: str) -> None:
     :param rt:
     :param rs:
     :param label:
-
     """
     if program.registers[rs] == program.registers[rt]:
         program.registers["pc"] = program.labels[label].value
@@ -39,7 +37,6 @@ def bne(program: MipsProgram, rs: str, rt: str, label: str) -> None:
     :param rt:
     :param rs:
     :param label:
-
     """
     if program.registers[rs] != program.registers[rt]:
         program.registers["pc"] = program.labels[label].value

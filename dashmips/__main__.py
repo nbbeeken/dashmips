@@ -11,10 +11,7 @@ from dashmips.preprocessor import preprocess
 
 
 def main_compile(args: argparse.Namespace) -> int:
-    """Compile/Exec mips code.
-
-    :param args:
-    """
+    """Compile/Exec mips code."""
     if args.file:
         program = preprocess(args.file)
     if args.out:
@@ -52,11 +49,7 @@ def main_run(args: argparse.Namespace) -> int:
 
 
 def main_debug(args: argparse.Namespace) -> int:
-    """Start debug server for mips.
-
-    :param args:
-
-    """
+    """Start debug server for mips."""
     debug_mips(host=args.host, port=args.port, should_log=args.log)
     return 0
 

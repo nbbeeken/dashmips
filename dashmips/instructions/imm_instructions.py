@@ -11,7 +11,6 @@ def parse(args: Tuple[str, str, str]) -> Tuple[str]:
     """Parse label to pass to instruction function.
 
     :param args:
-
     """
     return (args[2],)
 
@@ -22,7 +21,6 @@ def j(program: MipsProgram, address: str) -> None:
 
     :param program:
     :param address:
-
     """
     program.registers["pc"] = program.labels[address].value
 
@@ -33,7 +31,6 @@ def jal(program: MipsProgram, address: str) -> None:
 
     :param program:
     :param address:
-
     """
     program.registers["$ra"] = program.registers["pc"] + 1
     program.registers["pc"] = program.labels[address].value

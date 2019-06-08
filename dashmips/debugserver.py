@@ -42,7 +42,6 @@ class DebugServer:
         """Find client by rfile fd.
 
         :param fd:
-
         """
         for c in self.clients:
             if c.rfile.fileno() == fd:
@@ -78,7 +77,6 @@ class DebugServer:
         """Handle Debug Request.
 
         :param client: who the incoming message is from
-
         """
         from dashmips.debugger import Commands
 
@@ -95,8 +93,7 @@ class DebugServer:
 
         :param client: destination of response
 
-        :param msg: message to send to client
-        """
+        :param msg: message to send to client        """
         msg_to_send = json.dumps(msg.to_dict())
         try:
             client.wfile.write(msg_to_send + "\n")
@@ -116,7 +113,6 @@ class DebugServer:
         """Receive Client Command.
 
         :param client: Client:
-
         """
         try:
             txt = client.rfile.readline().strip()
@@ -159,7 +155,6 @@ class DebugServer:
         """Remove client from list.
 
         :param client:
-
         """
         self.clients.remove(client)
         try:
@@ -183,7 +178,6 @@ def debug_mips(
     :param host:  (Default value = 'localhost')
     :param port:  (Default value = 9999)
     :param should_log:  (Default value = False)
-
     """
     log.basicConfig(
         format="%(asctime)-15s %(levelname)-7s %(client)s: %(message)s",

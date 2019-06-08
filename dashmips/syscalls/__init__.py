@@ -19,13 +19,11 @@ def mips_syscall(number: int) -> Callable[
     YOU MUST import that function in `dashmips/__init__.py`
 
     :param number:
-
     """
     def decorator(function: Callable[[MipsProgram], None]) -> Syscall:
         """Syscall Decorator wrapper.
 
         :param function:
-
         """
         syscall = Syscall(function, number)
         Syscalls[syscall.number] = syscall

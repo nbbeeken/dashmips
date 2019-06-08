@@ -11,7 +11,6 @@ def parse(args: Tuple[str, str, str, str]) -> Tuple[str, int]:
     """Parse rd and imm to pass to instruction function.
 
     :param args:
-
     """
     return (args[2], parse_int(args[3]))
 
@@ -23,6 +22,5 @@ def lui(program: MipsProgram, rd: str, immediate: int) -> None:
     :param program:
     :param rd:
     :param immediate:
-
     """
     program.registers[rd] = (immediate << 16) & 0xFFFF_0000

@@ -11,7 +11,6 @@ def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, int]:
     """Two Register and Immediate instructions Parser.
 
     :param arg:
-
     """
     return (arg[2], arg[3], parse_int(arg[4]))
 
@@ -24,7 +23,6 @@ def addi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     program.registers[rs] = program.registers[rt] + num
 
@@ -37,7 +35,6 @@ def addiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     program.registers[rs] = (
         abs(program.registers[rt]) + abs(num)) & 0xFFFF_FFFF
@@ -51,7 +48,6 @@ def ori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     program.registers[rs] = program.registers[rt] | num
 
@@ -64,7 +60,6 @@ def andi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     program.registers[rs] = program.registers[rt] & num
 
@@ -77,7 +72,6 @@ def slti(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     if program.registers[rt] < num:
         program.registers[rs] = 1
@@ -93,7 +87,6 @@ def sltiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     if abs(program.registers[rt]) < abs(num):
         program.registers[rs] = 1
@@ -109,7 +102,6 @@ def xori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     program.registers[rs] = program.registers[rt] ^ num
 
@@ -122,7 +114,6 @@ def sra(program: MipsProgram, rd: str, rs: str, num: int) -> None:
     :param rd:
     :param rs:
     :param num:
-
     """
     msb = program.registers[rs] & 0x8000_0000
     program.registers[rd] = program.registers[rs] << num
@@ -137,7 +128,6 @@ def sll(program: MipsProgram, rd: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     program.registers[rd] = (program.registers[rt] << num) & 0xFFFF_FFFF
 
@@ -150,6 +140,5 @@ def srl(program: MipsProgram, rd: str, rt: str, num: int) -> None:
     :param rt:
     :param rs:
     :param num:
-
     """
     program.registers[rd] = (program.registers[rt] >> num) & 0xFFFF_FFFF

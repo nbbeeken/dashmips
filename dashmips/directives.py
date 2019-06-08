@@ -22,7 +22,6 @@ def align(name: str, data: str, memory: Memory) -> None:
     :param name: str:
     :param data: str:
     :param memory: Memory:
-
     """
     return None
 
@@ -33,7 +32,6 @@ def asciiz(name: str, data: str, memory: Memory) -> int:
     :param name: str:
     :param data: str:
     :param memory: Memory:
-
     """
     string = data[1:-1].encode("ascii", "ignore").decode("unicode_escape")
     asciiz_bytes = (string + "\0").encode()
@@ -48,7 +46,6 @@ def _ascii(name: str, data: str, memory: Memory) -> int:
     :param name: str:
     :param data: str:
     :param memory: Memory:
-
     """
     string = data[1:-1].encode("ascii", "ignore").decode("unicode_escape")
     ascii_bytes = (string).encode()
@@ -63,7 +60,6 @@ def byte(name: str, data: str, memory: Memory) -> int:
     :param name: str:
     :param data: str:
     :param memory: Memory:
-
     """
     value = parse_int(data)
     if value > 0xFF:
@@ -79,7 +75,6 @@ def half(name: str, data: str, memory: Memory) -> int:
     :param name: str:
     :param data: str:
     :param memory: Memory:
-
     """
     value = parse_int(data)
     if value > 0xFFFF:
@@ -95,7 +90,6 @@ def space(name: str, data: str, memory: Memory) -> int:
     :param name: str:
     :param data: str:
     :param memory: Memory:
-
     """
     value = parse_int(data)
     if value > 0xFFFF_FFFF:
@@ -110,7 +104,6 @@ def word(name: str, data: str, memory: Memory) -> int:
     :param name: str:
     :param data: str:
     :param memory: Memory:
-
     """
     value = parse_int(data)
     if value > 0xFFFF_FFFF:

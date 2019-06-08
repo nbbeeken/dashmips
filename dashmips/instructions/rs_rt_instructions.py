@@ -11,7 +11,6 @@ def parse(arg: Tuple[str, str, str, str]) -> Tuple[str, str]:
     """Two Register Instructions Parser.
 
     :param arg:
-
     """
     return (arg[2], arg[3])
 
@@ -23,7 +22,6 @@ def jalr(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     program.registers[rs] = program.registers["pc"]
     program.registers["pc"] = program.registers[rt]
@@ -36,7 +34,6 @@ def madd(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     product = program.registers[rs] * program.registers[rt]
     program.registers["hi"] += product & 0xFFFFFFFF_00000000
@@ -50,7 +47,6 @@ def maddu(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     product = abs(program.registers[rs]) * abs(program.registers[rt])
     program.registers["hi"] += product & 0xFFFFFFFF_00000000
@@ -64,7 +60,6 @@ def msubu(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     product = abs(program.registers[rs]) * abs(program.registers[rt])
     program.registers["hi"] -= product & 0xFFFFFFFF_00000000
@@ -78,7 +73,6 @@ def msub(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     product = program.registers[rs] * program.registers[rt]
     program.registers["hi"] -= product & 0xFFFFFFFF_00000000
@@ -92,7 +86,6 @@ def multu(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     product = abs(program.registers[rs]) * abs(program.registers[rt])
     program.registers["hi"] = product & 0xFFFFFFFF_00000000
@@ -106,7 +99,6 @@ def mult(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     product = program.registers[rs] * program.registers[rt]
     program.registers["hi"] = product & 0xFFFFFFFF_00000000
@@ -120,7 +112,6 @@ def clo(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     bit_to_check = 1 << 32
     val = program.registers[rt]
@@ -138,7 +129,6 @@ def clz(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     bit_to_check = 1 << 32
     val = program.registers[rt]
@@ -156,7 +146,6 @@ def div(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     quotient = program.registers[rs] / program.registers[rt]
     remainder = program.registers[rs] % program.registers[rt]
@@ -171,7 +160,6 @@ def divu(program: MipsProgram, rs: str, rt: str) -> None:
     :param program:
     :param rt:
     :param rs:
-
     """
     quotient = abs(program.registers[rs]) / abs(program.registers[rt])
     remainder = abs(program.registers[rs]) % abs(program.registers[rt])

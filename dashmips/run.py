@@ -18,7 +18,6 @@ def run(
 
     :param program: MipsProgram:
     :param runnable:  (Default value = lambda p: p.registers['pc'] != -1)
-
     """
     try:
         while runnable(program):
@@ -38,7 +37,6 @@ def next_instruction(program: MipsProgram) -> None:
     """Execute One Instruction.
 
     :param program:
-
     """
     current_pc = program.registers["pc"]
     if len(program.source) < current_pc:

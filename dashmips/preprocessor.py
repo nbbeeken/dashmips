@@ -67,7 +67,6 @@ def split_to_sections(code: List[SourceLine]) -> sectionsType:
 
     :param code: List[Tuple[int:
     :param str]]:
-
     """
     section: Optional[str] = None
     if code[0].line in [mips.RE.DATA_SEC, mips.RE.TEXT_SEC]:
@@ -100,7 +99,6 @@ def data_labels(labels: Dict[str, Label],
     :param labels:
     :param data_sec:
     :param memory:
-
     """
     data_line_re = f"({mips.RE.LABEL}):\\s*({mips.RE.DIRECTIVE})\\s+(.*)"
     for line in data_sec:
@@ -163,8 +161,7 @@ def code_labels(
 def process_file(file: TextIO) -> List[SourceLine]:
     """Process Mips File.
 
-    :param file: Mips source file
-    """
+    :param file: Mips source file    """
     filename = os.path.abspath(file.name)
     code = file.read()
     linenumbers = list(enumerate(code.splitlines()))
@@ -195,8 +192,7 @@ def preprocessor_directives(
 ) -> Tuple[Dict[str, str], List[SourceLine]]:
     """Preprocessor Directives handler.
 
-    :param lines: lines to compile.
-    """
+    :param lines: lines to compile.    """
     for idx, srcline in enumerate(lines):
         if ".globl" in srcline.line:
             del lines[idx]

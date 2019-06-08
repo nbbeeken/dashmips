@@ -45,8 +45,7 @@ class MipsProgram:
     def from_dict(prg: Dict[str, Any]) -> "MipsProgram":
         """From Basic dictionary to MipsProgram.
 
-        :param prg:
-        """
+        :param prg:        """
         from dashmips.hardware import Memory, Registers
 
         prg["memory"] = Memory(prg["memory"])
@@ -92,7 +91,6 @@ class DebugMessage:
         """Deserialize from json to DebugMessage.
 
         :param payload:
-
         """
         from dashmips.debugger import Commands
 

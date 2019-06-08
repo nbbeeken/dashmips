@@ -11,7 +11,6 @@ def parse(args: Tuple[str, str, str, str, str]) -> Tuple[str, int, str]:
     """Register and Memory access Instructions Parser.
 
     :param arg:
-
     """
     offset = 0
     if args[3]:
@@ -40,7 +39,6 @@ def lbu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param num:
     :param rs:
     :param rt:
-
     """
     program.registers[rs] = abs(program.memory[num + program.registers[rt]])
 
@@ -53,7 +51,6 @@ def lh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param num:
     :param rs:
     :param rt:
-
     """
     # FIXME: This does not sign extend correctly
     addr = num + program.registers[rt]
@@ -72,7 +69,6 @@ def lhu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param num:
     :param rs:
     :param rt:
-
     """
     addr = num + program.registers[rt]
     val = 0
@@ -90,7 +86,6 @@ def lw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param num:
     :param rs:
     :param rt:
-
     """
     addr = num + program.registers[rt]
     val = 0
@@ -108,7 +103,6 @@ def sb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param num:
     :param rs:
     :param rt:
-
     """
     val = program.registers[rs]
     program.memory[num + program.registers[rt]] = val & 0xFF
@@ -122,7 +116,6 @@ def sw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param num:
     :param rs:
     :param rt:
-
     """
     val = program.registers[rs]
     addr = num + program.registers[rt]
@@ -137,7 +130,6 @@ def sh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     :param num:
     :param rs:
     :param rt:
-
     """
     val = program.registers[rs]
     addr = num + program.registers[rt]

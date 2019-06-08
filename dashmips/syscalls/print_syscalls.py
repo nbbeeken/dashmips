@@ -8,7 +8,6 @@ def print_string(program: MipsProgram) -> None:
     """Print string at address provided in $a0.
 
     :param program:
-
     """
     address = program.registers["$a0"]
     bstring = program.memory[address: program.memory.index(0x0, address)]
@@ -21,7 +20,6 @@ def print_char(program: MipsProgram) -> None:
     """Print string at address provided in $a0.
 
     :param program:
-
     """
     character = chr(program.registers["$a0"] & 0xFF)
     print(character, end="")
@@ -32,7 +30,6 @@ def read_int(program: MipsProgram) -> None:
     """Read Int from stdin.
 
     :param program:
-
     """
     user_in = input("")
     try:
@@ -46,7 +43,6 @@ def print_int(program: MipsProgram) -> None:
     """Print Int.
 
     :param program:
-
     """
     print(program.registers["$a0"], end="")
 
@@ -56,7 +52,6 @@ def print_hex_int(program: MipsProgram) -> None:
     """Print Int in Hex.
 
     :param program:
-
     """
     print(hex(program.registers["$a0"]), end="")
 
@@ -66,7 +61,6 @@ def _exit(program: MipsProgram) -> None:
     """Exit MIPS Program.
 
     :param program:
-
     """
     # Internal definition of exited program
     program.registers["pc"] = -1
@@ -77,7 +71,6 @@ def dump_program(program: MipsProgram) -> None:
     """Print json format of program.
 
     :param program:
-
     """
     import json
 

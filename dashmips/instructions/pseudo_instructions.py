@@ -14,7 +14,6 @@ def la(program: MipsProgram, rd: str, address: str) -> None:
     :param program:
     :param address:
     :param rd:
-
     """
     program.registers[rd] = program.labels[address].value
 
@@ -29,7 +28,6 @@ def li(program: MipsProgram, rd: str, number: int) -> None:
     :param program:
     :param number:
     :param rd:
-
     """
     program.registers[rd] = number
 
@@ -45,7 +43,6 @@ def move(program: MipsProgram, rd: str, rs: str) -> None:
     :param program:
     :param rs:
     :param rd:
-
     """
     program.registers[rd] = program.registers[rs]
 
@@ -61,7 +58,6 @@ def beqz(program: MipsProgram, rd: str, label: str) -> None:
     :param program:
     :param rd:
     :param label:
-
     """
     if program.registers[rd] == 0:
         program.registers["pc"] = program.labels[label].value
@@ -78,7 +74,6 @@ def bnez(program: MipsProgram, rd: str, label: str) -> None:
     :param program:
     :param rd:
     :param label:
-
     """
     if program.registers[rd] != 0:
         program.registers["pc"] = program.labels[label].value
@@ -90,7 +85,6 @@ def b(program: MipsProgram, label: str) -> None:
 
     :param program:
     :param label:
-
     """
     program.registers["pc"] = program.labels[label].value
 
@@ -108,7 +102,6 @@ def bgt(program: MipsProgram, rd: str, rs: str, label: str) -> None:
 
     :param program:
     :param label:
-
     """
     if rs not in program.registers:
         rs_val = parse_int(rs)
@@ -132,7 +125,6 @@ def blt(program: MipsProgram, rd: str, rs: str, label: str) -> None:
 
     :param program:
     :param label:
-
     """
     if rs not in program.registers:
         rs_val = parse_int(rs)
@@ -153,7 +145,6 @@ def neg(program: MipsProgram, rd: str, rs: str) -> None:
 
     :param program:
     :param label:
-
     """
     program.registers[rd] = ~program.registers[rs]
 
@@ -167,7 +158,6 @@ def bge(program: MipsProgram, rd: str, rs: str, label: str) -> None:
 
     :param program:
     :param label:
-
     """
     if program.registers[rd] > program.registers[rs]:
         program.registers["pc"] = program.labels[label].value
@@ -182,7 +172,6 @@ def ble(program: MipsProgram, rd: str, rs: str, label: str) -> None:
 
     :param program:
     :param label:
-
     """
     if program.registers[rd] < program.registers[rs]:
         program.registers["pc"] = program.labels[label].value

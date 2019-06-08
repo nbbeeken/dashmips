@@ -10,7 +10,6 @@ def parse(arg: Tuple[str, str]) -> Tuple:
     """Instructions that take no arguments.
 
     :param arg:
-
     """
     return tuple()
 

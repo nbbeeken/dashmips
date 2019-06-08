@@ -11,7 +11,6 @@ def parse(args: Tuple[str, str, str]) -> Tuple[str]:
     """Parser for single register instructions.
 
     :param args:
-
     """
     return (args[2],)
 
@@ -22,7 +21,6 @@ def mflo(program: MipsProgram, rd: str) -> None:
 
     :param program:
     :param rd:
-
     """
     program.registers[rd] = program.registers["lo"]
 
@@ -33,7 +31,6 @@ def mfhi(program: MipsProgram, rd: str) -> None:
 
     :param program:
     :param rd:
-
     """
     program.registers[rd] = program.registers["hi"]
 
@@ -44,7 +41,6 @@ def mthi(program: MipsProgram, rd: str) -> None:
 
     :param program:
     :param rd:
-
     """
     program.registers["hi"] = program.registers[rd]
 
@@ -55,6 +51,5 @@ def mtlo(program: MipsProgram, rd: str) -> None:
 
     :param program:
     :param rd:
-
     """
     program.registers["lo"] = program.registers[rd]

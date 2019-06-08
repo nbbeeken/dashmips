@@ -12,7 +12,6 @@ def parse(arg: Tuple[str, str, str]) -> Tuple[str]:
     """Single Register instruction parser.
 
     :param arg:
-
     """
     return (arg[2],)
 
@@ -23,6 +22,5 @@ def jr(program: MipsProgram, rs: str) -> None:
 
     :param program:
     :param rs:
-
     """
     program.registers["pc"] = program.registers[rs]

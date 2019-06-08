@@ -155,7 +155,6 @@ class Memory(List[int]):
         """Get aligned address of unused memory.
 
         :param size: int:
-
         """
         pad = self._freespace % 4
         if pad > 0:
