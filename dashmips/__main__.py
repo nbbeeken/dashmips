@@ -99,15 +99,6 @@ def main() -> NoReturn:
 
     parser = argparse.ArgumentParser("dashmips")
 
-    if (
-        len(sys.argv) == 2
-        and sys.argv[1][0] != "-"
-        and sys.argv[1] not in "runcompiledebugdocsh"
-    ):
-        # should be ['dashmips', 'file']
-        # when just a file is provided we want to default to run
-        sys.argv = [sys.argv[0], "run", sys.argv[1]]
-
     parser.add_argument("-v", "--version", action="version", version="0.0.11")
 
     sbp = parser.add_subparsers(
