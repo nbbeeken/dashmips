@@ -41,7 +41,8 @@ def build_body(name: str, pattern: str, label: bool) -> str:
     """Create snippet body.
 
     :param name: Instruction name
-    :param pattern: Instruction regex pattern    """
+    :param pattern: Instruction regex pattern
+    """
     snip: str = f"{name:7s}" + pattern.format(**SNIPPET_REPLACEMENTS)
     snip = snip.replace("(", "")
     snip = snip.replace(")", "")

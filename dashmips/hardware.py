@@ -77,14 +77,6 @@ class Registers(Dict[str, int]):
         """
         return super().__getitem__(Registers.Resolve[key])
 
-    # def readablenum_registers(self):
-    #     """ """
-    #     return None
-
-    # def computer_registers(self):
-    #     """ """
-    #     return None
-
 
 class Memory(List[int]):
     """Mips Big Endiean RAM."""
@@ -162,7 +154,3 @@ class Memory(List[int]):
         old_freespace = self._freespace  # Aligned to 4
         self._freespace += size + pad  # Allocate Aligned amount
         return old_freespace
-
-    # def encoded_str(self):
-    #     """Base85 encoding of memory."""
-    #     return a85encode(bytes(self), foldspaces=True).decode('utf8')
