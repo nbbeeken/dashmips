@@ -18,7 +18,8 @@ classifiers=[
 dashmips = "dashmips.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
+"dataclasses" = { version = "^0.6", optional = true }
 
 [tool.poetry.dev-dependencies]
 "mypy" = "^0.701"

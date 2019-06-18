@@ -94,8 +94,7 @@ def main() -> NoReturn:
 
     parser.add_argument("-v", "--version", action="version", version="0.0.11")
 
-    sbp = parser.add_subparsers(
-        title="commands", dest="command", required=True)
+    sbp = parser.add_subparsers(title="commands", dest="command")
     compileparse = sbp.add_parser("compile", aliases=["c"])
     runparse = sbp.add_parser("run", aliases=["r"])
     debugparse = sbp.add_parser("debug", aliases=["d"])
@@ -155,8 +154,14 @@ def main() -> NoReturn:
     docsparse.set_defaults(func=main_docs)
 
     prog_args = parser.parse_args()
-    sys.exit(prog_args.func(prog_args))
+    if not hasattr(prog_args, 'func'):
+        # This is for python 3.6 compatibility
+        # you cannot enforce subparser to require in less than 3.6
+        print('Must provide a command')
+        parser.print_help()
+        sys.exit(1)
 
+    sys.exit(prog_args.func(prog_args))
 
 if __name__ == "__main__":
     main()
