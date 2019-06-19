@@ -4,7 +4,7 @@ import json
 from threading import Thread
 from typing import Any, List, NoReturn
 
-from dashmips.webdebugger import debug_mips
+from dashmips.debuggerwsserver import debug_mips
 from dashmips.extension import generate_snippets, instruction_name_regex
 from dashmips.plugins.vt100 import VT100
 from dashmips.preprocessor import preprocess

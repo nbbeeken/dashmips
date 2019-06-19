@@ -9,20 +9,22 @@ from dashmips.run import next_instruction, run
 from dashmips.models import MipsProgram
 
 
-def debug_start(msg: DebugMessage) -> Optional[DebugMessage]:
+def debug_start(operation: dict, program: MipsProgram) -> dict:
     """Debug start.
 
-    :param msg: DebugMessage:
+    :param operation: dict
+    :param program: MipsProgram
     """
     msg.program.registers["pc"] = msg.program.labels["main"].value
     msg.message = str(os.getpid())
     return msg
 
 
-def debug_step(msg: DebugMessage) -> DebugMessage:
+def debug_step(operation: dict, program: MipsProgram) -> dict:
     """Debug step.
 
-    :param msg: DebugMessage:
+    :param operation: dict
+    :param program: MipsProgram
     """
     try:
         next_instruction(msg.program)
@@ -35,10 +37,11 @@ def debug_step(msg: DebugMessage) -> DebugMessage:
     return msg
 
 
-def debug_continue(msg: DebugMessage) -> DebugMessage:
+def debug_continue(operation: dict, program: MipsProgram) -> dict:
     """Debug continue.
 
-    :param msg: DebugMessage:
+    :param operation: dict
+    :param program: MipsProgram
     """
     starting_pc = msg.program.registers["pc"]
 
@@ -71,15 +74,16 @@ def debug_continue(msg: DebugMessage) -> DebugMessage:
     return msg
 
 
-def debug_stop(msg: DebugMessage) -> DebugMessage:
+def debug_stop(operation: dict, program: MipsProgram) -> dict:
     """Stop messages incoming mean nothing to a server.
 
-    :param msg: DebugMessage:
+    :param operation: dict
+    :param program: MipsProgram
     """
     return msg
 
 
-Commands: Dict[str, Callable] = {
+COMMANDS: Dict[str, Callable[[dict, MipsProgram], dict]] = {
     "start": debug_start,
     "step": debug_step,
     "continue": debug_continue,

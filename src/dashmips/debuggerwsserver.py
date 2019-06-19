@@ -6,30 +6,18 @@ import json
 import logging as log
 
 from dashmips.models import MipsProgram
+from dashmips.debugger import COMMANDS
 
 
-def debug(debug_command: dict) -> dict:
+def debug(debug_command: dict, program: MipsProgram) -> dict:
     """Brains of the operation."""
-    return {'operation': 'successful'}
-
-
-async def dashmips_debugger(
-    client: WebSocketServerProtocol, path: str
-) -> None:
-    """Client handler for debug server."""
-    log.info(f'client={client} path={path}')
-    try:
-        async for message in client:
-            debug_command = json.loads(message)
-            log.debug(f'Recv "{debug_command}"')
-            debug_response = debug(debug_command)
-            log.debug(f'Send "{debug_response}"')
-            await client.send(json.dumps(debug_response))
-            break
-    except websockets.ConnectionClosed:
-        log.warn('Client disconnect')
-    finally:
-        log.warn('Debugging is truly over')
+    operation = debug_command['operation']
+    if operation not in COMMANDS:
+        return {
+            'operation': 'failed',
+            'reason': f'operation {operation} does not exist'
+        }
+    return COMMANDS[operation](operation, program)
 
 
 def debug_mips(
@@ -51,6 +39,23 @@ def debug_mips(
     logger.addHandler(log.StreamHandler())
 
     log.info('Starting server!')
+
+    async def dashmips_debugger(
+        client: WebSocketServerProtocol, path: str
+    ) -> None:
+        """Client handler for debug server."""
+        log.info(f'client={client} path={path}')
+        try:
+            async for message in client:
+                debug_command = json.loads(message)
+                log.debug(f'Recv "{debug_command}"')
+                debug_response = debug(debug_command, program)
+                log.debug(f'Send "{debug_response}"')
+                await client.send(json.dumps(debug_response))
+        except websockets.ConnectionClosed:
+            log.warn('Client disconnect')
+        finally:
+            log.warn('Debugging is truly over')
 
     start_server = websockets.serve(dashmips_debugger, host, port)
     try:
