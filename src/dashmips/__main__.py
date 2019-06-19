@@ -4,7 +4,7 @@ import json
 from threading import Thread
 from typing import Any, List, NoReturn
 
-from dashmips.debugserver import debug_mips
+from dashmips.webdebugger import debug_mips
 from dashmips.extension import generate_snippets, instruction_name_regex
 from dashmips.plugins.vt100 import VT100
 from dashmips.preprocessor import preprocess
@@ -50,7 +50,8 @@ def main_run(args: argparse.Namespace) -> int:
 
 def main_debug(args: argparse.Namespace) -> int:
     """Start debug server for mips."""
-    debug_mips(host=args.host, port=args.port, should_log=args.log)
+    program = preprocess(args.FILE, args=args.mips_args)
+    debug_mips(program, args.host, args.port, should_log=args.log)
     return 0
 
 
@@ -65,8 +66,8 @@ def main_docs(args: argparse.Namespace) -> int:
     print(f"{'----':15}{'------':<10}{'-----------'}")
     syscalls_list = list(Syscalls.items())
     syscalls_list.sort(key=lambda i: i[0])
-    for sysnum, syscall in syscalls_list:
-        print(f"{syscall.name:15}{sysnum:<10}{syscall.description}")
+    for sys_num, syscall in syscalls_list:
+        print(f"{syscall.name:15}{sys_num:<10}{syscall.description}")
 
     print()
 
@@ -134,6 +135,19 @@ def main() -> NoReturn:
     runparse.set_defaults(func=main_run)
 
     debugparse.add_argument(
+        "FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file"
+    )
+    debugparse.add_argument(
+        "-a",
+        "--args",
+        dest="mips_args",
+        nargs="*",
+        help="Arguments to pass into the mips main",
+    )
+    debugparse.add_argument(
+        "-t", "--vt100", action="store_true", help="Start VT100 Simulator"
+    )
+    debugparse.add_argument(
         "-p", "--port", type=int, default=9999, help="run debugger on port"
     )
     debugparse.add_argument(
@@ -162,6 +176,7 @@ def main() -> NoReturn:
         sys.exit(1)
 
     sys.exit(prog_args.func(prog_args))
+
 
 if __name__ == "__main__":
     main()
