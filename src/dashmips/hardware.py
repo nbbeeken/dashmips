@@ -44,7 +44,7 @@ class Registers(Dict[str, int]):
     }
 
     def __init__(self, dictionary: Optional[Dict[str, int]] = None) -> None:
-        """Intializes 32 registers to zero.
+        """Initialize 32 registers to zero.
 
         dictionary - can be partial/full dictionary of registers
         """
@@ -78,53 +78,22 @@ class Registers(Dict[str, int]):
         return super().__getitem__(Registers.Resolve[key])
 
 
-class Memory(List[int]):
+class Memory(bytearray):
     """Mips Big Endiean RAM."""
 
     PAGE = 4096
 
-    def __init__(self, listish: Optional[Iterable[Any]] = None) -> None:
+    def __init__(self, hexstring: Optional[str] = None) -> None:
         """Create 2KB of MIPS RAM."""
-        self._freespace = 0x4
-        # if isinstance(listish, bytes) or isinstance(listish, str):
-        #     listish = list(a85decode(listish, foldspaces=True))
-        if listish is None:
-            listish = []
+        self._freespace = 0x0
+        if hexstring:
+            super().fromhex(hexstring)
         else:
-            listish = list(listish)
-        remaining_size = (3 * Memory.PAGE) - len(listish)
-
-        self.on_change_listeners: List[Callable[["Memory"], None]] = []
-
-        super().__init__([*listish, *([0] * remaining_size)])
+            super().__init__(Memory.PAGE * 4)
 
         for i in range(0x2060, 0x2060 + ((80 * 25) * 2), 2):
-            self[i] = 0x0F
-            self[i + 1] = ord(" ")
-
-    def on_change(self, cb: Callable[["Memory"], None]) -> None:
-        """Insert on_change listener."""
-        self.on_change_listeners.append(cb)
-
-    def __setitem__(
-        self, key: Union[int, slice], value: Union[int, Iterable[int]]
-    ) -> None:
-        """Bounds checking on access."""
-        if isinstance(key, slice) and isinstance(value, (list, tuple, bytes)):
-            # Handle slice assignment
-            for byte in value:
-                assert not (byte & 0x00), f"0x{byte:X} is greater than a byte"
-
-        elif isinstance(key, slice) and isinstance(value, str):
-            for char in value:
-                byte = ord(char)
-                assert not (byte & 0x00), f"0x{byte:X} is greater than a byte"
-
-        elif isinstance(key, int) and isinstance(value, int):
-            # Handle single index assignment
-            assert not (value & 0x00), f"0x{value:X} is greater than a byte"
-
-        super().__setitem__(key, value)  # type: ignore
+            blank_space = (0x0F00 | ord(" "))
+            self[i:i + 1] = blank_space.to_bytes(2, 'little')
 
     def __repr__(self) -> str:
         """Compacted Memory string."""

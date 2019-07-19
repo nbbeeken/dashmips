@@ -5,19 +5,29 @@ import asyncio
 import json
 import logging as log
 
+from typing import Any
+
 from dashmips.models import MipsProgram
 from dashmips.debugger import COMMANDS
 
+from jsonrpc import JSONRPCResponseManager, jsonrpc2, dispatcher
 
-def debug(debug_command: dict, program: MipsProgram) -> dict:
-    """Brains of the operation."""
-    operation = debug_command['operation']
-    if operation not in COMMANDS:
-        return {
-            'operation': 'failed',
-            'reason': f'operation {operation} does not exist'
-        }
-    return COMMANDS[operation](operation, program)
+
+class ByteArrayJSON(json.JSONEncoder):
+    """Encode bytearray from hex string."""
+
+    def default(self, obj: Any) -> Any:
+        """Serialize bytearray to hex."""
+        if isinstance(obj, bytearray):
+            return obj.hex()
+        return json.JSONEncoder.default(self, obj)
+
+    @staticmethod
+    def bytearray_decoder(dct: dict) -> dict:
+        """Decode bytearray from hex string."""
+        if 'memory' in dct:
+            dct['memory'] = bytearray().fromhex(dct['memory'])
+        return dct
 
 
 def debug_mips(
@@ -40,6 +50,9 @@ def debug_mips(
 
     log.info('Starting server!')
 
+    for command_name, command in COMMANDS.items():
+        dispatcher.add_method(command, command_name)
+
     async def dashmips_debugger(
         client: WebSocketServerProtocol, path: str
     ) -> None:
@@ -47,15 +60,32 @@ def debug_mips(
         log.info(f'client={client} path={path}')
         try:
             async for message in client:
-                debug_command = json.loads(message)
+                debug_command = jsonrpc2.JSONRPC20Request.from_data(
+                    json.loads(
+                        message,
+                        object_hook=ByteArrayJSON.bytearray_decoder
+                    )
+                )
+
                 log.debug(f'Recv "{debug_command}"')
-                debug_response = debug(debug_command, program)
+
+                debug_response = JSONRPCResponseManager.handle_request(
+                    debug_command, dispatcher
+                )
+
                 log.debug(f'Send "{debug_response}"')
-                await client.send(json.dumps(debug_response))
+
+                await client.send(
+                    json.dumps(debug_response.data, cls=ByteArrayJSON)
+                )
+
         except websockets.ConnectionClosed:
             log.warn('Client disconnect')
+        except Exception as e:
+            log.error(f'Unknown error: {e}')
         finally:
             log.warn('Debugging is truly over')
+            return
 
     start_server = websockets.serve(dashmips_debugger, host, port)
     try:

@@ -2,6 +2,32 @@
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Tuple, TextIO, Iterable, Any, Optional, cast
 
+names_enum = tuple(
+    enumerate(
+        (
+            # fmt: off
+            '$zero',
+            '$at',
+            '$v0', '$v1',
+            '$a0', '$a1', '$a2', '$a3',
+            '$t0', '$t1', '$t2', '$t3', '$t4', '$t5', '$t6', '$t7',
+            '$s0', '$s1', '$s2', '$s3', '$s4', '$s5', '$s6', '$s7',
+            '$t8', '$t9',
+            '$k0', '$k1',
+            '$gp', '$sp', '$fp', '$ra',
+            'pc',
+            'hi',
+            'lo',
+            # fmt: on
+        )
+    )
+)
+
+
+def default_registers() -> dict:
+    """Construct Default Registers."""
+    return {name: 0 for i, name, in names_enum}
+
 
 @dataclass
 class SourceLine:
@@ -37,19 +63,20 @@ class MipsProgram:
     name: str
     labels: Dict[str, Label]
     source: List[SourceLine]
-    memory: Memory = field(default_factory=Memory)
-    registers: Registers = field(default_factory=Registers)
+    memory: bytearray = field(default_factory=bytearray)
+    registers: Dict[str, int] = field(default_factory=default_registers)
     eqvs: Dict[str, str] = field(default_factory=dict)
 
     @staticmethod
     def from_dict(prg: Dict[str, Any]) -> "MipsProgram":
         """From Basic dictionary to MipsProgram.
 
-        :param prg:        """
+        :param prg:
+        """
         from dashmips.hardware import Memory, Registers
 
         prg["memory"] = Memory(prg["memory"])
-        prg["registers"] = Registers(prg["registers"])
+        # prg["registers"] = check_registers(prg["registers"])
         prg["labels"] = {ln: Label(**l) for ln, l in prg["labels"].items()}
         prg["source"] = [SourceLine(**m) for m in prg["source"]]
         return MipsProgram(**prg)
@@ -69,7 +96,9 @@ class MipsProgram:
 class DebugMessage:
     """Format for debug messages."""
 
-    __slots__ = ("command", "program", "__dict__")
+    __slots__ = (
+        "command", "program", "__dict__"
+    )
 
     command: str
     program: MipsProgram
@@ -92,7 +121,7 @@ class DebugMessage:
 
         :param payload:
         """
-        from dashmips.debugger import Commands
+        from dashmips.debugger import COMMANDS
 
         if not payload:
             # Payload is Falsey
@@ -100,7 +129,7 @@ class DebugMessage:
         if "command" not in payload:
             # There is no command to handle
             return None
-        if payload["command"] not in Commands:
+        if payload["command"] not in COMMANDS:
             # The command does not exist
             return None
 
@@ -110,14 +139,3 @@ class DebugMessage:
         else:
             payload["program"] = None
         return DebugMessage(**payload)
-
-
-@dataclass
-class Client:
-    """A Client for DebugServer."""
-
-    __slots__ = ("rfile", "wfile", "address")
-
-    rfile: TextIO
-    wfile: TextIO
-    address: Tuple[str, int]

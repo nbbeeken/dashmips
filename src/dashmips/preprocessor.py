@@ -29,7 +29,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     # Collect Preproccessor Directives.
     eqvs, linesofcode = preprocessor_directives(linesofcode)
 
-    # Gather .data/.text sections into seperate lists
+    # Gather .data/.text sections into separate lists
     unprocessed_labels, unprocessed_code = split_to_sections(linesofcode)
 
     # First process all the .data labels so they can be replaced in .text
@@ -128,7 +128,7 @@ def code_labels(
     text: List[SourceLine] = []
     lbl_ct = 0
     for idx, srcline in enumerate(text_sec):
-        # For each line in the stipped text section, check for label
+        # For each line in the stripped text section, check for label
         match = re.match(f"({mips.RE.LABEL}):", srcline.line)
         if match:
             # If there's a label save it to the labels dictionary

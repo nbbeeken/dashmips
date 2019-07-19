@@ -1,49 +1,47 @@
 """Mips Debugger."""
 import logging as log
 import os
-from typing import Dict, Callable, Optional
+from typing import Dict, List, Callable, Optional, Any
 
-from dashmips.debugserver import DebugMessage
 from dashmips.mips import MipsException
 from dashmips.run import next_instruction, run
-from dashmips.models import MipsProgram
+from dashmips.models import MipsProgram, DebugMessage
 
 
-def debug_start(operation: dict, program: MipsProgram) -> dict:
+def debug_start(program: MipsProgram) -> int:
     """Debug start.
 
     :param operation: dict
     :param program: MipsProgram
     """
-    msg.program.registers["pc"] = msg.program.labels["main"].value
-    msg.message = str(os.getpid())
-    return msg
+    program.registers["pc"] = program.labels["main"].value
+    return os.getpid()
 
 
-def debug_step(operation: dict, program: MipsProgram) -> dict:
+def debug_step(program: MipsProgram) -> MipsProgram:
     """Debug step.
 
     :param operation: dict
     :param program: MipsProgram
     """
     try:
-        next_instruction(msg.program)
-        if msg.program.registers["pc"] == -1:
-            msg.command = "stop"
+        next_instruction(program)
+        if program.registers["pc"] == -1:
+            command = "stop"
     except MipsException as exc:
-        msg.error = True
-        msg.message = exc.message
+        error = True
+        message = exc.message
+    return program
 
-    return msg
 
-
-def debug_continue(operation: dict, program: MipsProgram) -> dict:
+def debug_continue(operation: dict, program: MipsProgram) -> MipsProgram:
     """Debug continue.
 
     :param operation: dict
     :param program: MipsProgram
     """
-    starting_pc = msg.program.registers["pc"]
+    starting_pc = program.registers["pc"]
+    breakpoints: List[int] = []  # FIXME: remove once u get ur protocol down!
 
     def breaking_condition(program: MipsProgram) -> bool:
         """Condition function to stop execution.
@@ -51,39 +49,39 @@ def debug_continue(operation: dict, program: MipsProgram) -> dict:
         :param program:
         """
         nonlocal starting_pc
-        log.info(f"bps: {msg.breakpoints}", extra={"client": ""})
+        log.info(f"bps: {breakpoints}", extra={"client": ""})
         if program.registers["pc"] == starting_pc:
             # current instruction will execute even if on breakpoint
             # b/c we would have broken on it last time.
             return True
-        if program.registers["pc"] in msg.breakpoints:
+        if program.registers["pc"] in breakpoints:
             return False
         if program.registers["pc"] == -1:
             return False
         return True
 
     try:
-        run(msg.program, breaking_condition)
-        if msg.program.registers["pc"] == -1:
+        run(program, breaking_condition)
+        if program.registers["pc"] == -1:
             # Exited
-            msg.command = "stop"
+            command = "stop"
     except MipsException as exc:
-        msg.error = True
-        msg.message = exc.message
+        error = True
+        message = exc.message
 
-    return msg
+    return program
 
 
-def debug_stop(operation: dict, program: MipsProgram) -> dict:
+def debug_stop(operation: dict, program: MipsProgram) -> MipsProgram:
     """Stop messages incoming mean nothing to a server.
 
     :param operation: dict
     :param program: MipsProgram
     """
-    return msg
+    return program
 
 
-COMMANDS: Dict[str, Callable[[dict, MipsProgram], dict]] = {
+COMMANDS = {
     "start": debug_start,
     "step": debug_step,
     "continue": debug_continue,
