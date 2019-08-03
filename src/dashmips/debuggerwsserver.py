@@ -10,7 +10,7 @@ from typing import Any
 from dashmips.models import MipsProgram
 from dashmips.debugger import COMMANDS
 
-from jsonrpc import JSONRPCResponseManager, jsonrpc2, dispatcher
+from jsonrpc import JSONRPCResponseManager, dispatcher
 
 
 class ByteArrayJSON(json.JSONEncoder):
@@ -59,25 +59,14 @@ def debug_mips(
         """Client handler for debug server."""
         log.info(f'client={client} path={path}')
         try:
+            message: str
             async for message in client:
-                debug_command = jsonrpc2.JSONRPC20Request.from_data(
-                    json.loads(
-                        message,
-                        object_hook=ByteArrayJSON.bytearray_decoder
-                    )
-                )
-
-                log.debug(f'Recv "{debug_command}"')
-
+                log.debug(f'Recv "{message}"')
                 debug_response = JSONRPCResponseManager.handle_request(
-                    debug_command, dispatcher
+                    message, dispatcher
                 )
-
                 log.debug(f'Send "{debug_response}"')
-
-                await client.send(
-                    json.dumps(debug_response.data, cls=ByteArrayJSON)
-                )
+                await client.send(debug_response.json)
 
         except websockets.ConnectionClosed:
             log.warn('Client disconnect')

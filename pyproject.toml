@@ -18,9 +18,10 @@ classifiers=[
 dashmips = "dashmips.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+"python" = "^3.6"
 "dataclasses" = { version = "^0.6", optional = true }
-websockets = "^7.0"
+"websockets" = "^7.0"
+"json-rpc" = "^1.12.1"
 
 [tool.poetry.dev-dependencies]
 "mypy" = "^0.701"
