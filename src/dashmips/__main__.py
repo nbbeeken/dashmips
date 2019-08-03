@@ -148,7 +148,7 @@ def main() -> NoReturn:
         "-t", "--vt100", action="store_true", help="Start VT100 Simulator"
     )
     debugparse.add_argument(
-        "-p", "--port", type=int, default=9999, help="run debugger on port"
+        "-p", "--port", type=int, default=2390, help="run debugger on port"
     )
     debugparse.add_argument(
         "-i", "--host", default="0.0.0.0", help="run debugger on host"

@@ -8,7 +8,7 @@ from dashmips.run import next_instruction, run
 from dashmips.models import MipsProgram, DebugMessage
 
 
-def debug_start(program: MipsProgram) -> int:
+def debug_start(program: MipsProgram, params) -> int:
     """Debug start.
 
     :param operation: dict
@@ -18,7 +18,7 @@ def debug_start(program: MipsProgram) -> int:
     return os.getpid()
 
 
-def debug_step(program: MipsProgram) -> MipsProgram:
+def debug_step(program: MipsProgram, params) -> MipsProgram:
     """Debug step.
 
     :param operation: dict
@@ -34,7 +34,7 @@ def debug_step(program: MipsProgram) -> MipsProgram:
     return program
 
 
-def debug_continue(operation: dict, program: MipsProgram) -> MipsProgram:
+def debug_continue(program: MipsProgram, params) -> MipsProgram:
     """Debug continue.
 
     :param operation: dict
@@ -72,7 +72,7 @@ def debug_continue(operation: dict, program: MipsProgram) -> MipsProgram:
     return program
 
 
-def debug_stop(operation: dict, program: MipsProgram) -> MipsProgram:
+def debug_stop(program: MipsProgram, params) -> MipsProgram:
     """Stop messages incoming mean nothing to a server.
 
     :param operation: dict
