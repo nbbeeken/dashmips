@@ -56,7 +56,7 @@ class Label:
 class MipsProgram:
     """All data associated with a mips program."""
 
-    from dashmips.hardware import Memory, Registers
+    from .hardware import Memory, Registers
 
     __slots__ = ("name", "labels", "source", "__dict__")
 
@@ -73,7 +73,7 @@ class MipsProgram:
 
         :param prg:
         """
-        from dashmips.hardware import Memory, Registers
+        from .hardware import Memory, Registers
 
         prg["memory"] = Memory(prg["memory"])
         # prg["registers"] = check_registers(prg["registers"])
@@ -121,7 +121,7 @@ class DebugMessage:
 
         :param payload:
         """
-        from dashmips.debugger import COMMANDS
+        from .debugger import COMMANDS
 
         if not payload:
             # Payload is Falsey

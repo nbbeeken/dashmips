@@ -1,12 +1,11 @@
 """Preprocessor for mips assembly."""
-import os.path
+import os
 import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple, TypeVar
 
-import dashmips.mips as mips
-from dashmips.hardware import Memory, Registers
-from dashmips.mips import MipsException
-from dashmips.models import Label, MipsProgram, SourceLine
+from .mips import RE as mipsRE, MipsException, Directives
+from .hardware import Memory, Registers
+from .models import Label, MipsProgram, SourceLine
 
 
 def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
@@ -39,7 +38,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     processed_code = code_labels(labels, unprocessed_code)
 
     # Cannot run a program without a main
-    if not ("main" in labels and labels["main"].location == mips.RE.TEXT_SEC):
+    if not ("main" in labels and labels["main"].location == mipsRE.TEXT_SEC):
         raise Exception(f"Cannot locate main in {filename}")
 
     bp = memory.malloc(512) + 508
@@ -69,25 +68,25 @@ def split_to_sections(code: List[SourceLine]) -> sectionsType:
     :param str]]:
     """
     section: Optional[str] = None
-    if code[0].line in [mips.RE.DATA_SEC, mips.RE.TEXT_SEC]:
+    if code[0].line in [mipsRE.DATA_SEC, mipsRE.TEXT_SEC]:
         section = code[0].line
 
     if section is None:
         raise MipsException("first line must be .text/.data")
 
-    sections: Dict[str, Any] = {mips.RE.DATA_SEC: [], mips.RE.TEXT_SEC: []}
+    sections: Dict[str, Any] = {mipsRE.DATA_SEC: [], mipsRE.TEXT_SEC: []}
     for srcline in code:
-        if srcline.line not in [mips.RE.DATA_SEC, mips.RE.TEXT_SEC]:
-            if section == mips.RE.DATA_SEC:
+        if srcline.line not in [mipsRE.DATA_SEC, mipsRE.TEXT_SEC]:
+            if section == mipsRE.DATA_SEC:
                 sections[section].append(srcline.line)  # Discard line number
                 continue
-            if section == mips.RE.TEXT_SEC:
+            if section == mipsRE.TEXT_SEC:
                 sections[section].append(srcline)  # Save og line number
                 continue
         else:
             section = srcline.line
 
-    return sections[mips.RE.DATA_SEC], sections[mips.RE.TEXT_SEC]
+    return sections[mipsRE.DATA_SEC], sections[mipsRE.TEXT_SEC]
 
 
 def data_labels(labels: Dict[str, Label],
@@ -100,16 +99,16 @@ def data_labels(labels: Dict[str, Label],
     :param data_sec:
     :param memory:
     """
-    data_line_re = f"({mips.RE.LABEL}):\\s*({mips.RE.DIRECTIVE})\\s+(.*)"
+    data_line_re = f"({mipsRE.LABEL}):\\s*({mipsRE.DIRECTIVE})\\s+(.*)"
     for line in data_sec:
         match = re.match(data_line_re, line)
         if match:
             name = match[1]
-            directive = mips.Directives[match[2][1:]]
+            directive = Directives[match[2][1:]]
             address = directive(name, match[3], memory)
             labels[name] = Label(name=name,
                                  value=address,
-                                 location=mips.RE.DATA_SEC,
+                                 location=mipsRE.DATA_SEC,
                                  kind=match[2][1:])
 
 
@@ -123,17 +122,17 @@ def code_labels(
     :param labels:
     :param text_sec:
     """
-    from dashmips.instructions import Instructions
+    from .instructions import Instructions
 
     text: List[SourceLine] = []
     lbl_ct = 0
     for idx, srcline in enumerate(text_sec):
         # For each line in the stripped text section, check for label
-        match = re.match(f"({mips.RE.LABEL}):", srcline.line)
+        match = re.match(f"({mipsRE.LABEL}):", srcline.line)
         if match:
             # If there's a label save it to the labels dictionary
             labels[match[1]] = Label(
-                location=mips.RE.TEXT_SEC,
+                location=mipsRE.TEXT_SEC,
                 value=(idx - lbl_ct),
                 name=match[1],
                 kind="text",
@@ -169,7 +168,7 @@ def process_file(file: TextIO) -> List[SourceLine]:
     # remove comments
     nocomments: Iterable[SourceLine] = map(
         lambda ln: SourceLine(
-            filename, ln[0] + 1, re.sub(mips.RE.COMMENT, "", ln[1]).strip()
+            filename, ln[0] + 1, re.sub(mipsRE.COMMENT, "", ln[1]).strip()
         ),
         linenumbers,
     )
@@ -240,7 +239,7 @@ def resolve_eqvs(lines: List[SourceLine]
     to_del = []
     for idx, srcline in enumerate(lines):
         # Check for eqv on this line
-        match = re.match(mips.RE.EQVS, srcline.line)
+        match = re.match(mipsRE.EQVS, srcline.line)
         if match:
             # Save Eqv into dict
             eqvs[match[1]] = match[2]
@@ -265,7 +264,7 @@ def resolve_macros(lines: List[SourceLine]) -> List[SourceLine]:
     lines_to_remove = []
     for idx, srcline in enumerate(lines):
         if found_macro is None:
-            match = re.match(mips.RE.MACRO, srcline.line)
+            match = re.match(mipsRE.MACRO, srcline.line)
             if match:
                 found_macro = match[1]
                 macros[match[1]] = {

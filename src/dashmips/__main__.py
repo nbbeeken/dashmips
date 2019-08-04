@@ -4,10 +4,10 @@ import json
 from threading import Thread
 from typing import Any, List, NoReturn
 
-from dashmips.debuggerwsserver import debug_mips
-from dashmips.extension import generate_snippets, instruction_name_regex
-from dashmips.plugins.vt100 import VT100
-from dashmips.preprocessor import preprocess
+from .debuggerwsserver import debug_mips
+from .extension import generate_snippets, instruction_name_regex
+from .plugins.vt100 import VT100
+from .preprocessor import preprocess
 
 
 def main_compile(args: argparse.Namespace) -> int:
@@ -32,7 +32,7 @@ def main_compile(args: argparse.Namespace) -> int:
 
 def main_run(args: argparse.Namespace) -> int:
     """Run for exec-ing mips program."""
-    from dashmips.run import run
+    from .run import run
 
     program = preprocess(args.FILE, args=args.mips_args)
     plugins: List[Any] = []
@@ -57,8 +57,8 @@ def main_debug(args: argparse.Namespace) -> int:
 
 def main_docs(args: argparse.Namespace) -> int:
     """Display information about mips."""
-    from dashmips.instructions import Instructions
-    from dashmips.syscalls import Syscalls
+    from .instructions import Instructions
+    from .syscalls import Syscalls
 
     # Syscall printer
     print("Syscalls")

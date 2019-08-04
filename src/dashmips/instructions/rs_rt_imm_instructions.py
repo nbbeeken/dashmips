@@ -1,8 +1,8 @@
 """Two Register and Immediate instructions."""
 from typing import Tuple, cast
 
-from dashmips.instructions import mips_instruction, parse_int
-from dashmips.models import MipsProgram
+from . import mips_instruction, parse_int
+from ..models import MipsProgram
 
 PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({number})"
 

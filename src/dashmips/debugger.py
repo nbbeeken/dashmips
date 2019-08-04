@@ -3,9 +3,9 @@ import logging as log
 import os
 from typing import Dict, List, Callable, Optional, Any
 
-from dashmips.mips import MipsException
-from dashmips.run import next_instruction, run
-from dashmips.models import MipsProgram, DebugMessage
+from .mips import MipsException
+from .run import next_instruction, run
+from .models import MipsProgram, DebugMessage
 
 
 def debug_start(program: MipsProgram, params) -> int:

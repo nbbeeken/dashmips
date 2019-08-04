@@ -4,9 +4,9 @@ import sys
 
 from typing import Callable
 
-from dashmips.instructions import Instructions
-from dashmips.mips import MipsException
-from dashmips.models import MipsProgram
+from .instructions import Instructions
+from .mips import MipsException
+from .models import MipsProgram
 
 RUN_COND: Callable[[MipsProgram], bool] = (lambda p: p.registers["pc"] != -1)
 

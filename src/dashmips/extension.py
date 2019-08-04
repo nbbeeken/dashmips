@@ -1,7 +1,7 @@
 """Vscode extension helpers."""
 from typing import Dict
 
-from dashmips.instructions import Instructions
+from .instructions import Instructions
 
 snippet_part = "${{{count}:{filler}}}"
 

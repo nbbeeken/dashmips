@@ -1,33 +1,34 @@
 """dashmips package."""
 
-import os
-import os.path
-from importlib import import_module
+import os as _os
+from importlib import import_module as _import_module
 
 # Import all instructions
-
-instruction_modules = [
-    f"dashmips.instructions.{s[:-3]}"
-    for s in os.listdir(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "instructions"
-        )
-    )
-    if s.endswith("_instructions.py")
+_instruction_filter = (lambda fn: fn.endswith("_instructions.py"))
+_instruction_files = _os.listdir(
+    _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "instructions")
+)
+_instruction_files = filter(_instruction_filter, _instruction_files)
+_instruction_modules = [
+    f"dashmips.instructions.{mn[:-3]}" for mn in _instruction_files
 ]
 
-for im in instruction_modules:
-    import_module(im)
+for _im in _instruction_modules:
+    _import_module(_im)
 
 # Import all syscalls
-
-syscall_modules = [
-    f"dashmips.syscalls.{s[:-3]}"
-    for s in os.listdir(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "syscalls")
-    )
-    if s.endswith("_syscalls.py")
+_syscall_filter = (lambda fn: fn.endswith("_instructions.py"))
+_syscall_files = _os.listdir(
+    _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "syscalls")
+)
+_syscall_modules = [
+    f"dashmips.syscalls.{mn[:-3]}" for mn in _instruction_files
 ]
 
-for sm in syscall_modules:
-    import_module(sm)
+for _sm in _syscall_modules:
+    _import_module(_sm)
+
+__all__ = [
+    'syscalls', 'instructions', 'plugins', 'directives', 'hardware', 'mips',
+    'models', 'preprocessor', 'run', 'debugger', 'debuggerwsserver'
+]

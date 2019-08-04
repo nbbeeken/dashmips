@@ -5,8 +5,8 @@ import the file to `dashmips/__init__.py`
 """
 from typing import Dict, Callable
 
-from dashmips.syscalls.Syscall import Syscall
-from dashmips.models import MipsProgram
+from .Syscall import Syscall
+from ..models import MipsProgram
 
 Syscalls: Dict[int, Syscall] = {}
 

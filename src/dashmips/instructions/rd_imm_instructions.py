@@ -1,8 +1,8 @@
 """Instructions that accept a register and immediate as an argument."""
 from typing import Tuple, cast
 
-from dashmips.instructions import mips_instruction, parse_int
-from dashmips.models import MipsProgram
+from . import mips_instruction, parse_int
+from ..models import MipsProgram
 
 PTRN = r"{instr_gap}({register}){args_gap}({number})"
 

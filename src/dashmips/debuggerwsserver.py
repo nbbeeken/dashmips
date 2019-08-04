@@ -1,15 +1,13 @@
 """Debugger over websockets."""
 import websockets
-from websockets import WebSocketServerProtocol
 import asyncio
 import json
 import logging as log
 import functools
+from websockets import WebSocketServerProtocol
 
-from typing import Any
-
-from dashmips.models import MipsProgram
-from dashmips.debugger import COMMANDS
+from .models import MipsProgram
+from .debugger import COMMANDS
 
 
 async def dashmips_debugger(client: WebSocketServerProtocol, path: str):
@@ -51,7 +49,7 @@ def debug_mips(
     logger = log.getLogger('websockets.server')
     logger.addHandler(log.StreamHandler())
 
-    log.info(f'Starting server: ws://{host}:{port}')
+    log.info(f'Starting!!! server: ws://{host}:{port}')
 
     for name, command in COMMANDS.items():
         COMMANDS[name] = functools.partial(command, program=program)

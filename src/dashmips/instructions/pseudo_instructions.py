@@ -1,6 +1,6 @@
 """Instructions that are not real."""
-from dashmips.instructions import mips_instruction, parse_int
-from dashmips.models import MipsProgram
+from . import mips_instruction, parse_int
+from ..models import MipsProgram
 
 
 @mips_instruction(

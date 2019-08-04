@@ -1,7 +1,7 @@
 """Derective handling."""
 from typing import Union
 
-from dashmips.hardware import Memory
+from .hardware import Memory
 
 
 def parse_int(int_str: str) -> int:

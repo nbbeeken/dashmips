@@ -1,6 +1,6 @@
 """Syscalls related to printing."""
-from dashmips.syscalls import mips_syscall
-from dashmips.models import MipsProgram
+from . import mips_syscall
+from ..models import MipsProgram
 
 
 @mips_syscall(4)

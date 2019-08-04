@@ -1,8 +1,8 @@
 """Instructions that accept a label as an argument."""
 from typing import Tuple
 
-from dashmips.instructions import mips_instruction
-from dashmips.models import MipsProgram
+from . import mips_instruction
+from ..models import MipsProgram
 
 PTRN = r"{instr_gap}({label})"
 

@@ -1,16 +1,16 @@
 """Instruction class."""
-from typing import Callable, Any, Iterable, Match, Tuple
+from typing import Any, Iterable, Match, Tuple
 
-import dashmips.mips as mips
-from dashmips.models import MipsProgram
+from ..mips import RE
+from ..models import MipsProgram
 
 
 class Instruction:
     """Instruction Class, callable."""
 
     def __init__(
-        self, fn: Callable, regex_ptrn: str,
-        parser: Callable, label: bool = False,
+        self, fn, regex_ptrn: str,
+        parser, label: bool = False,
     ) -> None:
         """
         Regex and argument parser for instruction.
@@ -31,7 +31,7 @@ class Instruction:
 
         self.label = label
         self.pattern = regex_ptrn
-        self.regex = f"({self.name}){regex_ptrn}".format(**mips.RE.ALL)
+        self.regex = f"({self.name}){regex_ptrn}".format(**RE.ALL)
         self.parser = parser
 
     def __call__(self, program: MipsProgram,

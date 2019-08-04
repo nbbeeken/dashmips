@@ -1,6 +1,6 @@
 """Syscall Class."""
 from typing import Callable
-from dashmips.models import MipsProgram
+from ..models import MipsProgram
 
 
 class Syscall:

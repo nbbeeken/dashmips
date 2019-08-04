@@ -6,8 +6,8 @@ except ImportError:
     pass  # So we do nothing
 from typing import Any
 
-from dashmips.hardware import Memory
-from dashmips.plugins import Plugin
+from ..hardware import Memory
+from . import Plugin
 
 VGA_COLORS = {
     0b0000: "black",

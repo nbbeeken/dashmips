@@ -1,9 +1,9 @@
 """Mips Management."""
 import inspect
 from typing import Any, Callable, Dict
+from importlib import import_module
 
-import dashmips.directives as directives
-from dashmips.hardware import Memory
+from .hardware import Memory
 
 
 class MipsException(Exception):
@@ -17,7 +17,9 @@ class MipsException(Exception):
 
 Directives: Dict[str, Callable[[str, Any, Memory], int]] = {
     directive.replace("_", ""): fn
-    for directive, fn in inspect.getmembers(directives, inspect.isfunction)
+    for directive, fn in inspect.getmembers(
+        import_module('.directives', 'dashmips'), inspect.isfunction
+    )
 }
 
 
