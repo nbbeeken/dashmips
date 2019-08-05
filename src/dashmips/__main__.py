@@ -4,7 +4,7 @@ import json
 from threading import Thread
 from typing import Any, List, NoReturn
 
-from .debuggerwsserver import debug_mips
+from .debuggerserver import debug_mips
 from .extension import generate_snippets, instruction_name_regex
 from .plugins.vt100 import VT100
 from .preprocessor import preprocess
@@ -89,8 +89,6 @@ def main_docs(args: argparse.Namespace) -> int:
 
 def main() -> NoReturn:
     """Entry function for Dashmips."""
-    import sys
-
     parser = argparse.ArgumentParser("dashmips")
 
     parser.add_argument("-v", "--version", action="version", version="0.0.11")
@@ -173,9 +171,10 @@ def main() -> NoReturn:
         # you cannot enforce subparser to require in less than 3.6
         print('Must provide a command')
         parser.print_help()
-        sys.exit(1)
+        exit(1)
 
-    sys.exit(prog_args.func(prog_args))
+    ret_val = prog_args.func(prog_args)
+    exit(ret_val)
 
 
 if __name__ == "__main__":

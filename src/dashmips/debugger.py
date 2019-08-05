@@ -2,6 +2,7 @@
 import logging as log
 import os
 from typing import Dict, List, Callable, Optional, Any
+from dataclasses import asdict
 
 from .mips import MipsException
 from .run import next_instruction, run
@@ -15,7 +16,7 @@ def debug_start(program: MipsProgram, params) -> int:
     :param program: MipsProgram
     """
     program.registers["pc"] = program.labels["main"].value
-    return os.getpid()
+    return {'pid': os.getpid(), 'source': [asdict(s) for s in program.source]}
 
 
 def debug_step(program: MipsProgram, params) -> MipsProgram:
@@ -31,7 +32,7 @@ def debug_step(program: MipsProgram, params) -> MipsProgram:
     except MipsException as exc:
         error = True
         message = exc.message
-    return program
+    return []
 
 
 def debug_continue(program: MipsProgram, params) -> MipsProgram:
@@ -41,7 +42,7 @@ def debug_continue(program: MipsProgram, params) -> MipsProgram:
     :param program: MipsProgram
     """
     starting_pc = program.registers["pc"]
-    breakpoints: List[int] = []  # FIXME: remove once u get ur protocol down!
+    breakpoints: List[int] = [p['srcLineIdx'] for p in params]
 
     def breaking_condition(program: MipsProgram) -> bool:
         """Condition function to stop execution.
@@ -49,7 +50,6 @@ def debug_continue(program: MipsProgram, params) -> MipsProgram:
         :param program:
         """
         nonlocal starting_pc
-        log.info(f"bps: {breakpoints}", extra={"client": ""})
         if program.registers["pc"] == starting_pc:
             # current instruction will execute even if on breakpoint
             # b/c we would have broken on it last time.
@@ -64,12 +64,12 @@ def debug_continue(program: MipsProgram, params) -> MipsProgram:
         run(program, breaking_condition)
         if program.registers["pc"] == -1:
             # Exited
-            command = "stop"
+            return {'exited': True}
     except MipsException as exc:
         error = True
         message = exc.message
 
-    return program
+    return {'stopped': asdict(program.current_line)}
 
 
 def debug_stop(program: MipsProgram, params) -> MipsProgram:
@@ -78,12 +78,4 @@ def debug_stop(program: MipsProgram, params) -> MipsProgram:
     :param operation: dict
     :param program: MipsProgram
     """
-    return program
-
-
-COMMANDS = {
-    "start": debug_start,
-    "step": debug_step,
-    "continue": debug_continue,
-    "stop": debug_stop,
-}
+    return []

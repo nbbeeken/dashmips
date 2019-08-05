@@ -11,8 +11,7 @@ from ..models import MipsProgram
 Syscalls: Dict[int, Syscall] = {}
 
 
-def mips_syscall(number: int) -> Callable[
-        [Callable[[MipsProgram], None]], Syscall]:
+def mips_syscall(number: int):
     """Make a Syscall object from decorated function.
 
     Note: If you use this to make a new instruction
