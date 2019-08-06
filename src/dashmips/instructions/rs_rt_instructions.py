@@ -24,7 +24,7 @@ def jalr(program: MipsProgram, rs: str, rt: str) -> None:
     :param rs:
     """
     program.registers[rs] = program.registers["pc"]
-    program.registers["pc"] = program.registers[rt]
+    program.registers["pc"] = program.registers[rt] - 1
 
 
 @mips_instruction(PTRN, parse)

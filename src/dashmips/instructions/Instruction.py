@@ -38,13 +38,7 @@ class Instruction:
                  args: Iterable[Any] = tuple()) -> None:
         """Callable Instruction."""
         self.function(program, *args)
-        if not program.registers.pc_changed:
-            # if not jmp/branch instruction pc
-            # wont have been changed in the instruction
-            # otherwise, pc will have some value for next line of execution
-            program.registers["pc"] += 1
-
-        program.registers.pc_changed = False  # reset for next loop
+        program.registers["pc"] += 1
 
     def __repr__(self) -> str:
         """Return Representation string."""

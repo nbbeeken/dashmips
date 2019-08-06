@@ -15,12 +15,13 @@ async def dashmips_debugger(
     client: WebSocketServerProtocol, path: str, commands
 ):
     """Client handler for debug server."""
-    log.info(f'client={client} path={path}')
+    log.info(f'client={client.local_address}')
     try:
         async for message in client:
             log.info(f'Recv "{message}"')
             req = json.loads(message)
-            res = json.dumps(commands[req['method']](params=req['params']))
+            ret = commands[req['method']](params=req['params'])
+            res = json.dumps(ret)
             log.info(f'Send "{res}"')
             await client.send(res)
             if 'exited' in res:

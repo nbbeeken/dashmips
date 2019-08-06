@@ -26,7 +26,7 @@ def beq(program: MipsProgram, rs: str, rt: str, label: str) -> None:
     :param label:
     """
     if program.registers[rs] == program.registers[rt]:
-        program.registers["pc"] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value - 1
 
 
 @mips_instruction(PTRN, parse)
@@ -39,4 +39,4 @@ def bne(program: MipsProgram, rs: str, rt: str, label: str) -> None:
     :param label:
     """
     if program.registers[rs] != program.registers[rt]:
-        program.registers["pc"] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value - 1

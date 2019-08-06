@@ -63,7 +63,7 @@ def _exit(program: MipsProgram) -> None:
     :param program:
     """
     # Internal definition of exited program
-    program.registers["pc"] = -1
+    program.exited = True
 
 
 @mips_syscall(45)

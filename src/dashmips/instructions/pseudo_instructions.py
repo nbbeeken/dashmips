@@ -49,9 +49,8 @@ def move(program: MipsProgram, rd: str, rs: str) -> None:
 
 @mips_instruction(
     r"{instr_gap}({register}){args_gap}({label})",
-    lambda args: (
-        args[2],
-        args[3]))
+    lambda args: (args[2], args[3])
+)
 def beqz(program: MipsProgram, rd: str, label: str) -> None:
     """Branch to label if Reg[rd] == 0.
 
@@ -60,7 +59,7 @@ def beqz(program: MipsProgram, rd: str, label: str) -> None:
     :param label:
     """
     if program.registers[rd] == 0:
-        program.registers["pc"] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value - 1
 
 
 @mips_instruction(
@@ -76,7 +75,7 @@ def bnez(program: MipsProgram, rd: str, label: str) -> None:
     :param label:
     """
     if program.registers[rd] != 0:
-        program.registers["pc"] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value - 1
 
 
 @mips_instruction(r"{instr_gap}({label})", lambda args: (args[2],))
@@ -86,7 +85,7 @@ def b(program: MipsProgram, label: str) -> None:
     :param program:
     :param label:
     """
-    program.registers["pc"] = program.labels[label].value
+    program.registers["pc"] = program.labels[label].value - 1
 
 
 @mips_instruction(
@@ -109,7 +108,7 @@ def bgt(program: MipsProgram, rd: str, rs: str, label: str) -> None:
         rs_val = program.registers[rs]
 
     if program.registers[rd] > rs_val:
-        program.registers["pc"] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value - 1
 
 
 @mips_instruction(
@@ -132,7 +131,7 @@ def blt(program: MipsProgram, rd: str, rs: str, label: str) -> None:
         rs_val = program.registers[rs]
 
     if program.registers[rd] < rs_val:
-        program.registers["pc"] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value - 1
 
 
 @mips_instruction(
@@ -160,7 +159,7 @@ def bge(program: MipsProgram, rd: str, rs: str, label: str) -> None:
     :param label:
     """
     if program.registers[rd] > program.registers[rs]:
-        program.registers["pc"] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value - 1
 
 
 @mips_instruction(
@@ -174,4 +173,4 @@ def ble(program: MipsProgram, rd: str, rs: str, label: str) -> None:
     :param label:
     """
     if program.registers[rd] < program.registers[rs]:
-        program.registers["pc"] = program.labels[label].value
+        program.registers["pc"] = program.labels[label].value - 1

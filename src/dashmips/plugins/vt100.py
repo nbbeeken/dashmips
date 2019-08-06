@@ -6,7 +6,6 @@ except ImportError:
     pass  # So we do nothing
 from typing import Any
 
-from ..hardware import Memory
 from . import Plugin
 
 VGA_COLORS = {
@@ -134,7 +133,7 @@ class VT100(Plugin):
 
         self.vt["state"] = "disabled"
 
-    def push(self, memory: Memory) -> None:
+    def push(self, memory: bytearray) -> None:
         """Push a new memory text layout."""
         mmio = bytes(memory[VT100.BASE_ADDR: VT100.BASE_ADDR + VT100.SIZE])
         if mmio == self.screen:

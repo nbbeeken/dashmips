@@ -56,7 +56,7 @@ class Label:
 class MipsProgram:
     """All data associated with a mips program."""
 
-    from .hardware import Memory, Registers
+    from .hardware import Registers
 
     __slots__ = ("name", "labels", "source", "__dict__")
 
@@ -66,6 +66,7 @@ class MipsProgram:
     memory: bytearray = field(default_factory=bytearray)
     registers: Dict[str, int] = field(default_factory=default_registers)
     eqvs: Dict[str, str] = field(default_factory=dict)
+    exited: bool = False
 
     @staticmethod
     def from_dict(prg: Dict[str, Any]) -> "MipsProgram":
@@ -73,9 +74,9 @@ class MipsProgram:
 
         :param prg:
         """
-        from .hardware import Memory, Registers
+        from .hardware import Registers
 
-        prg["memory"] = Memory(prg["memory"])
+        prg["memory"] = bytearray().fromhex(prg["memory"])
         # prg["registers"] = check_registers(prg["registers"])
         prg["labels"] = {ln: Label(**l) for ln, l in prg["labels"].items()}
         prg["source"] = [SourceLine(**m) for m in prg["source"]]

@@ -22,7 +22,7 @@ def j(program: MipsProgram, address: str) -> None:
     :param program:
     :param address:
     """
-    program.registers["pc"] = program.labels[address].value
+    program.registers["pc"] = program.labels[address].value - 1
 
 
 @mips_instruction(PTRN, parse, label=True)
@@ -33,4 +33,4 @@ def jal(program: MipsProgram, address: str) -> None:
     :param address:
     """
     program.registers["$ra"] = program.registers["pc"] + 1
-    program.registers["pc"] = program.labels[address].value
+    program.registers["pc"] = program.labels[address].value - 1

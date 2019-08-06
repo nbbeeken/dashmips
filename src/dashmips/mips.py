@@ -3,8 +3,6 @@ import inspect
 from typing import Any, Callable, Dict
 from importlib import import_module
 
-from .hardware import Memory
-
 
 class MipsException(Exception):
     """Mips related errors."""
@@ -15,7 +13,7 @@ class MipsException(Exception):
         self.message = message
 
 
-Directives: Dict[str, Callable[[str, Any, Memory], int]] = {
+Directives: Dict[str, Callable[[str, Any, bytearray], int]] = {
     directive.replace("_", ""): fn
     for directive, fn in inspect.getmembers(
         import_module('.directives', 'dashmips'), inspect.isfunction

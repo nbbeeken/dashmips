@@ -1,7 +1,6 @@
 """Derective handling."""
 from typing import Union
-
-from .hardware import Memory
+from .hardware import malloc
 
 
 def parse_int(int_str: str) -> int:
@@ -16,50 +15,50 @@ def parse_int(int_str: str) -> int:
     return arg
 
 
-def align(name: str, data: str, memory: Memory) -> None:
+def align(name: str, data: str, memory: bytearray) -> None:
     """Align directive.
 
     :param name: str:
     :param data: str:
-    :param memory: Memory:
+    :param memory: bytearray:
     """
     return None
 
 
-def asciiz(name: str, data: str, memory: Memory) -> int:
+def asciiz(name: str, data: str, memory: bytearray) -> int:
     """Asciiz directive.
 
     :param name: str:
     :param data: str:
-    :param memory: Memory:
+    :param memory: bytearray:
     """
     string = data[1:-1].encode("ascii", "ignore").decode("unicode_escape")
     asciiz_bytes = (string + "\0").encode()
-    address = memory.malloc(len(asciiz_bytes))
+    address = malloc(memory, len(asciiz_bytes))
     memory[address: address + len(asciiz_bytes)] = asciiz_bytes
     return address
 
 
-def _ascii(name: str, data: str, memory: Memory) -> int:
+def _ascii(name: str, data: str, memory: bytearray) -> int:
     """Ascii directive.
 
     :param name: str:
     :param data: str:
-    :param memory: Memory:
+    :param memory: bytearray:
     """
     string = data[1:-1].encode("ascii", "ignore").decode("unicode_escape")
     ascii_bytes = (string).encode()
-    address = memory.malloc(len(ascii_bytes))
+    address = malloc(memory, len(ascii_bytes))
     memory[address: address + len(ascii_bytes)] = ascii_bytes
     return address
 
 
-def byte(name: str, data: str, memory: Memory) -> int:
+def byte(name: str, data: str, memory: bytearray) -> int:
     """Byte directive.
 
     :param name: str:
     :param data: str:
-    :param memory: Memory:
+    :param memory: bytearray:
     """
     value = parse_int(data)
     if value > 0xFF:
@@ -69,12 +68,12 @@ def byte(name: str, data: str, memory: Memory) -> int:
     return address
 
 
-def half(name: str, data: str, memory: Memory) -> int:
+def half(name: str, data: str, memory: bytearray) -> int:
     """Half directive.
 
     :param name: str:
     :param data: str:
-    :param memory: Memory:
+    :param memory: bytearray:
     """
     value = parse_int(data)
     if value > 0xFFFF:
@@ -84,12 +83,12 @@ def half(name: str, data: str, memory: Memory) -> int:
     return address
 
 
-def space(name: str, data: str, memory: Memory) -> int:
+def space(name: str, data: str, memory: bytearray) -> int:
     """Space directive.
 
     :param name: str:
     :param data: str:
-    :param memory: Memory:
+    :param memory: bytearray:
     """
     value = parse_int(data)
     if value > 0xFFFF_FFFF:
@@ -98,12 +97,12 @@ def space(name: str, data: str, memory: Memory) -> int:
     return address
 
 
-def word(name: str, data: str, memory: Memory) -> int:
+def word(name: str, data: str, memory: bytearray) -> int:
     """Word directive.
 
     :param name: str:
     :param data: str:
-    :param memory: Memory:
+    :param memory: bytearray:
     """
     value = parse_int(data)
     if value > 0xFFFF_FFFF:

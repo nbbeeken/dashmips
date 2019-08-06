@@ -23,4 +23,4 @@ def jr(program: MipsProgram, rs: str) -> None:
     :param program:
     :param rs:
     """
-    program.registers["pc"] = program.registers[rs]
+    program.registers["pc"] = program.registers[rs] - 1

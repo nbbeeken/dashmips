@@ -78,48 +78,54 @@ class Registers(Dict[str, int]):
         return super().__getitem__(Registers.Resolve[key])
 
 
-class Memory(bytearray):
-    """Mips Big Endiean RAM."""
+PAGE = 4096
+FREESPACE = 0x0
 
-    PAGE = 4096
 
-    def __init__(self, hexstring: Optional[str] = None) -> None:
-        """Create 2KB of MIPS RAM."""
-        self._freespace = 0x0
-        if hexstring:
-            super().fromhex(hexstring)
+def new_memory(hexstring: Optional[str] = None) -> None:
+    """Create 2KB of MIPS RAM."""
+    global FREESPACE
+    FREESPACE = 0x0
+    memory = bytearray()
+    if hexstring and type(hexstring) is str:
+        memory.fromhex(hexstring)
+    else:
+        memory = bytearray(PAGE * 4)
+
+    for i in range(0x2060, 0x2060 + ((80 * 25) * 2), 2):
+        blank_space = (0x0F00 | ord(" "))
+        memory[i:i + 1] = blank_space.to_bytes(2, 'little')
+
+    return memory
+
+
+def compact_memory_string(memory: bytearray) -> str:
+    """Compacted Memory string."""
+    s = "["
+    zero_ct = 0
+    for v in memory:
+        if v == 0:
+            zero_ct += 1
         else:
-            super().__init__(Memory.PAGE * 4)
+            if zero_ct != 0:
+                s += f"<0 repeats {zero_ct} times>, "
+                zero_ct = 0
+            s += str(v) + ", "
+    if zero_ct != 0:
+        s += f"<0 repeats {zero_ct} times>, "
+    s += "]"
+    return s
 
-        for i in range(0x2060, 0x2060 + ((80 * 25) * 2), 2):
-            blank_space = (0x0F00 | ord(" "))
-            self[i:i + 1] = blank_space.to_bytes(2, 'little')
 
-    def __repr__(self) -> str:
-        """Compacted Memory string."""
-        s = "["
-        zero_ct = 0
-        for v in self:
-            if v == 0:
-                zero_ct += 1
-            else:
-                if zero_ct != 0:
-                    s += f"<0 repeats {zero_ct} times>, "
-                    zero_ct = 0
-                s += str(v) + ", "
-        if zero_ct != 0:
-            s += f"<0 repeats {zero_ct} times>, "
-        s += "]"
-        return s
+def malloc(memory: bytearray, size: int) -> int:
+    """Get aligned address of unused memory.
 
-    def malloc(self, size: int) -> int:
-        """Get aligned address of unused memory.
-
-        :param size: int:
-        """
-        pad = self._freespace % 4
-        if pad > 0:
-            self._freespace = self._freespace + (4 - pad)
-        old_freespace = self._freespace  # Aligned to 4
-        self._freespace += size + pad  # Allocate Aligned amount
-        return old_freespace
+    :param size: int:
+    """
+    global FREESPACE
+    pad = FREESPACE % 4
+    if pad > 0:
+        FREESPACE = FREESPACE + (4 - pad)
+    oldFREESPACE = FREESPACE  # Aligned to 4
+    FREESPACE += size + pad  # Allocate Aligned amount
+    return oldFREESPACE

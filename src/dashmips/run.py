@@ -8,7 +8,7 @@ from .instructions import Instructions
 from .mips import MipsException
 from .models import MipsProgram
 
-RUN_COND: Callable[[MipsProgram], bool] = (lambda p: p.registers["pc"] != -1)
+RUN_COND: Callable[[MipsProgram], bool] = (lambda p: not p.exited)
 
 
 def run(

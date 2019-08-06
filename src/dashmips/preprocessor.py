@@ -4,7 +4,7 @@ import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple, TypeVar
 
 from .mips import RE as mipsRE, MipsException, Directives
-from .hardware import Memory, Registers
+from .hardware import malloc, new_memory, Registers
 from .models import Label, MipsProgram, SourceLine
 
 
@@ -16,7 +16,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     :param file: TextIO:
     """
     filename = os.path.abspath(file.name)
-    memory = Memory()
+    memory = new_memory()
 
     argv = [filename]
     if args:
@@ -41,7 +41,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     if not ("main" in labels and labels["main"].location == mipsRE.TEXT_SEC):
         raise Exception(f"Cannot locate main in {filename}")
 
-    bp = memory.malloc(512) + 508
+    bp = malloc(memory, 512) + 508
     init_regs = {"pc": labels["main"].value, "$sp": bp, "$fp": bp, "$gp": bp}
 
     load_args(init_regs, memory, argv)
@@ -90,7 +90,7 @@ def split_to_sections(code: List[SourceLine]) -> sectionsType:
 
 
 def data_labels(labels: Dict[str, Label],
-                data_sec: List[str], memory: Memory) -> None:
+                data_sec: List[str], memory: bytearray) -> None:
     """Construct the .data section to spec.
 
     Fill the .data section memory with user defined static data
@@ -322,13 +322,13 @@ def macro_with_args(
 
 
 def load_args(init_regs: Dict[str, int],
-              memory: Memory, args: List[str]) -> None:
+              memory: bytearray, args: List[str]) -> None:
     """Load arguments on to the stack and sets argc."""
     init_regs["$a0"] = len(args)  # argc
 
     argv: List[int] = []
     for arg in args:
-        ptr = memory.malloc(len(arg) + 1)
+        ptr = malloc(memory, len(arg) + 1)
         # str ending in null
         memory[ptr: ptr + len(arg) + 1] = [*[ord(c) for c in arg], 0]
         argv.append(ptr)
@@ -336,7 +336,7 @@ def load_args(init_regs: Dict[str, int],
     argv.append(0)  # NULL to end pointer array
 
     # Malloc all at once this time for contiguous memory
-    argvbp = memory.malloc(len(argv) * 4)
+    argvbp = malloc(memory, len(argv) * 4)
 
     for idx, ptr in enumerate(argv):
         store_addr = argvbp + idx * 4
