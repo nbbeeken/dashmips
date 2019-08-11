@@ -25,8 +25,8 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     linesofcode: List[SourceLine] = process_file(file)
 
     labels: Dict[str, Label] = {}
-    # Collect Preproccessor Directives.
-    eqvs, linesofcode = preprocessor_directives(linesofcode)
+    # Collect Preprocessor Directives.
+    includes, eqvs, linesofcode = preprocessor_directives(linesofcode)
 
     # Gather .data/.text sections into separate lists
     unprocessed_labels, unprocessed_code = split_to_sections(linesofcode)
@@ -48,6 +48,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
 
     return MipsProgram(
         name=filename,
+        filenames=[filename, *includes],
         labels=labels,
         memory=memory,
         source=processed_code,
@@ -197,18 +198,24 @@ def preprocessor_directives(
     for idx, srcline in enumerate(lines):
         if ".globl" in srcline.line:
             del lines[idx]
-    lines = resolve_include(lines)
+    includes = []
+    lines = resolve_include(lines, includes)
     lines, eqvs = resolve_eqvs(lines)
     lines = resolve_macros(lines)
-    return eqvs, lines
+    return includes, eqvs, lines
 
 
-def resolve_include(lines: List[SourceLine]) -> List[SourceLine]:
+def resolve_include(
+    lines: List[SourceLine], includes: List[str]
+) -> Tuple[List[str], List[SourceLine]]:
     """Resolve all includes recursively."""
     for idx, srcline in enumerate(lines):
         match = re.match(r'\s*\.include\s+"(.*)"\s*', srcline.line)
         if match:
             includefilename = os.path.abspath(match[1])
+            if includefilename in includes:
+                raise MipsException('Recursive importing detected')
+            includes.append(includefilename)
             includefile = open(includefilename)
             includelines = resolve_include(process_file(includefile))
             lines[idx] = includelines  # type: ignore

@@ -1,16 +1,5 @@
 """Mips Hardware."""
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Mapping,
-    Optional,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import Dict, Optional, Union
 
 names_enum = tuple(
     enumerate(
@@ -82,7 +71,7 @@ PAGE = 4096
 FREESPACE = 0x0
 
 
-def new_memory(hexstring: Optional[str] = None) -> None:
+def new_memory(hexstring: Optional[str] = None) -> bytearray:
     """Create 2KB of MIPS RAM."""
     global FREESPACE
     FREESPACE = 0x0

@@ -58,9 +58,10 @@ class MipsProgram:
 
     from .hardware import Registers
 
-    __slots__ = ("name", "labels", "source", "__dict__")
+    __slots__ = ("name", "filenames", "labels", "source", "__dict__")
 
     name: str
+    filenames: List[str]
     labels: Dict[str, Label]
     source: List[SourceLine]
     memory: bytearray = field(default_factory=bytearray)
@@ -84,59 +85,12 @@ class MipsProgram:
 
     def to_dict(self) -> dict:
         """Two item iterable for dictionary making."""
-        return asdict(self)
+        program_dict = asdict(self)
+        program_dict['memory'] = program_dict['memory'].hex()
+        return program_dict
 
     @property
     def current_line(self) -> SourceLine:
         """Return Current Line According to PC."""
         pc: int = self.registers["pc"]
         return self.source[pc]
-
-
-@dataclass
-class DebugMessage:
-    """Format for debug messages."""
-
-    __slots__ = (
-        "command", "program", "__dict__"
-    )
-
-    command: str
-    program: MipsProgram
-    breakpoints: List[int] = field(default_factory=list)
-    message: str = ""
-    error: bool = False
-
-    def __post_init__(self) -> None:
-        """Ensure unique breakpoints."""
-        # set to remove duplicates and sort
-        self.breakpoints = sorted(set(self.breakpoints))
-
-    def to_dict(self) -> dict:
-        """Make DebugMessage castable to dict."""
-        return asdict(self)
-
-    @staticmethod
-    def from_dict(payload: dict) -> Optional["DebugMessage"]:
-        """Deserialize from json to DebugMessage.
-
-        :param payload:
-        """
-        from .debugger import COMMANDS
-
-        if not payload:
-            # Payload is Falsey
-            return None
-        if "command" not in payload:
-            # There is no command to handle
-            return None
-        if payload["command"] not in COMMANDS:
-            # The command does not exist
-            return None
-
-        if "program" in payload:
-            payload["program"] = MipsProgram.from_dict(
-                payload.get("program", {}))
-        else:
-            payload["program"] = None
-        return DebugMessage(**payload)

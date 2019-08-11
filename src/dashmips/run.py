@@ -39,7 +39,7 @@ def next_instruction(program: MipsProgram) -> None:
     :param program:
     """
     current_pc = program.registers["pc"]
-    if len(program.source) < current_pc:
+    if current_pc >= len(program.source):
         # We jumped or executed beyond available text
         raise MipsException(f"Bad pc value {current_pc}")
 

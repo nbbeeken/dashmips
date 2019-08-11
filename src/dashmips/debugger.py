@@ -5,27 +5,22 @@ All commands need to return
     error?:{code: number, message: str, data?: any}
 }
 """
-import logging as log
 import os
-from typing import Dict, List, Callable, Optional, Any
-from dataclasses import asdict
-from json import JSONDecoder, JSONEncoder
+from typing import List
 
 from .mips import MipsException
+from .models import MipsProgram
 from .run import next_instruction, run
-from .models import MipsProgram, DebugMessage
 
 
-def debug_start(program: MipsProgram, params) -> dict:
+def debug_start(program: MipsProgram, params=None) -> dict:
     """Debug start.
 
     :param operation: dict
     :param program: MipsProgram
     """
     program.registers["pc"] = program.labels["main"].value
-    return {'result': {
-        'pid': os.getpid(),
-    }}
+    return {'pid': os.getpid()}
 
 
 def debug_step(program: MipsProgram, params) -> dict:
@@ -36,24 +31,25 @@ def debug_step(program: MipsProgram, params) -> dict:
     """
     try:
         next_instruction(program)
-        if program.registers["pc"] == -1:
-            command = "stop"
+
+        if program.exited:
+            return {'exited': True}
+
     except MipsException as exc:
-        error = True
-        message = exc.message
-    return {'result': {}}
+        return {'exited': True, 'message': exc.message}
+
+    return {'stopped': True}
 
 
 def debug_continue(program: MipsProgram, params) -> dict:
     """Debug continue.
 
-    :param operation: dict
     :param program: MipsProgram
     """
     starting_pc = program.registers["pc"]
     # vscode should have done the translation
     # these are pc values (aka index into srclines)
-    breakpoints: List[int] = [p for p in params]
+    verified, breakpoints = verify_breakpoints(program, params)
 
     def breaking_condition(program: MipsProgram) -> bool:
         """Condition function to stop execution.
@@ -67,20 +63,18 @@ def debug_continue(program: MipsProgram, params) -> dict:
             return True
         if program.registers["pc"] in breakpoints:
             return False
-        if program.registers["pc"] == -1:
+        if program.exited:
             return False
         return True
 
     try:
         run(program, breaking_condition)
-        if program.registers["pc"] == -1:
-            # Exited
-            return {'result': {'exited': True}}
+        if program.exited:
+            return {'exited': True}
     except MipsException as exc:
-        error = True
-        message = exc.message
+        return {'exited': True, 'message': exc.message}
 
-    return {'result': {'stopped': True, 'breakpoints': []}}
+    return {'stopped': True, 'breakpoints': verified}
 
 
 def debug_stop(program: MipsProgram, params) -> dict:
@@ -89,11 +83,32 @@ def debug_stop(program: MipsProgram, params) -> dict:
     :param operation: dict
     :param program: MipsProgram
     """
-    return {'result': {'exited': True}}
+    return {'exited': True}
 
 
 def debug_info(program: MipsProgram, params) -> dict:
     """Build program as dict."""
-    return {'result': {
-        'program': program.to_dict()
-    }}
+    return {'program': program.to_dict()}
+
+
+def verify_breakpoints(
+    program: MipsProgram, breakpoints
+) -> Tuple[List[int], List[int]]:
+    """Find the known breakpoint lines."""
+    local_breakpoints = []
+    remote_breakpoints = []
+    for breakpoint in breakpoints:
+        def checkfile(f): return os.path.samefile(f, breakpoint['src']['path'])
+
+        real_line = None
+        for pc_value, srcline in enumerate(program.source):
+            if breakpoint['line'] == srcline.lineno:
+                real_line = pc_value
+                break
+
+        is_known_file = any(checkfile(fn) for fn in program.filenames)
+        if real_line is not None and is_known_file:
+            remote_breakpoints.append(breakpoint['line'])
+            local_breakpoints.append(real_line)
+
+    return remote_breakpoints, local_breakpoints

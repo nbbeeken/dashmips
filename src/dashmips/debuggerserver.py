@@ -14,27 +14,32 @@ from .models import MipsProgram
 async def dashmips_debugger(
     client: WebSocketServerProtocol, path: str, commands
 ):
-    """Client handler for debug server."""
+    """Client handler for debug server.
+
+    :param client: Websocket handler
+    :param path: should never be set '/'
+    :param commands: dictionary of debug commands to functions
+    """
     log.info(f'client={client.local_address}')
     try:
         async for message in client:
             log.info(f'Recv "{message}"')
             req = json.loads(message)
             ret = commands[req['method']](params=req['params'])
-            res = json.dumps(ret)
-            log.info(f'Send "{res}"')
+            res = json.dumps({'result': ret})
+            log.info(f'Send "{res if req["method"] != "info" else ""}"')
             await client.send(res)
-            if 'exited' in res:
+
+            if 'exited' in ret:
+                # only check top level
+                log.warn('Program exited')
                 break
+
         await client.close()
     except websockets.ConnectionClosed:
-        log.warn('Client disconnect')
+        log.warning('Client disconnect')
     except Exception as e:
         log.error(f'Unknown error: {e}')
-    finally:
-        log.warn('Debugging is truly over')
-        # asyncio.get_running_loop().stop()
-        return
 
 
 def debug_mips(
@@ -43,6 +48,7 @@ def debug_mips(
 ) -> None:
     """Create a debugging instance of mips.
 
+    :param program: The compiled mips program
     :param host:  (Default value = 'localhost')
     :param port:  (Default value = 2390)
     :param should_log:  (Default value = False)
@@ -72,7 +78,7 @@ def debug_mips(
         ws_server = loop.run_until_complete(start_server)
         loop.run_forever()
     except KeyboardInterrupt as e:
-        log.warn('bye bye... Debugger exiting...')
+        log.warning('bye bye... Debugger exiting...')
     finally:
         ws_server.close()
         loop.run_until_complete(ws_server.wait_closed())

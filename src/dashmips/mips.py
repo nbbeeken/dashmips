@@ -14,10 +14,11 @@ class MipsException(Exception):
 
 
 Directives: Dict[str, Callable[[str, Any, bytearray], int]] = {
-    directive.replace("_", ""): fn
-    for directive, fn in inspect.getmembers(
-        import_module('.directives', 'dashmips'), inspect.isfunction
-    )
+    name.replace("directive_", ""): fn
+    for name, fn in inspect.getmembers(
+        import_module('.directives', 'dashmips'),
+        inspect.isfunction
+    ) if name.startswith("directive_")
 }
 
 

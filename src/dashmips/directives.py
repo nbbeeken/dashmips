@@ -1,4 +1,4 @@
-"""Derective handling."""
+"""Directive handling."""
 from typing import Union
 from .hardware import malloc
 
@@ -15,7 +15,7 @@ def parse_int(int_str: str) -> int:
     return arg
 
 
-def align(name: str, data: str, memory: bytearray) -> None:
+def directive_align(name: str, data: str, memory: bytearray) -> None:
     """Align directive.
 
     :param name: str:
@@ -25,7 +25,7 @@ def align(name: str, data: str, memory: bytearray) -> None:
     return None
 
 
-def asciiz(name: str, data: str, memory: bytearray) -> int:
+def directive_asciiz(name: str, data: str, memory: bytearray) -> int:
     """Asciiz directive.
 
     :param name: str:
@@ -39,7 +39,7 @@ def asciiz(name: str, data: str, memory: bytearray) -> int:
     return address
 
 
-def _ascii(name: str, data: str, memory: bytearray) -> int:
+def directive_ascii(name: str, data: str, memory: bytearray) -> int:
     """Ascii directive.
 
     :param name: str:
@@ -53,7 +53,7 @@ def _ascii(name: str, data: str, memory: bytearray) -> int:
     return address
 
 
-def byte(name: str, data: str, memory: bytearray) -> int:
+def directive_byte(name: str, data: str, memory: bytearray) -> int:
     """Byte directive.
 
     :param name: str:
@@ -68,7 +68,7 @@ def byte(name: str, data: str, memory: bytearray) -> int:
     return address
 
 
-def half(name: str, data: str, memory: bytearray) -> int:
+def directive_half(name: str, data: str, memory: bytearray) -> int:
     """Half directive.
 
     :param name: str:
@@ -83,7 +83,7 @@ def half(name: str, data: str, memory: bytearray) -> int:
     return address
 
 
-def space(name: str, data: str, memory: bytearray) -> int:
+def directive_space(name: str, data: str, memory: bytearray) -> int:
     """Space directive.
 
     :param name: str:
@@ -97,7 +97,7 @@ def space(name: str, data: str, memory: bytearray) -> int:
     return address
 
 
-def word(name: str, data: str, memory: bytearray) -> int:
+def directive_word(name: str, data: str, memory: bytearray) -> int:
     """Word directive.
 
     :param name: str:
