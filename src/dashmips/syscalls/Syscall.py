@@ -1,5 +1,6 @@
 """Syscall Class."""
 from typing import Callable
+
 from ..models import MipsProgram
 
 

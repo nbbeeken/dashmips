@@ -1,6 +1,6 @@
 """Data Models Essential to the Dashmips Ecosystem."""
 from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Tuple, TextIO, Iterable, Any, Optional
+from typing import Dict, List, Any
 
 names_enum = tuple(
     enumerate(
@@ -56,8 +56,6 @@ class Label:
 class MipsProgram:
     """All data associated with a mips program."""
 
-    from .hardware import Registers
-
     __slots__ = ("name", "filenames", "labels", "source", "__dict__")
 
     name: str
@@ -75,8 +73,6 @@ class MipsProgram:
 
         :param prg:
         """
-        from .hardware import Registers
-
         prg["memory"] = bytearray().fromhex(prg["memory"])
         # prg["registers"] = check_registers(prg["registers"])
         prg["labels"] = {ln: Label(**l) for ln, l in prg["labels"].items()}

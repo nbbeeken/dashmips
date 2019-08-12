@@ -1,5 +1,5 @@
 """Instruction class."""
-from typing import Any, Iterable, Match, Tuple
+from typing import Any, Iterable
 
 from ..mips import RE
 from ..models import MipsProgram

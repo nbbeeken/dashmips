@@ -1,7 +1,7 @@
 """Mips Management."""
 import inspect
-from typing import Any, Callable, Dict
 from importlib import import_module
+from typing import Any, Callable, Dict
 
 
 class MipsException(Exception):

@@ -4,7 +4,6 @@ from typing import Tuple
 from . import mips_instruction
 from ..models import MipsProgram
 
-
 PATTERN = r"{instr_gap}({register}){args_gap}({label})"
 
 

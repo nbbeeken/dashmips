@@ -1,11 +1,12 @@
 """Debugger over websockets."""
+import asyncio
+import functools
 import importlib
 import inspect
-import websockets
-import asyncio
 import json
 import logging as log
-import functools
+
+import websockets
 from websockets import WebSocketServerProtocol
 
 from .models import MipsProgram

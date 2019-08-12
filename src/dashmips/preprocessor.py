@@ -1,10 +1,10 @@
 """Preprocessor for mips assembly."""
 import os
 import re
-from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple, TypeVar
+from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
-from .mips import RE as mipsRE, MipsException, Directives
 from .hardware import malloc, new_memory, Registers
+from .mips import RE as mipsRE, MipsException, Directives
 from .models import Label, MipsProgram, SourceLine
 
 

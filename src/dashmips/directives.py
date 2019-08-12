@@ -1,5 +1,6 @@
 """Directive handling."""
 from typing import Union
+
 from .hardware import malloc
 
 

@@ -71,12 +71,8 @@ def b(program: MipsProgram, label: str):
 
 
 @mips_instruction(
-    r"{instr_gap}({register}){args_gap}" +
-    r"({register}|{number}){args_gap}({label})",
-    lambda args: (
-        args[2],
-        args[3],
-        args[4]),
+    r"{instr_gap}({register}){args_gap}({register}|{number}){args_gap}({label})",
+    lambda args: (args[2], args[3], args[4]),
 )
 def bgt(program: MipsProgram, rd: str, rs: str, label: str):
     """Branch to label if Reg[rd]>Reg[rs].

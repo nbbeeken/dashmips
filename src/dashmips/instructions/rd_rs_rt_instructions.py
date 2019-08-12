@@ -1,5 +1,5 @@
 """Three Register instructions."""
-from typing import Tuple, cast
+from typing import Tuple
 
 from . import mips_instruction
 from ..models import MipsProgram

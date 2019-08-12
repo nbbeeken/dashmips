@@ -1,5 +1,5 @@
 """Two Register and Immediate instructions."""
-from typing import Tuple, cast
+from typing import Tuple
 
 from . import mips_instruction, parse_int
 from ..models import MipsProgram

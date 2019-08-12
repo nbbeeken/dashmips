@@ -1,7 +1,6 @@
 """MIPS Runner."""
 import re
 import sys
-
 from typing import Callable
 
 from .instructions import Instructions

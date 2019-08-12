@@ -83,7 +83,7 @@ If you want to contribute to the dashmips project you will need the following:
 - After installing Poetry, and cloning this repository:
 - `poetry install` - will install the dashmips dependencies in a virtual environment that won't harm your global set up.
 - `poetry run X` - can run X command in the correct python environment
-- Try `poetry run pytest --mypy --docstyle --codestyle` to ensure all tests are passing correctly
+- Try `poetry run pytest --tap-stream --tap-outdir=testout --mypy --docstyle --codestyle` to ensure all tests are passing correctly
 
 
 ### Adding Syscalls / Adding Instructions
