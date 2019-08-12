@@ -8,32 +8,27 @@ from .instructions import Instructions
 from .mips import MipsException
 from .models import MipsProgram
 
-RUN_COND: Callable[[MipsProgram], bool] = (lambda p: not p.exited)
+RUN_CONDITION: Callable[[MipsProgram], bool] = (lambda p: not p.exited)
 
 
-def run(
-    program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_COND
-) -> int:
+def run(program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_CONDITION) -> int:
     """Execute Preprocessed Mips.
 
     :param program: MipsProgram:
-    :param runnable:  (Default value = lambda p: p.registers['pc'] != -1)
+    :param runnable:  (Default value = lambda p: p.registers["pc"] != -1)
     """
     try:
         while runnable(program):
             next_instruction(program)
     except MipsException as mips_ex:
         print(f"{mips_ex.message} on ", file=sys.stderr, end="")
-        print(
-            f"{program.current_line.filename}:{program.current_line.lineno}",
-            file=sys.stderr,
-        )
+        print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr)
         sys.exit()
 
     return program.registers["$a0"]  # should hold program exit code
 
 
-def next_instruction(program: MipsProgram) -> None:
+def next_instruction(program: MipsProgram):
     """Execute One Instruction.
 
     :param program:
@@ -56,4 +51,4 @@ def next_instruction(program: MipsProgram) -> None:
     else:
         # Bad arguments to instruction
         lineno = program.source[current_pc].lineno
-        raise MipsException(f"'{line}':{lineno} malformed for '{instruction}'")
+        raise MipsException(f"`{line}`:{lineno} malformed for `{instruction}`")

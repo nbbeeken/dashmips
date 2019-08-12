@@ -7,7 +7,7 @@ from importlib import import_module
 class MipsException(Exception):
     """Mips related errors."""
 
-    def __init__(self, message: str) -> None:
+    def __init__(self, message: str):
         """Create MipsException."""
         super().__init__(message)
         self.message = message
@@ -16,7 +16,7 @@ class MipsException(Exception):
 Directives: Dict[str, Callable[[str, Any, bytearray], int]] = {
     name.replace("directive_", ""): fn
     for name, fn in inspect.getmembers(
-        import_module('.directives', 'dashmips'),
+        import_module(".directives", "dashmips"),
         inspect.isfunction
     ) if name.startswith("directive_")
 }
@@ -28,10 +28,7 @@ class RE:
     DATA_SEC = ".data"
     TEXT_SEC = ".text"
 
-    REGISTER = (
-        r"hi|lo|(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])" +
-        r"|zero|sp|fp|gp|ra))"
-    )
+    REGISTER = r"hi|lo|(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])|zero|sp|fp|gp|ra))"
     LABEL = r"\b[\w]+\b"
     DIRECTIVE = "\\." + "|\\.".join(Directives.keys())
 

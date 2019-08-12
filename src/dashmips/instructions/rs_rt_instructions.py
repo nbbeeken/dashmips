@@ -4,7 +4,7 @@ from typing import Tuple, cast
 from . import mips_instruction
 from ..models import MipsProgram
 
-PTRN = r"{instr_gap}({register}){args_gap}({register})"
+PATTERN = r"{instr_gap}({register}){args_gap}({register})"
 
 
 def parse(arg: Tuple[str, str, str, str]) -> Tuple[str, str]:
@@ -15,8 +15,8 @@ def parse(arg: Tuple[str, str, str, str]) -> Tuple[str, str]:
     return (arg[2], arg[3])
 
 
-@mips_instruction(PTRN, parse)
-def jalr(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def jalr(program: MipsProgram, rs: str, rt: str):
     """Jump and link register. Store pc into rs, jump to rt.
 
     :param program:
@@ -27,8 +27,8 @@ def jalr(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers["pc"] = program.registers[rt] - 1
 
 
-@mips_instruction(PTRN, parse)
-def madd(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def madd(program: MipsProgram, rs: str, rt: str):
     """Multiply Add.
 
     :param program:
@@ -40,8 +40,8 @@ def madd(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers["lo"] += product & 0x00000000_FFFFFFFF
 
 
-@mips_instruction(PTRN, parse)
-def maddu(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def maddu(program: MipsProgram, rs: str, rt: str):
     """Multiply Add Unsigned.
 
     :param program:
@@ -53,8 +53,8 @@ def maddu(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers["lo"] += product & 0x00000000_FFFFFFFF
 
 
-@mips_instruction(PTRN, parse)
-def msubu(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def msubu(program: MipsProgram, rs: str, rt: str):
     """Multiply Subtract Unsigned.
 
     :param program:
@@ -66,8 +66,8 @@ def msubu(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers["lo"] -= product & 0x00000000_FFFFFFFF
 
 
-@mips_instruction(PTRN, parse)
-def msub(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def msub(program: MipsProgram, rs: str, rt: str):
     """Multiply Subtract.
 
     :param program:
@@ -79,8 +79,8 @@ def msub(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers["lo"] -= product & 0x00000000_FFFFFFFF
 
 
-@mips_instruction(PTRN, parse)
-def multu(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def multu(program: MipsProgram, rs: str, rt: str):
     """Multiply Unsigned.
 
     :param program:
@@ -92,8 +92,8 @@ def multu(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers["lo"] = product & 0x00000000_FFFFFFFF
 
 
-@mips_instruction(PTRN, parse)
-def mult(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def mult(program: MipsProgram, rs: str, rt: str):
     """Multiply.
 
     :param program:
@@ -105,8 +105,8 @@ def mult(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers["lo"] = product & 0x00000000_FFFFFFFF
 
 
-@mips_instruction(PTRN, parse)
-def clo(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def clo(program: MipsProgram, rs: str, rt: str):
     """Count number of leading ones in Reg[rt].
 
     :param program:
@@ -122,8 +122,8 @@ def clo(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers[rs] = count
 
 
-@mips_instruction(PTRN, parse)
-def clz(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def clz(program: MipsProgram, rs: str, rt: str):
     """Count number of leading zeros in Reg[rt].
 
     :param program:
@@ -139,8 +139,8 @@ def clz(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers[rs] = count
 
 
-@mips_instruction(PTRN, parse)
-def div(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def div(program: MipsProgram, rs: str, rt: str):
     """Divide.
 
     :param program:
@@ -153,8 +153,8 @@ def div(program: MipsProgram, rs: str, rt: str) -> None:
     program.registers["lo"] = int(quotient)
 
 
-@mips_instruction(PTRN, parse)
-def divu(program: MipsProgram, rs: str, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def divu(program: MipsProgram, rs: str, rt: str):
     """Divide unsigned.
 
     :param program:

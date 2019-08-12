@@ -1,11 +1,11 @@
-"""Instuctions that operate on one register."""
+"""Instructions that operate on one register."""
 from typing import Tuple, cast
 
 from . import mips_instruction
 from ..models import MipsProgram
 
 
-PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})"
+PATTERN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})"
 
 
 def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, str]:
@@ -16,8 +16,8 @@ def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, str]:
     return (arg[2], arg[3], arg[4])
 
 
-@mips_instruction(PTRN, parse)
-def beq(program: MipsProgram, rs: str, rt: str, label: str) -> None:
+@mips_instruction(PATTERN, parse)
+def beq(program: MipsProgram, rs: str, rt: str, label: str):
     """Branch to label if Reg[rs] == Reg[rt].
 
     :param program:
@@ -29,8 +29,8 @@ def beq(program: MipsProgram, rs: str, rt: str, label: str) -> None:
         program.registers["pc"] = program.labels[label].value - 1
 
 
-@mips_instruction(PTRN, parse)
-def bne(program: MipsProgram, rs: str, rt: str, label: str) -> None:
+@mips_instruction(PATTERN, parse)
+def bne(program: MipsProgram, rs: str, rt: str, label: str):
     """Branch to label if Reg[rs] != Reg[rt].
 
     :param program:

@@ -10,10 +10,7 @@ from .Instruction import Instruction
 Instructions = {}
 
 
-def mips_instruction(
-        pattern: str,
-        parser,
-        label: bool = False):
+def mips_instruction(pattern: str, parser, label: bool = False):
     """Make an Instruction object from decorated function.
 
     :param pattern: param parser:

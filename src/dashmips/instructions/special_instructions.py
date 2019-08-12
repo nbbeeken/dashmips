@@ -6,7 +6,7 @@ from ..models import MipsProgram
 from ..syscalls import Syscalls
 
 
-def parse(arg: Tuple[str, str]) -> Tuple:
+def parse(arg: Tuple[str, str]):
     """Instructions that take no arguments.
 
     :param arg:
@@ -15,7 +15,7 @@ def parse(arg: Tuple[str, str]) -> Tuple:
 
 
 @mips_instruction("", parse)
-def nop(program: MipsProgram) -> None:
+def nop(program: MipsProgram):
     """Do nothing.
 
     :param program:
@@ -24,7 +24,7 @@ def nop(program: MipsProgram) -> None:
 
 
 @mips_instruction("", parse)
-def syscall(program: MipsProgram) -> None:
+def syscall(program: MipsProgram):
     """Call syscall specified in $v0.
 
     :param program:

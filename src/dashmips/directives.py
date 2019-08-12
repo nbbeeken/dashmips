@@ -15,7 +15,7 @@ def parse_int(int_str: str) -> int:
     return arg
 
 
-def directive_align(name: str, data: str, memory: bytearray) -> None:
+def directive_align(name: str, data: str, memory: bytearray):
     """Align directive.
 
     :param name: str:
@@ -63,7 +63,7 @@ def directive_byte(name: str, data: str, memory: bytearray) -> int:
     value = parse_int(data)
     if value > 0xFF:
         raise Exception("You cannot store a value greater than 2^8")
-    address = memory.malloc(1)
+    address = malloc(memory, 1)
     memory[address] = value
     return address
 
@@ -78,7 +78,7 @@ def directive_half(name: str, data: str, memory: bytearray) -> int:
     value = parse_int(data)
     if value > 0xFFFF:
         raise Exception("You cannot store a value greater than 2^16")
-    address = memory.malloc(2)
+    address = malloc(memory, 2)
     memory[address: address + 2] = value.to_bytes(2, "big")
     return address
 
@@ -93,7 +93,7 @@ def directive_space(name: str, data: str, memory: bytearray) -> int:
     value = parse_int(data)
     if value > 0xFFFF_FFFF:
         raise Exception("Please use less memory...")
-    address = memory.malloc(value)
+    address = malloc(memory, value)
     return address
 
 
@@ -107,6 +107,6 @@ def directive_word(name: str, data: str, memory: bytearray) -> int:
     value = parse_int(data)
     if value > 0xFFFF_FFFF:
         raise Exception("You cannot store a value greater than 2^32")
-    address = memory.malloc(4)
+    address = malloc(memory, 4)
     memory[address: address + 4] = value.to_bytes(4, "big")
     return address

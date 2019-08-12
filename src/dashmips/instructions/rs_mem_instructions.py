@@ -4,7 +4,7 @@ from typing import Tuple, cast
 from . import mips_instruction, parse_int
 from ..models import MipsProgram
 
-PTRN = r"{instr_gap}({register}){args_gap}({number}?)\(({register})\)"
+PATTERN = r"{instr_gap}({register}){args_gap}({number}?)\(({register})\)"
 
 
 def parse(args: Tuple[str, str, str, str, str]) -> Tuple[str, int, str]:
@@ -19,8 +19,8 @@ def parse(args: Tuple[str, str, str, str, str]) -> Tuple[str, int, str]:
     return (args[2], offset, args[4])
 
 
-@mips_instruction(PTRN, parse)
-def lb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def lb(program: MipsProgram, rs: str, num: int, rt: str):
     """Load Byte from memory.
 
     :param program:
@@ -31,8 +31,8 @@ def lb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     program.registers[rs] = program.memory[num + program.registers[rt]]
 
 
-@mips_instruction(PTRN, parse)
-def lbu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def lbu(program: MipsProgram, rs: str, num: int, rt: str):
     """Load Byte Unsigned from memory.
 
     :param program:
@@ -43,8 +43,8 @@ def lbu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     program.registers[rs] = abs(program.memory[num + program.registers[rt]])
 
 
-@mips_instruction(PTRN, parse)
-def lh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def lh(program: MipsProgram, rs: str, num: int, rt: str):
     """Load half-word from memory.
 
     :param program:
@@ -55,14 +55,14 @@ def lh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     # FIXME: This does not sign extend correctly
     addr = num + program.registers[rt]
     val = 0
-    vals = program.memory[addr: addr + 2]
-    for i, b in enumerate(reversed(vals)):
+    values = program.memory[addr: addr + 2]
+    for i, b in enumerate(reversed(values)):
         val |= b << i * 8
     program.registers[rs] = val
 
 
-@mips_instruction(PTRN, parse)
-def lhu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def lhu(program: MipsProgram, rs: str, num: int, rt: str):
     """Load half-word unsigned from memory.
 
     :param program:
@@ -72,14 +72,14 @@ def lhu(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """
     addr = num + program.registers[rt]
     val = 0
-    vals = program.memory[addr: addr + 2]
-    for i, b in enumerate(reversed(vals)):
+    values = program.memory[addr: addr + 2]
+    for i, b in enumerate(reversed(values)):
         val |= b << i * 8
     program.registers[rs] = val
 
 
-@mips_instruction(PTRN, parse)
-def lw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def lw(program: MipsProgram, rs: str, num: int, rt: str):
     """Load word from memory.
 
     :param program:
@@ -89,14 +89,14 @@ def lw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     """
     addr = num + program.registers[rt]
     val = 0
-    vals = program.memory[addr: addr + 4]
-    for i, b in enumerate(reversed(vals)):
+    values = program.memory[addr: addr + 4]
+    for i, b in enumerate(reversed(values)):
         val |= b << i * 8
     program.registers[rs] = val
 
 
-@mips_instruction(PTRN, parse)
-def sb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def sb(program: MipsProgram, rs: str, num: int, rt: str):
     """Store Byte to memory.
 
     :param program:
@@ -108,8 +108,8 @@ def sb(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     program.memory[num + program.registers[rt]] = val & 0xFF
 
 
-@mips_instruction(PTRN, parse)
-def sw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def sw(program: MipsProgram, rs: str, num: int, rt: str):
     """Store word to memory.
 
     :param program:
@@ -122,8 +122,8 @@ def sw(program: MipsProgram, rs: str, num: int, rt: str) -> None:
     program.memory[addr: addr + 4] = val.to_bytes(4, "big")
 
 
-@mips_instruction(PTRN, parse)
-def sh(program: MipsProgram, rs: str, num: int, rt: str) -> None:
+@mips_instruction(PATTERN, parse)
+def sh(program: MipsProgram, rs: str, num: int, rt: str):
     """Store halfword to memory.
 
     :param program:

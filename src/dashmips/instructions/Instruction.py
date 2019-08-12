@@ -8,14 +8,11 @@ from ..models import MipsProgram
 class Instruction:
     """Instruction Class, callable."""
 
-    def __init__(
-        self, fn, regex_ptrn: str,
-        parser, label: bool = False,
-    ) -> None:
+    def __init__(self, fn, regex_ptrn: str, parser, label: bool = False):
         """
         Regex and argument parser for instruction.
 
-        Adds itself to list upon instanciation.
+        Adds itself to list upon instantiation.
         """
         self.function = fn
 
@@ -34,8 +31,7 @@ class Instruction:
         self.regex = f"({self.name}){regex_ptrn}".format(**RE.ALL)
         self.parser = parser
 
-    def __call__(self, program: MipsProgram,
-                 args: Iterable[Any] = tuple()) -> None:
+    def __call__(self, program: MipsProgram, args: Iterable[Any] = tuple()):
         """Callable Instruction."""
         self.function(program, *args)
         program.registers["pc"] += 1

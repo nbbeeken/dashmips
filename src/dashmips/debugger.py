@@ -1,4 +1,5 @@
 """Mips Debugger.
+
 All commands need to return
 {
     result?: {program: MipsProgram, any_key: other_data}
@@ -6,24 +7,24 @@ All commands need to return
 }
 """
 import os
-from typing import List
+from typing import List, Dict, Any, Tuple
 
 from .mips import MipsException
 from .models import MipsProgram
 from .run import next_instruction, run
 
 
-def debug_start(program: MipsProgram, params=None) -> dict:
+def debug_start(program: MipsProgram, params=None) -> Dict[str, int]:
     """Debug start.
 
     :param operation: dict
     :param program: MipsProgram
     """
     program.registers["pc"] = program.labels["main"].value
-    return {'pid': os.getpid()}
+    return {"pid": os.getpid()}
 
 
-def debug_step(program: MipsProgram, params) -> dict:
+def debug_step(program: MipsProgram, params) -> Dict[str, Any]:
     """Debug step.
 
     :param operation: dict
@@ -33,15 +34,15 @@ def debug_step(program: MipsProgram, params) -> dict:
         next_instruction(program)
 
         if program.exited:
-            return {'exited': True}
+            return {"exited": True}
 
     except MipsException as exc:
-        return {'exited': True, 'message': exc.message}
+        return {"exited": True, "message": exc.message}
 
-    return {'stopped': True}
+    return {"stopped": True}
 
 
-def debug_continue(program: MipsProgram, params) -> dict:
+def debug_continue(program: MipsProgram, params) -> Dict[str, Any]:
     """Debug continue.
 
     :param program: MipsProgram
@@ -70,25 +71,25 @@ def debug_continue(program: MipsProgram, params) -> dict:
     try:
         run(program, breaking_condition)
         if program.exited:
-            return {'exited': True}
+            return {"exited": True}
     except MipsException as exc:
-        return {'exited': True, 'message': exc.message}
+        return {"exited": True, "message": exc.message}
 
-    return {'stopped': True, 'breakpoints': verified}
+    return {"stopped": True, "breakpoints": verified}
 
 
-def debug_stop(program: MipsProgram, params) -> dict:
+def debug_stop(program: MipsProgram, params) -> Dict[str, bool]:
     """Stop messages incoming mean nothing to a server.
 
     :param operation: dict
     :param program: MipsProgram
     """
-    return {'exited': True}
+    return {"exited": True}
 
 
-def debug_info(program: MipsProgram, params) -> dict:
+def debug_info(program: MipsProgram, params) -> Dict[str, Any]:
     """Build program as dict."""
-    return {'program': program.to_dict()}
+    return {"program": program.to_dict()}
 
 
 def verify_breakpoints(
@@ -98,17 +99,18 @@ def verify_breakpoints(
     local_breakpoints = []
     remote_breakpoints = []
     for breakpoint in breakpoints:
-        def checkfile(f): return os.path.samefile(f, breakpoint['src']['path'])
+        def checkfile(f: str) -> bool:
+            return os.path.samefile(f, breakpoint["src"]["path"])
 
         real_line = None
         for pc_value, srcline in enumerate(program.source):
-            if breakpoint['line'] == srcline.lineno:
+            if breakpoint["line"] == srcline.lineno:
                 real_line = pc_value
                 break
 
         is_known_file = any(checkfile(fn) for fn in program.filenames)
         if real_line is not None and is_known_file:
-            remote_breakpoints.append(breakpoint['line'])
+            remote_breakpoints.append(breakpoint["line"])
             local_breakpoints.append(real_line)
 
     return remote_breakpoints, local_breakpoints

@@ -13,6 +13,7 @@ classifiers=[
     "Programming Language :: Assembly",
     "License :: OSI Approved :: MIT License"
 ]
+packages = [{ include = "dashmips", from = "./src" }]
 
 [tool.poetry.scripts]
 dashmips = "dashmips.__main__:main"
@@ -23,12 +24,12 @@ dashmips = "dashmips.__main__:main"
 "websockets" = "^8.0"
 
 [tool.poetry.dev-dependencies]
-"mypy" = "^0.701"
+"mypy" = "^0.720"
 "mypy-extensions" = "^0.4.1"
 "pycodestyle" = "^2.5.0"
 "autopep8" = "^1.4.4"
 "pydocstyle" = "^3.0.0"
-"pytest" = "^4.4.2"
+"pytest" = "^5.0.1"
 "pytest-pycodestyle" = "^1.4.0"
 "pytest-pydocstyle" = "^1.5.0"
 "pytest-tap" = "^2.3"

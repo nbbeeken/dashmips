@@ -1,10 +1,10 @@
-"""Instuctions that operate on one register."""
+"""Instructions that operate on one register."""
 from typing import Tuple, cast
 
 from . import mips_instruction
 from ..models import MipsProgram
 
-PTRN = r"{instr_gap}({register})"
+PATTERN = r"{instr_gap}({register})"
 
 
 def parse(args: Tuple[str, str, str]) -> Tuple[str]:
@@ -15,8 +15,8 @@ def parse(args: Tuple[str, str, str]) -> Tuple[str]:
     return (args[2],)
 
 
-@mips_instruction(PTRN, parse)
-def mflo(program: MipsProgram, rd: str) -> None:
+@mips_instruction(PATTERN, parse)
+def mflo(program: MipsProgram, rd: str):
     """Move from lo register to Reg[rd].
 
     :param program:
@@ -25,8 +25,8 @@ def mflo(program: MipsProgram, rd: str) -> None:
     program.registers[rd] = program.registers["lo"]
 
 
-@mips_instruction(PTRN, parse)
-def mfhi(program: MipsProgram, rd: str) -> None:
+@mips_instruction(PATTERN, parse)
+def mfhi(program: MipsProgram, rd: str):
     """Move from hi register to Reg[rd].
 
     :param program:
@@ -35,8 +35,8 @@ def mfhi(program: MipsProgram, rd: str) -> None:
     program.registers[rd] = program.registers["hi"]
 
 
-@mips_instruction(PTRN, parse)
-def mthi(program: MipsProgram, rd: str) -> None:
+@mips_instruction(PATTERN, parse)
+def mthi(program: MipsProgram, rd: str):
     """Move to hi register from Reg[rd].
 
     :param program:
@@ -45,8 +45,8 @@ def mthi(program: MipsProgram, rd: str) -> None:
     program.registers["hi"] = program.registers[rd]
 
 
-@mips_instruction(PTRN, parse)
-def mtlo(program: MipsProgram, rd: str) -> None:
+@mips_instruction(PATTERN, parse)
+def mtlo(program: MipsProgram, rd: str):
     """Move to lo register from Reg[rd].
 
     :param program:

@@ -4,7 +4,7 @@ from typing import Tuple, cast
 from . import mips_instruction, parse_int
 from ..models import MipsProgram
 
-PTRN = r"{instr_gap}({register}){args_gap}({number})"
+PATTERN = r"{instr_gap}({register}){args_gap}({number})"
 
 
 def parse(args: Tuple[str, str, str, str]) -> Tuple[str, int]:
@@ -15,8 +15,8 @@ def parse(args: Tuple[str, str, str, str]) -> Tuple[str, int]:
     return (args[2], parse_int(args[3]))
 
 
-@mips_instruction(PTRN, parse)
-def lui(program: MipsProgram, rd: str, immediate: int) -> None:
+@mips_instruction(PATTERN, parse)
+def lui(program: MipsProgram, rd: str, immediate: int):
     """Load upper bits from immediate.
 
     :param program:

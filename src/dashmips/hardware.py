@@ -32,7 +32,7 @@ class Registers(Dict[str, int]):
         **{f"${i}": name for (i, name) in names_enum},
     }
 
-    def __init__(self, dictionary: Optional[Dict[str, int]] = None) -> None:
+    def __init__(self, dictionary: Optional[Dict[str, int]] = None):
         """Initialize 32 registers to zero.
 
         dictionary - can be partial/full dictionary of registers
@@ -48,7 +48,7 @@ class Registers(Dict[str, int]):
         else:
             super().__init__(base_reg)
 
-    def __setitem__(self, key: str, value: int) -> None:
+    def __setitem__(self, key: str, value: int):
         """
         Set register value.
 
@@ -83,7 +83,7 @@ def new_memory(hexstring: Optional[str] = None) -> bytearray:
 
     for i in range(0x2060, 0x2060 + ((80 * 25) * 2), 2):
         blank_space = (0x0F00 | ord(" "))
-        memory[i:i + 1] = blank_space.to_bytes(2, 'little')
+        memory[i:i + 1] = blank_space.to_bytes(2, "little")
 
     return memory
 

@@ -4,7 +4,7 @@ from typing import Tuple, cast
 from . import mips_instruction, parse_int
 from ..models import MipsProgram
 
-PTRN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({number})"
+PATTERN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({number})"
 
 
 def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, int]:
@@ -15,8 +15,8 @@ def parse(arg: Tuple[str, str, str, str, str]) -> Tuple[str, str, int]:
     return (arg[2], arg[3], parse_int(arg[4]))
 
 
-@mips_instruction(PTRN, parse)
-def addi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def addi(program: MipsProgram, rs: str, rt: str, num: int):
     """Add immediate Reg[rs] = Reg[rt] + immediate.
 
     :param program:
@@ -27,8 +27,8 @@ def addi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     program.registers[rs] = program.registers[rt] + num
 
 
-@mips_instruction(PTRN, parse)
-def addiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def addiu(program: MipsProgram, rs: str, rt: str, num: int):
     """Add immediate unsigned Reg[rs] = Reg[rt] + immediate.
 
     :param program:
@@ -40,8 +40,8 @@ def addiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
         abs(program.registers[rt]) + abs(num)) & 0xFFFF_FFFF
 
 
-@mips_instruction(PTRN, parse)
-def ori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def ori(program: MipsProgram, rs: str, rt: str, num: int):
     """Or immediate Reg[rs] = Reg[rt] | immediate.
 
     :param program:
@@ -52,8 +52,8 @@ def ori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     program.registers[rs] = program.registers[rt] | num
 
 
-@mips_instruction(PTRN, parse)
-def andi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def andi(program: MipsProgram, rs: str, rt: str, num: int):
     """And immediate Reg[rs] = Reg[rt] & immediate.
 
     :param program:
@@ -64,8 +64,8 @@ def andi(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     program.registers[rs] = program.registers[rt] & num
 
 
-@mips_instruction(PTRN, parse)
-def slti(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def slti(program: MipsProgram, rs: str, rt: str, num: int):
     """Set on less than immediate.
 
     :param program:
@@ -79,8 +79,8 @@ def slti(program: MipsProgram, rs: str, rt: str, num: int) -> None:
         program.registers[rs] = 0
 
 
-@mips_instruction(PTRN, parse)
-def sltiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def sltiu(program: MipsProgram, rs: str, rt: str, num: int):
     """Set on less than immediate unsigned.
 
     :param program:
@@ -94,8 +94,8 @@ def sltiu(program: MipsProgram, rs: str, rt: str, num: int) -> None:
         program.registers[rs] = 0
 
 
-@mips_instruction(PTRN, parse)
-def xori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def xori(program: MipsProgram, rs: str, rt: str, num: int):
     """Xor immediate Reg[rs] = Reg[rt] ^ immediate.
 
     :param program:
@@ -106,8 +106,8 @@ def xori(program: MipsProgram, rs: str, rt: str, num: int) -> None:
     program.registers[rs] = program.registers[rt] ^ num
 
 
-@mips_instruction(PTRN, parse)
-def sra(program: MipsProgram, rd: str, rs: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def sra(program: MipsProgram, rd: str, rs: str, num: int):
     """Shift Right Arithmetic.
 
     :param program:
@@ -120,8 +120,8 @@ def sra(program: MipsProgram, rd: str, rs: str, num: int) -> None:
     program.registers[rd] |= msb
 
 
-@mips_instruction(PTRN, parse)
-def sll(program: MipsProgram, rd: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def sll(program: MipsProgram, rd: str, rt: str, num: int):
     """Shift Left Logical.
 
     :param program:
@@ -132,8 +132,8 @@ def sll(program: MipsProgram, rd: str, rt: str, num: int) -> None:
     program.registers[rd] = (program.registers[rt] << num) & 0xFFFF_FFFF
 
 
-@mips_instruction(PTRN, parse)
-def srl(program: MipsProgram, rd: str, rt: str, num: int) -> None:
+@mips_instruction(PATTERN, parse)
+def srl(program: MipsProgram, rd: str, rt: str, num: int):
     """Shift Right Logical.
 
     :param program:

@@ -37,8 +37,8 @@ def main_run(args: argparse.Namespace) -> int:
     program = preprocess(args.FILE, args=args.mips_args)
     plugins: List[Any] = []
     if args.vt100:
-        vt = VT100()
-        program.memory.on_change(vt.push)
+        vt = VT100()  # type: ignore
+        # program.memory.on_change(vt.push)
         t = Thread(target=run, args=(program,))
         t.start()
         vt.start()
@@ -99,77 +99,34 @@ def main() -> NoReturn:
     debugparse = sbp.add_parser("debug", aliases=["d"])
     docsparse = sbp.add_parser("docs", aliases=["h"])
 
-    compileparse.add_argument(
-        "-f", "--file",
-        type=argparse.FileType("r", encoding="utf8"), help="Input file"
-    )
-    compileparse.add_argument(
-        "-o",
-        "--out",
-        type=argparse.FileType("w", encoding="utf8"),
-        help="Output file name",
-    )
-    compileparse.add_argument(
-        "-j", "--json", action="store_true", help="Output json to stdout"
-    )
-    compileparse.add_argument(
-        "--vscode", action="store_true", help="Output json for vscode"
-    )
+    compileparse.add_argument("-f", "--file", type=argparse.FileType("r", encoding="utf8"), help="Input file")
+    compileparse.add_argument("-o", "--out", type=argparse.FileType("w", encoding="utf8"), help="Output file name")
+    compileparse.add_argument("-j", "--json", action="store_true", help="Output json to stdout")
+    compileparse.add_argument("--vscode", action="store_true", help="Output json for vscode")
     compileparse.set_defaults(func=main_compile)
 
-    runparse.add_argument(
-        "FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file"
-    )
-    runparse.add_argument(
-        "-a",
-        "--args",
-        dest="mips_args",
-        nargs="*",
-        help="Arguments to pass into the mips main",
-    )
-    runparse.add_argument(
-        "-t", "--vt100", action="store_true", help="Start VT100 Simulator"
-    )
+    runparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
+    runparse.add_argument("-a", "--args", dest="mips_args", nargs="*", help="Arguments to pass into the mips main")
+    runparse.add_argument("-t", "--vt100", action="store_true", help="Start VT100 Simulator")
     runparse.set_defaults(func=main_run)
 
-    debugparse.add_argument(
-        "FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file"
-    )
-    debugparse.add_argument(
-        "-a",
-        "--args",
-        dest="mips_args",
-        nargs="*",
-        help="Arguments to pass into the mips main",
-    )
-    debugparse.add_argument(
-        "-t", "--vt100", action="store_true", help="Start VT100 Simulator"
-    )
-    debugparse.add_argument(
-        "-p", "--port", type=int, default=2390, help="run debugger on port"
-    )
-    debugparse.add_argument(
-        "-i", "--host", default="0.0.0.0", help="run debugger on host"
-    )
-    debugparse.add_argument(
-        "-l", "--log", dest="log",
-        action="store_true", help="Log all network traffic"
-    )
+    debugparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
+    debugparse.add_argument("-a", "--args", dest="mips_args", nargs="*", help="Arguments to pass into the mips main")
+    debugparse.add_argument("-t", "--vt100", action="store_true", help="Start VT100 Simulator")
+    debugparse.add_argument("-p", "--port", type=int, default=2390, help="run debugger on port")
+    debugparse.add_argument("-i", "--host", default="0.0.0.0", help="run debugger on host")
+    debugparse.add_argument("-l", "--log", dest="log", action="store_true", help="Log all network traffic")
     debugparse.set_defaults(func=main_debug)
 
-    docsparse.add_argument(
-        "-s", "--syscalls", action="store_true", help="Show syscall table"
-    )
-    docsparse.add_argument(
-        "-i", "--instr", action="store_true", help="Show instruction table"
-    )
+    docsparse.add_argument("-s", "--syscalls", action="store_true", help="Show syscall table")
+    docsparse.add_argument("-i", "--instr", action="store_true", help="Show instruction table")
     docsparse.set_defaults(func=main_docs)
 
     prog_args = parser.parse_args()
-    if not hasattr(prog_args, 'func'):
+    if not hasattr(prog_args, "func"):
         # This is for python 3.6 compatibility
         # you cannot enforce subparser to require in less than 3.6
-        print('Must provide a command')
+        print("Must provide a command")
         parser.print_help()
         exit(1)
 

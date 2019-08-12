@@ -11,45 +11,51 @@ from websockets import WebSocketServerProtocol
 from .models import MipsProgram
 
 
-async def dashmips_debugger(
-    client: WebSocketServerProtocol, path: str, commands
-):
+async def client_loop(client: WebSocketServerProtocol, commands: dict):
+    """Message loop handler."""
+    async for message in client:
+        log.info(f"Recv `{message}`")
+
+        request = json.loads(message)
+
+        command = commands[request["method"]]
+        result = command(params=request["params"])
+
+        response = json.dumps({"result": result})
+
+        if request["method"] != "info":
+            log.info(f"Send `{response}`")
+
+        await client.send(response)
+
+        if "exited" in result:
+            # only check top level
+            log.warn("Program exited")
+            break
+
+
+async def dashmips_debugger(client: WebSocketServerProtocol, path: str, commands: dict):
     """Client handler for debug server.
 
     :param client: Websocket handler
-    :param path: should never be set '/'
+    :param path: should never be set always is `/`
     :param commands: dictionary of debug commands to functions
     """
-    log.info(f'client={client.local_address}')
+    log.info(f"client={client.local_address}")
     try:
-        async for message in client:
-            log.info(f'Recv "{message}"')
-            req = json.loads(message)
-            ret = commands[req['method']](params=req['params'])
-            res = json.dumps({'result': ret})
-            log.info(f'Send "{res if req["method"] != "info" else ""}"')
-            await client.send(res)
-
-            if 'exited' in ret:
-                # only check top level
-                log.warn('Program exited')
-                break
-
+        client_loop(client, commands)
         await client.close()
     except websockets.ConnectionClosed:
-        log.warning('Client disconnect')
+        log.warning("Client disconnect")
     except Exception as e:
-        log.error(f'Unknown error: {e}')
+        log.error(f"Unknown error: {e}")
 
 
-def debug_mips(
-    program: MipsProgram,
-    host: str = "localhost", port: int = 2390, should_log: bool = False
-) -> None:
+def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=False):
     """Create a debugging instance of mips.
 
     :param program: The compiled mips program
-    :param host:  (Default value = 'localhost')
+    :param host:  (Default value = "localhost")
     :param port:  (Default value = 2390)
     :param should_log:  (Default value = False)
     """
@@ -57,18 +63,16 @@ def debug_mips(
         format="%(asctime)-15s %(levelname)-7s %(message)s",
         level=log.INFO if should_log else log.CRITICAL,
     )
-    logger = log.getLogger('websockets.server')
+    logger = log.getLogger("websockets.server")
     logger.addHandler(log.StreamHandler())
-    log.info(f'Serving on: ws://{host}:{port}')
+    log.info(f"Serving on: ws://{host}:{port}")
 
     # Collect functions from debugger.py
-    debugger_module = importlib.import_module('.debugger', 'dashmips')
+    debugger_module = importlib.import_module(".debugger", "dashmips")
     funcs = inspect.getmembers(debugger_module, inspect.isfunction)
     commands = {}
     for name, command in funcs:
-        commands[name.replace("debug_", "")] = functools.partial(
-            command, program=program
-        )
+        commands[name.replace("debug_", "")] = functools.partial(command, program=program)
 
     # Bind commands positional arg before launching
     ws_func = functools.partial(dashmips_debugger, commands=commands)
@@ -78,7 +82,7 @@ def debug_mips(
         ws_server = loop.run_until_complete(start_server)
         loop.run_forever()
     except KeyboardInterrupt as e:
-        log.warning('bye bye... Debugger exiting...')
+        log.warning("bye bye... Debugger exiting...")
     finally:
         ws_server.close()
         loop.run_until_complete(ws_server.wait_closed())

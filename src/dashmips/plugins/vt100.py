@@ -48,26 +48,20 @@ class VT100(Plugin):
     SIZE = (80 * 25) * 2
     BASE_ADDR = 0x2060  # 8288
 
-    def __init__(self) -> None:
+    def __init__(self):
         """Construct VT100."""
         super(VT100, self).__init__(name="VT100")
         self.root = tk.Tk()
         self.root.title("VT100")
 
         self.content = tk.Variable(self.root, b"", "content")
-        self.content.trace_add("write", self.pull)  # type: ignore
+        self.content.trace_add("write", self.pull)
 
-        self.quit_request = tk.BooleanVar(
-            self.root, False, "quit_request"
-        )
-        self.quit_request.trace_add("write", self.close)  # type: ignore
+        self.quit_request = tk.BooleanVar(self.root, False, "quit_request")
+        self.quit_request.trace_add("write", self.close)
 
-        self.vt = tk.Text(
-            self.root, state="disabled", width=80, height=25
-        )
-        self.vt.configure(
-            {"fg": "white", "bg": "black", "font": ("Courier", 12, "normal")}
-        )
+        self.vt = tk.Text(self.root, state="disabled", width=80, height=25)
+        self.vt.configure({"fg": "white", "bg": "black", "font": ("Courier", 12, "normal")})
         self.vt.pack()
 
         self.add_tags()
@@ -76,14 +70,14 @@ class VT100(Plugin):
 
         self.screen: bytes = b"\x0F " * VT100.SIZE
 
-    def start(self) -> None:
+    def start(self):
         """Run simulator FUNCTION BLOCKS."""
         try:
             self.root.mainloop()
         except KeyboardInterrupt:
             pass
 
-    def add_tags(self) -> None:
+    def add_tags(self):
         """Add Color Tags to vt widget."""
         bold = ("Courier", 12, "bold")
         normal = ("Courier", 12, "normal")
@@ -107,15 +101,15 @@ class VT100(Plugin):
         """From index into byte array return tk.Text position string."""
         return f"{(idx // VT100.WIDTH) + 1}.{idx % VT100.WIDTH}"
 
-    def close(self, *a: Any) -> None:
+    def close(self, *a: Any):
         """Close the VT100 Window."""
         self.root.quit()  # type: ignore
 
-    def request_close(self) -> None:
+    def request_close(self):
         """Request to close the VT100 Window."""
-        self.quit_request.set(True)  # type: ignore
+        self.quit_request.set(True)
 
-    def pull(self, *changes: Any) -> None:
+    def pull(self, *changes: Any):
         """Pull Updated Screen."""
         vga_memory: bytes = self.content.get()  # type: ignore
 
@@ -133,7 +127,7 @@ class VT100(Plugin):
 
         self.vt["state"] = "disabled"
 
-    def push(self, memory: bytearray) -> None:
+    def push(self, memory: bytearray):
         """Push a new memory text layout."""
         mmio = bytes(memory[VT100.BASE_ADDR: VT100.BASE_ADDR + VT100.SIZE])
         if mmio == self.screen:

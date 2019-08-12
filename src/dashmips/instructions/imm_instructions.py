@@ -4,7 +4,7 @@ from typing import Tuple
 from . import mips_instruction
 from ..models import MipsProgram
 
-PTRN = r"{instr_gap}({label})"
+PATTERN = r"{instr_gap}({label})"
 
 
 def parse(args: Tuple[str, str, str]) -> Tuple[str]:
@@ -15,8 +15,8 @@ def parse(args: Tuple[str, str, str]) -> Tuple[str]:
     return (args[2],)
 
 
-@mips_instruction(PTRN, parse, label=True)
-def j(program: MipsProgram, address: str) -> None:
+@mips_instruction(PATTERN, parse, label=True)
+def j(program: MipsProgram, address: str):
     """Jump unconditionally to label.
 
     :param program:
@@ -25,8 +25,8 @@ def j(program: MipsProgram, address: str) -> None:
     program.registers["pc"] = program.labels[address].value - 1
 
 
-@mips_instruction(PTRN, parse, label=True)
-def jal(program: MipsProgram, address: str) -> None:
+@mips_instruction(PATTERN, parse, label=True)
+def jal(program: MipsProgram, address: str):
     """Jump unconditionally to label and set $ra to current $pc.
 
     :param program:

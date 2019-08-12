@@ -57,10 +57,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     )
 
 
-sectionsType = Tuple[List[str], List[SourceLine]]
-
-
-def split_to_sections(code: List[SourceLine]) -> sectionsType:
+def split_to_sections(code: List[SourceLine]) -> Tuple[List[str], List[SourceLine]]:
     """Handle file with mixed sections.
 
     .text and .data sections can come in any order.
@@ -90,8 +87,7 @@ def split_to_sections(code: List[SourceLine]) -> sectionsType:
     return sections[mipsRE.DATA_SEC], sections[mipsRE.TEXT_SEC]
 
 
-def data_labels(labels: Dict[str, Label],
-                data_sec: List[str], memory: bytearray) -> None:
+def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: bytearray):
     """Construct the .data section to spec.
 
     Fill the .data section memory with user defined static data
@@ -113,9 +109,7 @@ def data_labels(labels: Dict[str, Label],
                                  kind=match[2][1:])
 
 
-def code_labels(
-    labels: Dict[str, Label], text_sec: List[SourceLine]
-) -> List[SourceLine]:
+def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[SourceLine]:
     """Construct the .text section to spec.
 
     Fill the .text section memory with user code
@@ -150,7 +144,7 @@ def code_labels(
         else:
             instruction = srcline.line.split(" ")[0]
             if instruction not in Instructions:
-                print(f'Error line {idx}: "{instruction}" invalid')
+                print(f"Error line {idx}: `{instruction}` invalid")
                 exit(1)
             # Otherwise save the line as is
             text.append(srcline)
@@ -188,9 +182,7 @@ def process_file(file: TextIO) -> List[SourceLine]:
     return linesofcode
 
 
-def preprocessor_directives(
-    lines: List[SourceLine]
-) -> Tuple[Dict[str, str], List[SourceLine]]:
+def preprocessor_directives(lines: List[SourceLine]) -> Tuple[List[str], Dict[str, str], List[SourceLine]]:
     """Preprocessor Directives handler.
 
     :param lines: lines to compile.
@@ -198,26 +190,24 @@ def preprocessor_directives(
     for idx, srcline in enumerate(lines):
         if ".globl" in srcline.line:
             del lines[idx]
-    includes = []
+    includes: List[str] = []
     lines = resolve_include(lines, includes)
     lines, eqvs = resolve_eqvs(lines)
     lines = resolve_macros(lines)
     return includes, eqvs, lines
 
 
-def resolve_include(
-    lines: List[SourceLine], includes: List[str]
-) -> Tuple[List[str], List[SourceLine]]:
+def resolve_include(lines: List[SourceLine], includes: List[str]) -> List[SourceLine]:
     """Resolve all includes recursively."""
     for idx, srcline in enumerate(lines):
         match = re.match(r'\s*\.include\s+"(.*)"\s*', srcline.line)
         if match:
             includefilename = os.path.abspath(match[1])
             if includefilename in includes:
-                raise MipsException('Recursive importing detected')
+                raise MipsException("Recursive importing detected")
             includes.append(includefilename)
             includefile = open(includefilename)
-            includelines = resolve_include(process_file(includefile))
+            includelines = resolve_include(process_file(includefile), includes)
             lines[idx] = includelines  # type: ignore
 
     lines = flatten(lines)
@@ -225,10 +215,7 @@ def resolve_include(
     return lines
 
 
-T = TypeVar("T")
-
-
-def flatten(nestedlist: Iterable[T]) -> List[T]:
+def flatten(nestedlist: Iterable) -> list:
     """Flatten a nested list."""
     newlist = []
     for item in nestedlist:
@@ -239,8 +226,7 @@ def flatten(nestedlist: Iterable[T]) -> List[T]:
     return newlist
 
 
-def resolve_eqvs(lines: List[SourceLine]
-                 ) -> Tuple[List[SourceLine], Dict[str, str]]:
+def resolve_eqvs(lines: List[SourceLine]) -> Tuple[List[SourceLine], Dict[str, str]]:
     """Gather eqvs to text replace throughout code."""
     eqvs = {}
     to_del = []
@@ -302,13 +288,7 @@ def resolve_macros(lines: List[SourceLine]) -> List[SourceLine]:
     return flatten(lines)
 
 
-def macro_with_args(
-    idx: int,
-    lines: List[SourceLine],
-    macro: str,
-    macroinfo: Dict[str, Any],
-    srcline: SourceLine,
-) -> None:
+def macro_with_args(idx: int, lines: List[SourceLine], macro: str, macroinfo: Dict[str, Any], srcline: SourceLine):
     """Handle Parsing for macro that has arguments."""
     macroregex = fr"{macro}\((.+)\)"
     match = re.match(macroregex, srcline.line)
@@ -328,8 +308,7 @@ def macro_with_args(
         lines[idx] = expanded_macro  # type: ignore
 
 
-def load_args(init_regs: Dict[str, int],
-              memory: bytearray, args: List[str]) -> None:
+def load_args(init_regs: Dict[str, int], memory: bytearray, args: List[str]):
     """Load arguments on to the stack and sets argc."""
     init_regs["$a0"] = len(args)  # argc
 
@@ -343,10 +322,10 @@ def load_args(init_regs: Dict[str, int],
     argv.append(0)  # NULL to end pointer array
 
     # Malloc all at once this time for contiguous memory
-    argvbp = malloc(memory, len(argv) * 4)
+    argv_ptr = malloc(memory, len(argv) * 4)
 
     for idx, ptr in enumerate(argv):
-        store_addr = argvbp + idx * 4
+        store_addr = argv_ptr + idx * 4
         memory[store_addr: store_addr + 4] = ptr.to_bytes(4, "big")
 
-    init_regs["$a1"] = argvbp  # argv
+    init_regs["$a1"] = argv_ptr  # argv

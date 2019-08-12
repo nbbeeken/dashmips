@@ -5,7 +5,7 @@ from . import mips_instruction
 from ..models import MipsProgram
 
 
-PTRN = r"{instr_gap}({register})"
+PATTERN = r"{instr_gap}({register})"
 
 
 def parse(arg: Tuple[str, str, str]) -> Tuple[str]:
@@ -16,8 +16,8 @@ def parse(arg: Tuple[str, str, str]) -> Tuple[str]:
     return (arg[2],)
 
 
-@mips_instruction(PTRN, parse)
-def jr(program: MipsProgram, rs: str) -> None:
+@mips_instruction(PATTERN, parse)
+def jr(program: MipsProgram, rs: str):
     """Jump to address in Reg[rs].
 
     :param program:
