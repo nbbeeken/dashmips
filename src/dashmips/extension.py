@@ -77,7 +77,7 @@ def build_example(name: str, pattern: str, label: bool) -> str:
     for i in range(0, reg_ct):
         snip = snip.replace("\\$reg", f"${REG_ARGS[i]}", 1)
 
-    snip = snip.replace("label", "mylabel")
+    snip = snip.replace("label", "my_label")
     snip = snip.replace("number", "100")
 
     return snip
