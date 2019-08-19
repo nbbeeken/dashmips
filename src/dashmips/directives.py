@@ -1,7 +1,6 @@
 """Directive handling."""
 from typing import Union
-
-from .hardware import malloc
+from .hardware import Memory, bytesify
 
 
 def parse_int(int_str: str) -> int:
@@ -16,98 +15,87 @@ def parse_int(int_str: str) -> int:
     return arg
 
 
-def directive_align(name: str, data: str, memory: bytearray):
+def directive_align(data: str, memory: Memory):
     """Align directive.
 
     :param name: str:
     :param data: str:
-    :param memory: bytearray:
+    :param memory: Memory:
     """
+    raise Exception("Unsupported directive.")
     return None
 
 
-def directive_asciiz(name: str, data: str, memory: bytearray) -> int:
+def directive_asciiz(data: str, memory: Memory) -> int:
     """Asciiz directive.
 
     :param name: str:
     :param data: str:
-    :param memory: bytearray:
+    :param memory: Memory:
     """
     string = data[1:-1].encode("ascii", "ignore").decode("unicode_escape")
-    asciiz_bytes = (string + "\0").encode()
-    address = malloc(memory, len(asciiz_bytes))
-    memory[address: address + len(asciiz_bytes)] = asciiz_bytes
+    address = memory.extend_data(bytesify(string, null_byte=True))
     return address
 
 
-def directive_ascii(name: str, data: str, memory: bytearray) -> int:
+def directive_ascii(data: str, memory: Memory) -> int:
     """Ascii directive.
 
     :param name: str:
     :param data: str:
-    :param memory: bytearray:
+    :param memory: Memory:
     """
     string = data[1:-1].encode("ascii", "ignore").decode("unicode_escape")
-    ascii_bytes = (string).encode()
-    address = malloc(memory, len(ascii_bytes))
-    memory[address: address + len(ascii_bytes)] = ascii_bytes
+    address = memory.extend_data(bytesify(string, null_byte=False))
     return address
 
 
-def directive_byte(name: str, data: str, memory: bytearray) -> int:
+def directive_byte(data: str, memory: Memory) -> int:
     """Byte directive.
 
     :param name: str:
     :param data: str:
-    :param memory: bytearray:
+    :param memory: Memory:
     """
-    value = parse_int(data)
-    if value > 0xFF:
-        raise Exception("You cannot store a value greater than 2^8")
-    address = malloc(memory, 1)
-    memory[address] = value
+    value = bytesify(parse_int(data), size=1)
+    address = memory.extend_data(value)
     return address
 
 
-def directive_half(name: str, data: str, memory: bytearray) -> int:
+def directive_half(data: str, memory: Memory) -> int:
     """Half directive.
 
     :param name: str:
     :param data: str:
-    :param memory: bytearray:
+    :param memory: Memory:
     """
-    value = parse_int(data)
-    if value > 0xFFFF:
-        raise Exception("You cannot store a value greater than 2^16")
-    address = malloc(memory, 2)
-    memory[address: address + 2] = value.to_bytes(2, "big")
+    value = bytesify(parse_int(data), size=2)
+    address = memory.extend_data(value)
     return address
 
 
-def directive_space(name: str, data: str, memory: bytearray) -> int:
-    """Space directive.
-
-    :param name: str:
-    :param data: str:
-    :param memory: bytearray:
-    """
-    value = parse_int(data)
-    if value > 0xFFFF_FFFF:
-        raise Exception("Please use less memory...")
-    address = malloc(memory, value)
-    return address
-
-
-def directive_word(name: str, data: str, memory: bytearray) -> int:
+def directive_word(data: str, memory: Memory) -> int:
     """Word directive.
 
     :param name: str:
     :param data: str:
-    :param memory: bytearray:
+    :param memory: Memory:
+    """
+    value = bytesify(parse_int(data), size=4)
+    address = memory.extend_data(value)
+    return address
+
+
+def directive_space(data: str, memory: Memory) -> int:
+    """Space directive.
+
+    :param name: str:
+    :param data: str:
+    :param memory: Memory:
     """
     value = parse_int(data)
-    if value > 0xFFFF_FFFF:
-        raise Exception("You cannot store a value greater than 2^32")
-    address = malloc(memory, 4)
-    memory[address: address + 4] = value.to_bytes(4, "big")
+    if value > 0x77359400:
+        # 2 Gigabytes of space...
+        raise Exception("Please use less memory...")
+    address = memory.extend_data(bytes([0] * value))
     return address

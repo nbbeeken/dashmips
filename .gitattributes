@@ -1,0 +1,2 @@
+*.py     text diff=python
+*.lock   text -diff

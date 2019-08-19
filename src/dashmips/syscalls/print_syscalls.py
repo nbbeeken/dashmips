@@ -10,7 +10,7 @@ def print_string(program: MipsProgram):
     :param program:
     """
     address = program.registers["$a0"]
-    bin_string = program.memory[address: program.memory.index(0x0, address)]
+    bin_string = program.memory[address: program.memory[address].index(0x0, address)]
     string = "".join([chr(c) for c in bin_string])
     print(string, end="")
 

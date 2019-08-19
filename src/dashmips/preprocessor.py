@@ -3,7 +3,7 @@ import os
 import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
-from .hardware import malloc, new_memory, Registers
+from .hardware import Memory, Registers, bytesify
 from .mips import RE as mipsRE, MipsException, Directives
 from .models import Label, MipsProgram, SourceLine
 
@@ -16,7 +16,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     :param file: TextIO:
     """
     filename = os.path.abspath(file.name)
-    memory = new_memory()
+    memory = Memory()  # type: ignore
 
     argv = [filename]
     if args:
@@ -41,10 +41,11 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     if not ("main" in labels and labels["main"].location == mipsRE.TEXT_SEC):
         raise Exception(f"Cannot locate main in {filename}")
 
-    bp = malloc(memory, 512) + 508
-    init_regs = {"pc": labels["main"].value, "$sp": bp, "$fp": bp, "$gp": bp}
+    registers = Registers()  # type: ignore
+    registers["pc"] = labels["main"].value
+    registers["$sp"] = registers["$fp"] = registers["$gp"] = memory.ram["stack"]["stop"]
 
-    load_args(init_regs, memory, argv)
+    load_args(registers, memory, argv)
 
     return MipsProgram(
         name=filename,
@@ -52,7 +53,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
         labels=labels,
         memory=memory,
         source=processed_code,
-        registers=Registers(init_regs),
+        registers=registers,
         eqvs=eqvs,
     )
 
@@ -87,7 +88,7 @@ def split_to_sections(code: List[SourceLine]) -> Tuple[List[str], List[SourceLin
     return sections[mipsRE.DATA_SEC], sections[mipsRE.TEXT_SEC]
 
 
-def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: bytearray):
+def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
     """Construct the .data section to spec.
 
     Fill the .data section memory with user defined static data
@@ -96,17 +97,23 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: bytearray
     :param data_sec:
     :param memory:
     """
-    data_line_re = f"({mipsRE.LABEL}):\\s*({mipsRE.DIRECTIVE})\\s+(.*)"
+    data_line_re = f"(?:({mipsRE.LABEL}):)?\\s*({mipsRE.DIRECTIVE})\\s+(.*)"
     for line in data_sec:
         match = re.match(data_line_re, line)
         if match:
-            name = match[1]
-            directive = Directives[match[2][1:]]
-            address = directive(name, match[3], memory)
-            labels[name] = Label(name=name,
-                                 value=address,
-                                 location=mipsRE.DATA_SEC,
-                                 kind=match[2][1:])
+            label_name = match[1]
+            directive_name = match[2][1:]
+            raw_data = match[3]
+            directive = Directives[directive_name]
+            address = directive(raw_data, memory)
+            if label_name:
+                # Not all directives need labels
+                labels[label_name] = Label(name=label_name, value=address, location=mipsRE.DATA_SEC, kind=match[2][1:])
+        else:
+            raise MipsException(f"Unknown directive {line}")
+
+    address = Directives["space"]('4', memory)  # Pad the end of data section
+    memory.ram["heap"]["start"] = memory.ram["heap"]["stop"] = address  # Prep the heap section
 
 
 def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[SourceLine]:
@@ -126,12 +133,7 @@ def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[So
         match = re.match(f"({mipsRE.LABEL}):", srcline.line)
         if match:
             # If there's a label save it to the labels dictionary
-            labels[match[1]] = Label(
-                location=mipsRE.TEXT_SEC,
-                value=(idx - lbl_ct),
-                name=match[1],
-                kind="text",
-            )
+            labels[match[1]] = Label(name=match[1], value=(idx - lbl_ct), location=mipsRE.TEXT_SEC, kind="text")
             if len(srcline.line) > len(match[0]):
                 # If the line is longer than what was matched, lets assume
                 # the rest is an instruction (comments and whitespace should
@@ -160,24 +162,23 @@ def process_file(file: TextIO) -> List[SourceLine]:
     filename = os.path.abspath(file.name)
     code = file.read()
     linenumbers = list(enumerate(code.splitlines()))
+
+    def remove_comments(ln):
+        lineno, line = ln[0], ln[1]
+        return SourceLine(filename, lineno + 1, re.sub(mipsRE.COMMENT, "", line).strip())
+
     # remove comments
-    nocomments: Iterable[SourceLine] = map(
-        lambda ln: SourceLine(
-            filename, ln[0] + 1, re.sub(mipsRE.COMMENT, "", ln[1]).strip()
-        ),
-        linenumbers,
-    )
+    nocomments: Iterable[SourceLine] = map(remove_comments, linenumbers)
+
     # drop lines that are empty
-    noemptylines: Iterable[SourceLine] = filter(
-        lambda ln: ln.line != "", nocomments)
+    noemptylines: Iterable[SourceLine] = filter(lambda ln: ln.line != "", nocomments)
 
     def manyspaces_to_onespace(ln: SourceLine) -> SourceLine:
         ln.line = " ".join(ln.line.split())
         return ln
 
     # make every white space just one space
-    linesofcode: List[SourceLine] = list(
-        map(manyspaces_to_onespace, noemptylines))
+    linesofcode: List[SourceLine] = list(map(manyspaces_to_onespace, noemptylines))
 
     return linesofcode
 
@@ -308,24 +309,19 @@ def macro_with_args(idx: int, lines: List[SourceLine], macro: str, macroinfo: Di
         lines[idx] = expanded_macro  # type: ignore
 
 
-def load_args(init_regs: Dict[str, int], memory: bytearray, args: List[str]):
+def load_args(init_regs: Registers, memory: Memory, args: List[str]):
     """Load arguments on to the stack and sets argc."""
     init_regs["$a0"] = len(args)  # argc
+    space_len_pointers = (len(args) + 1) * 4  # num bytes needed for argv pointers + null pointer
+    argv_base_address = memory.extend_stack(bytes(space_len_pointers))
 
     argv: List[int] = []
     for arg in args:
-        ptr = malloc(memory, len(arg) + 1)
-        # str ending in null
-        memory[ptr: ptr + len(arg) + 1] = [*[ord(c) for c in arg], 0]
+        ptr = memory.extend_stack(bytesify(arg))
         argv.append(ptr)
 
-    argv.append(0)  # NULL to end pointer array
-
-    # Malloc all at once this time for contiguous memory
-    argv_ptr = malloc(memory, len(argv) * 4)
-
     for idx, ptr in enumerate(argv):
-        store_addr = argv_ptr + idx * 4
-        memory[store_addr: store_addr + 4] = ptr.to_bytes(4, "big")
+        store_addr = argv_base_address + idx * 4
+        memory[store_addr: store_addr + 4] = bytesify(ptr, size=4)
 
-    init_regs["$a1"] = argv_ptr  # argv
+    init_regs["$a1"] = argv_base_address  # argv

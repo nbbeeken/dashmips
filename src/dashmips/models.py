@@ -1,6 +1,7 @@
 """Data Models Essential to the Dashmips Ecosystem."""
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Any
+from .hardware import Memory, Registers
 
 names_enum = tuple(
     enumerate(
@@ -62,8 +63,8 @@ class MipsProgram:
     filenames: List[str]
     labels: Dict[str, Label]
     source: List[SourceLine]
-    memory: bytearray = field(default_factory=bytearray)
-    registers: Dict[str, int] = field(default_factory=default_registers)
+    memory: Memory = field(default_factory=Memory)
+    registers: Registers = field(default_factory=Registers)
     eqvs: Dict[str, str] = field(default_factory=dict)
     exited: bool = False
 

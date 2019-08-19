@@ -3,6 +3,8 @@ import inspect
 from importlib import import_module
 from typing import Any, Callable, Dict
 
+from .hardware import Memory
+
 
 class MipsException(Exception):
     """Mips related errors."""
@@ -13,7 +15,7 @@ class MipsException(Exception):
         self.message = message
 
 
-Directives: Dict[str, Callable[[str, Any, bytearray], int]] = {
+Directives: Dict[str, Callable[[str, Memory], int]] = {
     name.replace("directive_", ""): fn
     for name, fn in inspect.getmembers(
         import_module(".directives", "dashmips"),
@@ -28,7 +30,7 @@ class RE:
     DATA_SEC = ".data"
     TEXT_SEC = ".text"
 
-    REGISTER = r"hi|lo|(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])|zero|sp|fp|gp|ra))"
+    REGISTER = r"(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])|zero|sp|fp|gp|ra))"
     LABEL = r"\b[\w]+\b"
     DIRECTIVE = "\\." + "|\\.".join(Directives.keys())
 

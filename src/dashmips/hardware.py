@@ -1,91 +1,155 @@
 """Mips Hardware."""
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Iterable
+from typing_extensions import Literal
+from mypy_extensions import TypedDict
+from collections.abc import ByteString
 
-names_enum = tuple(
-    enumerate(
-        (
-            # fmt: off
-            "$zero",
-            "$at",
-            "$v0", "$v1",
-            "$a0", "$a1", "$a2", "$a3",
-            "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7",
-            "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7",
-            "$t8", "$t9",
-            "$k0", "$k1",
-            "$gp", "$sp", "$fp", "$ra",
-            "pc",
-            "hi",
-            "lo",
-            # fmt: on
-        )
-    )
+Section = TypedDict("Section", {"m": bytearray, "start": int, "stop": int})
+RAM = TypedDict("RAM", {"data": Section, "stack": Section, "bss": Section, "heap": Section})
+
+register_names = (
+    # fmt: off
+    "$zero",
+    "$at",
+    "$v0", "$v1",
+    "$a0", "$a1", "$a2", "$a3",
+    "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7",
+    "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7",
+    "$t8", "$t9",
+    "$k0", "$k1",
+    "$gp", "$sp", "$fp", "$ra",
+    # fmt: on
 )
 
 
 class Registers(Dict[str, int]):
     """Mips Register File."""
 
-    Resolve: Dict[Union[str, int], str] = {
-        # **{i: name for (i, name) in names_enum},
-        **{name: name for (i, name) in names_enum},
-        **{f"${i}": name for (i, name) in names_enum},
+    SPECIAL = ("pc", "hi", "lo")
+
+    resolve: Dict[Union[str, int], str] = {
+        **{name: name for (i, name) in enumerate(register_names)},
+        **{f"${i}": name for (i, name) in enumerate(register_names)},
     }
 
-    def __init__(self, dictionary: Optional[Dict[str, int]] = None):
+    def __init__(self):
         """Initialize 32 registers to zero.
 
         dictionary - can be partial/full dictionary of registers
         """
-        self.pc_changed = False
-        base_reg = {name: 0 for idx, name in names_enum}
-        if dictionary:
-            new_dict = {
-                Registers.Resolve[regname]: value
-                for regname, value in dict(dictionary).items()
-            }
-            super().__init__({**base_reg, **new_dict})
-        else:
-            super().__init__(base_reg)
+        for name in register_names:
+            self[name] = 0x0
+
+        # Special Registers
+        self["pc"] = 0x0
+        self["hi"] = 0x0
+        self["lo"] = 0x0
 
     def __setitem__(self, key: str, value: int):
-        """
-        Set register value.
-
-        Accepts string or number for key
-        """
-        assert not value & 0x00_00_00_00, "Reg value cannot exceed 32 bits"
-        self.pc_changed = Registers.Resolve[key] == "pc"
-        super().__setitem__(Registers.Resolve[key], value)
+        """Set register value."""
+        if key in Registers.SPECIAL:
+            return super().__setitem__(key, value)
+        if key not in Registers.resolve:
+            raise Exception(f'Unknown register Reg[{key}]={hex(value)}')
+        if value > 0xFFFFFFFF:
+            raise Exception(f'Registers are only 32-bits Reg[{key}]={hex(value)}')
+        super().__setitem__(Registers.resolve[key], value)
 
     def __getitem__(self, key: str) -> int:
-        """
-        Get register value.
-
-        Accepts string or number for key
-        """
-        return super().__getitem__(Registers.Resolve[key])
+        """Get register value."""
+        if key in Registers.SPECIAL:
+            return super().__getitem__(key)
+        return super().__getitem__(Registers.resolve[key])
 
 
-PAGE = 4096
-FREESPACE = 0x0
+class Memory():
+    """Memory simulated by bytearray."""
+
+    PAGE = 2**12
+    TASK_LIMIT = 0xc0000000
+    START_DATA = 0x08049000
+    STACK_STOP = 0x007A1200
+
+    def __init__(self):
+        """Create Mips Memory."""
+        self.ram: RAM = {
+            "stack": {
+                "m": bytearray(),
+                "start": Memory.STACK_STOP,
+                "stop": Memory.STACK_STOP
+            },
+            "heap": {
+                "m": bytearray(),
+                "start": 0,
+                "stop": 0
+            },
+            "data": {
+                "m": bytearray(),
+                "start": Memory.START_DATA,
+                "stop": Memory.START_DATA
+            },
+        }
+
+    def allocate(self, size):
+        """Allocates size bytes of space in the data section (preprocess time)."""
+        pad = self.freespace % 4
+        if pad > 0:
+            self.freespace = self.freespace + (4 - pad)
+        old_freespace = self.freespace  # Aligned to 4
+        self.freespace += size + pad  # Allocate Aligned amount
+        return old_freespace
+
+    def _get_section_name(self, key):
+        for section_name, section in self.ram.items():
+            if type(key) is int:
+                if section["start"] >= key >= section["stop"]:
+                    return section_name
+            if type(key) is slice:
+                if section["start"] >= key.start and key.stop <= section["stop"]:
+                    return section_name
+        ranges = " ".join([f"{sn}:[0x{s['start']:08x}, 0x{s['stop']:08x})" for sn, s in self.ram.items()])
+        raise IndexError(f"{key} not in ranges {ranges}")
+
+    def extend_data(self, data: bytes) -> int:
+        """Insert data into memory."""
+        section = self.ram["data"]
+        section["m"].extend(data)
+        section["stop"] = section["start"] + len(section["m"])
+        return section["stop"] - len(data)
+
+    def extend_stack(self, data) -> int:
+        """Put data on stack."""
+        section = self.ram["stack"]
+        section["m"].extend(data)
+        section["stop"] = section["start"] - len(section["m"])
+        return section["stop"]
+
+    def __setitem__(self, key, values):
+        """Store to memory."""
+        data = bytesify(values)
+        section_name = self._get_section_name(key)
+        section = self.ram[section_name]
+        section["m"][key] = data
+
+    def __getitem__(self, key):
+        """Search for and get item from ram section."""
+        return self.ram[self._get_section_name(key)]["m"]
 
 
-def new_memory(hexstring: Optional[str] = None) -> bytearray:
-    """Create 2KB of MIPS RAM."""
-    global FREESPACE
-    FREESPACE = 0x0
-    memory = bytearray()
-    if hexstring and type(hexstring) is str:
-        memory.fromhex(hexstring)
-    else:
-        memory = bytearray(PAGE * 4)
+def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> bytes:
+    """Take variety of types and turn them into bytes."""
+    if isinstance(data, str):
+        return bytes(data + ("\0" if null_byte else ""), "utf8")
+    if isinstance(data, int):
+        int_size = size if size else (data.bit_length() // 8) + 1
+        return data.to_bytes(int_size, "big")
+    return bytes(data)
 
-    for i in range(0x2060, 0x2060 + ((80 * 25) * 2), 2):
-        blank_space = (0x0F00 | ord(" "))
-        memory[i:i + 1] = blank_space.to_bytes(2, "little")
 
-    return memory
+def align(data: bytes) -> bytes:
+    """Align bytes to multiple of 4 bytes."""
+    alignment = len(data) + ((4 - len(data) % 4) % 4)
+    return data + bytes(alignment)
 
 
 def compact_memory_string(memory: bytearray) -> str:
@@ -104,17 +168,3 @@ def compact_memory_string(memory: bytearray) -> str:
         s += f"<0 repeats {zero_ct} times>, "
     s += "]"
     return s
-
-
-def malloc(memory: bytearray, size: int) -> int:
-    """Get aligned address of unused memory.
-
-    :param size: int:
-    """
-    global FREESPACE
-    pad = FREESPACE % 4
-    if pad > 0:
-        FREESPACE = FREESPACE + (4 - pad)
-    oldFREESPACE = FREESPACE  # Aligned to 4
-    FREESPACE += size + pad  # Allocate Aligned amount
-    return oldFREESPACE
