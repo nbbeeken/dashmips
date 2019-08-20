@@ -42,8 +42,9 @@ version = "0.4.1"
 [[package]]
 category = "main"
 description = "A backport of the dataclasses module for Python 3.6"
+marker = "python_version == \"3.6\""
 name = "dataclasses"
-optional = true
+optional = false
 python-versions = "*"
 version = "0.6"
 
@@ -308,7 +309,7 @@ version = "0.1.7"
 category = "main"
 description = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 name = "websockets"
-optional = false
+optional = true
 python-versions = ">=3.6"
 version = "8.0.2"
 
@@ -325,7 +326,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "73eaa5451ba83b62b98bb290057f5f86b6bfefdb4fd3a71296ddb328fca3cfe9"
+content-hash = "23ab27519db5e49bf317c15383b788945e70026acf733a833e8d0d6ba93bad78"
 python-versions = "^3.6"
 
 [metadata.hashes]

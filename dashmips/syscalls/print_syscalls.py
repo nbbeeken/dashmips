@@ -10,7 +10,16 @@ def print_string(program: MipsProgram):
     :param program:
     """
     address = program.registers["$a0"]
-    bin_string = program.memory[address: program.memory[address].index(0x0, address)]
+    bin_string = []
+    offset = 0
+    while True:
+        byte = program.memory[address + offset]
+        if not byte:
+            # null terminator encountered
+            break
+        bin_string.append(byte)
+        offset += 1
+
     string = "".join([chr(c) for c in bin_string])
     print(string, end="")
 
@@ -53,7 +62,7 @@ def print_hex_int(program: MipsProgram):
 
     :param program:
     """
-    print(hex(program.registers["$a0"]), end="")
+    print(f"0x{program.registers['$a0']:08x}", end="")
 
 
 @mips_syscall(10)

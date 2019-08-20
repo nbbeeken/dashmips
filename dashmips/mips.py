@@ -1,7 +1,7 @@
 """Mips Management."""
 import inspect
 from importlib import import_module
-from typing import Any, Callable, Dict
+from typing import Callable, Dict
 
 from .hardware import Memory
 

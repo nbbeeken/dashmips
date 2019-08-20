@@ -40,6 +40,7 @@ def generate_snippets(examples: bool = False) -> Dict[str, Dict[str, str]]:
 def build_body(name: str, pattern: str, label: bool) -> str:
     """Create snippet body.
 
+    :param label:
     :param name: Instruction name
     :param pattern: Instruction regex pattern
     """
@@ -65,7 +66,7 @@ def build_body(name: str, pattern: str, label: bool) -> str:
     return snip
 
 
-def build_example(name: str, pattern: str, label: bool) -> str:
+def build_example(name: str, pattern: str) -> str:
     """Generate an example usage of the instruction."""
     snip = f"{name:7s}" + pattern.format(**SNIPPET_REPLACEMENTS)
 

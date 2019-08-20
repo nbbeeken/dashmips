@@ -4,7 +4,7 @@ import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 from . import MipsException
-from .hardware import Memory, Registers, bytesify
+from .hardware import Memory, Registers, bytesify, hexdump
 from .mips import RE as mipsRE, Directives
 from .models import Label, MipsProgram, SourceLine
 
@@ -14,6 +14,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
 
     Breaks the code into directive and text sections.
 
+    :param args:
     :param file: TextIO:
     """
     filename = os.path.abspath(file.name)
@@ -44,9 +45,16 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
 
     registers = Registers()  # type: ignore
     registers["pc"] = labels["main"].value
-    registers["$sp"] = registers["$fp"] = registers["$gp"] = memory.ram["stack"]["stop"]
+    registers["$sp"] = registers["$fp"] = registers["$gp"] = memory.ram["stack"]["stops"]
 
     load_args(registers, memory, argv)
+
+    print('---stack---')
+    print(hexdump(memory.ram["stack"]["m"], offset=memory.ram["stack"]["start"], reverse_idx=True))
+    print('---data---')
+    print(hexdump(memory.ram["data"]["m"], offset=memory.ram["data"]["start"]))
+    print('---heap---')
+    print(hexdump(memory.ram["heap"]["m"], offset=memory.ram["heap"]["start"]))
 
     return MipsProgram(
         name=filename,
@@ -64,8 +72,7 @@ def split_to_sections(code: List[SourceLine]) -> Tuple[List[str], List[SourceLin
 
     .text and .data sections can come in any order.
 
-    :param code: List[Tuple[int:
-    :param str]]:
+    :param code:
     """
     section: Optional[str] = None
     if code[0].line in [mipsRE.DATA_SEC, mipsRE.TEXT_SEC]:
@@ -114,7 +121,6 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
             raise MipsException(f"Unknown directive {line}")
 
     address = Directives["space"]('4', memory)  # Pad the end of data section
-    memory.ram["heap"]["start"] = memory.ram["heap"]["stop"] = address  # Prep the heap section
 
 
 def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[SourceLine]:
@@ -314,7 +320,7 @@ def load_args(init_regs: Registers, memory: Memory, args: List[str]):
     """Load arguments on to the stack and sets argc."""
     init_regs["$a0"] = len(args)  # argc
     space_len_pointers = (len(args) + 1) * 4  # num bytes needed for argv pointers + null pointer
-    argv_base_address = memory.extend_stack(bytes(space_len_pointers))
+    argv_base_address = memory.extend_stack(bytes(space_len_pointers)) + space_len_pointers
 
     argv: List[int] = []
     for arg in args:

@@ -1,6 +1,5 @@
 """Mips Hardware."""
-from typing import Dict, Optional, Union, Iterable
-from collections.abc import ByteString
+from typing import Dict, Union
 
 register_names = (
     # fmt: off
@@ -57,7 +56,7 @@ class Registers(Dict[str, int]):
         return super().__getitem__(Registers.resolve[key])
 
 
-class Memory():
+class Memory:
     """Memory simulated by bytearray."""
 
     PAGE = 2**12
@@ -71,55 +70,83 @@ class Memory():
             "stack": {
                 "m": bytearray(),
                 "start": Memory.STACK_STOP,
-                "stop": Memory.STACK_STOP
+                "stops": Memory.STACK_STOP
             },
             "heap": {
                 "m": bytearray(),
                 "start": 0,
-                "stop": 0
+                "stops": 0
             },
             "data": {
                 "m": bytearray(),
                 "start": Memory.START_DATA,
-                "stop": Memory.START_DATA
+                "stops": Memory.START_DATA
             },
         }
 
-    def _get_section_name(self, key):
-        for section_name, section in self.ram.items():
+    def _tlb(self, key):
+        for section_name in self.ram:
+            start = self.ram[section_name]["start"]
+            stops = self.ram[section_name]["stops"]
+
             if type(key) is int:
-                if section["start"] >= key >= section["stop"]:
-                    return section_name
+                if section_name == "stack" and start >= key >= stops:
+                    return section_name, start - key
+
+                if start <= key <= stops:
+                    return section_name, key - start
+
             if type(key) is slice:
-                if section["start"] >= key.start and key.stop <= section["stop"]:
-                    return section_name
-        ranges = " ".join([f"{sn}:[0x{s['start']:08x}, 0x{s['stop']:08x})" for sn, s in self.ram.items()])
-        raise IndexError(f"{key} not in ranges {ranges}")
+                if section_name == "stack" and start >= key.start and stops <= key.stop:
+                    distance = abs(key.start - key.stop)
+                    address_start = start - key.start
+                    return "stack", slice(address_start, address_start + distance, key.step)
+
+                if start <= key.start and stops >= key.stop:
+                    distance = abs(key.start - key.stop)
+                    address_start = key.start - stops
+                    return section_name, slice(address_start, address_start + distance, key.step)
+
+        self._raise_index_error(key)
+
+    def _raise_index_error(self, key, address=None):
+        ranges = " ".join([f"{sn}:[0x{s['start']:08x}, 0x{s['stops']:08x})" for sn, s in self.ram.items()])
+        tlb_msg = ""
+        if address:
+            tlb_msg = f" ; tlb generated {address}"
+        print(f"Error: 0x{key:08x} not in ranges {ranges}{tlb_msg}")
+        exit(1)
 
     def extend_data(self, data: bytes) -> int:
         """Insert data into memory."""
         section = self.ram["data"]
         section["m"].extend(data)
-        section["stop"] = section["start"] + len(section["m"])
-        return section["stop"] - len(data)
+        section["stops"] = section["start"] + len(section["m"])
+        return section["stops"] - len(data)
 
     def extend_stack(self, data) -> int:
         """Put data on stack."""
         section = self.ram["stack"]
         section["m"].extend(data)
-        section["stop"] = section["start"] - len(section["m"])
-        return section["stop"]
+        section["stops"] = section["start"] - len(section["m"])
+        return section["stops"] - len(data)
 
     def __setitem__(self, key, values):
         """Store to memory."""
         data = bytesify(values)
-        section_name = self._get_section_name(key)
-        section = self.ram[section_name]
-        section["m"][key] = data
+        section_name, address = self._tlb(key)
+        try:
+            self.ram[section_name]["m"][address] = data
+        except IndexError:
+            self._raise_index_error(key, address)
 
     def __getitem__(self, key):
         """Search for and get item from ram section."""
-        return self.ram[self._get_section_name(key)]["m"]
+        section, address = self._tlb(key)
+        try:
+            return self.ram[section]["m"][address]
+        except IndexError:
+            self._raise_index_error(key, address)
 
 
 def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> bytes:
@@ -138,19 +165,32 @@ def align(data: bytes) -> bytes:
     return data + bytes(alignment)
 
 
-def compact_memory_string(memory: bytearray) -> str:
-    """Compacted Memory string."""
-    s = "["
-    zero_ct = 0
-    for v in memory:
-        if v == 0:
-            zero_ct += 1
+def hexdump(data, *, offset=0, reverse_idx=False):
+    """Build a hexdump from a bytestring."""
+    hex_string = ""
+    rows = []
+    row = []
+    for idx, byte in enumerate(data):
+        if idx % 0x10 == 0:
+            row = [] if idx != 0 else row
+            rows.append(row)
+        row.append(byte)
+
+    for idx, byte_row in enumerate(rows):
+        if reverse_idx:
+            calc_idx = offset - (idx * 0x10)
         else:
-            if zero_ct != 0:
-                s += f"<0 repeats {zero_ct} times>, "
-                zero_ct = 0
-            s += str(v) + ", "
-    if zero_ct != 0:
-        s += f"<0 repeats {zero_ct} times>, "
-    s += "]"
-    return s
+            calc_idx = (idx * 0x10) + offset
+        hex_string += f"{calc_idx:08x}  "
+        hex_string += " ".join([f"{byte:02x}" for byte in byte_row[:8]])
+        hex_string += "  " if len(byte_row) > 8 else ' '
+        hex_string += " ".join([f"{byte:02x}" for byte in byte_row[8:]])
+        spaces = '' if idx != len(rows) - 1 else ' ' * (16 - len(byte_row)) * 3
+        ascii_str = "".join([
+            chr(byte) if ord(' ') <= byte <= ord('~') else '.'
+            for byte in byte_row
+        ])
+        hex_string += f"{spaces}  |{ascii_str}|"
+        hex_string += "\n"
+
+    return hex_string
