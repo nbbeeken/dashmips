@@ -4,7 +4,6 @@ import json
 from threading import Thread
 from typing import Any, List, NoReturn
 
-from .debuggerserver import debug_mips
 from .extension import generate_snippets, instruction_name_regex
 from .plugins.vt100 import VT100
 from .preprocessor import preprocess
@@ -50,6 +49,7 @@ def main_run(args: argparse.Namespace) -> int:
 
 def main_debug(args: argparse.Namespace) -> int:
     """Start debug server for mips."""
+    from .debuggerserver import debug_mips
     program = preprocess(args.FILE, args=args.mips_args)
     debug_mips(program, args.host, args.port, should_log=args.log)
     return 0

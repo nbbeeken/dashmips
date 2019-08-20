@@ -3,8 +3,8 @@ import re
 import sys
 from typing import Callable
 
+from . import MipsException
 from .instructions import Instructions
-from .mips import MipsException
 from .models import MipsProgram
 
 RUN_CONDITION: Callable[[MipsProgram], bool] = (lambda p: not p.exited)

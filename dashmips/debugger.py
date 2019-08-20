@@ -9,7 +9,7 @@ All commands need to return
 import os
 from typing import List, Dict, Any, Tuple
 
-from .mips import MipsException
+from . import MipsException
 from .models import MipsProgram
 from .run import next_instruction, run
 

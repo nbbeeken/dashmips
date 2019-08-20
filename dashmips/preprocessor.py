@@ -3,8 +3,9 @@ import os
 import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
+from . import MipsException
 from .hardware import Memory, Registers, bytesify
-from .mips import RE as mipsRE, MipsException, Directives
+from .mips import RE as mipsRE, Directives
 from .models import Label, MipsProgram, SourceLine
 
 

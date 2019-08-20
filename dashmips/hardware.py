@@ -1,11 +1,6 @@
 """Mips Hardware."""
 from typing import Dict, Optional, Union, Iterable
-from typing_extensions import Literal
-from mypy_extensions import TypedDict
 from collections.abc import ByteString
-
-Section = TypedDict("Section", {"m": bytearray, "start": int, "stop": int})
-RAM = TypedDict("RAM", {"data": Section, "stack": Section, "bss": Section, "heap": Section})
 
 register_names = (
     # fmt: off
@@ -72,7 +67,7 @@ class Memory():
 
     def __init__(self):
         """Create Mips Memory."""
-        self.ram: RAM = {
+        self.ram = {
             "stack": {
                 "m": bytearray(),
                 "start": Memory.STACK_STOP,
@@ -89,15 +84,6 @@ class Memory():
                 "stop": Memory.START_DATA
             },
         }
-
-    def allocate(self, size):
-        """Allocates size bytes of space in the data section (preprocess time)."""
-        pad = self.freespace % 4
-        if pad > 0:
-            self.freespace = self.freespace + (4 - pad)
-        old_freespace = self.freespace  # Aligned to 4
-        self.freespace += size + pad  # Allocate Aligned amount
-        return old_freespace
 
     def _get_section_name(self, key):
         for section_name, section in self.ram.items():

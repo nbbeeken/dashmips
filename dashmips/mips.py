@@ -5,16 +5,6 @@ from typing import Any, Callable, Dict
 
 from .hardware import Memory
 
-
-class MipsException(Exception):
-    """Mips related errors."""
-
-    def __init__(self, message: str):
-        """Create MipsException."""
-        super().__init__(message)
-        self.message = message
-
-
 Directives: Dict[str, Callable[[str, Memory], int]] = {
     name.replace("directive_", ""): fn
     for name, fn in inspect.getmembers(
@@ -53,7 +43,7 @@ class RE:
 
     NUMBERS = [HEX, BIN, OCT, DEC, ASCII_LITERAL]
 
-    NUMBER = "(?:" + "|".join(NUMBERS) + ")"
+    NUMBER = f"(?:{'|'.join(NUMBERS)})"
 
     ALL = {
         "register": REGISTER,

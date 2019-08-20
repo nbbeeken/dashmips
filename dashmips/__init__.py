@@ -23,6 +23,16 @@ _syscall_modules = [f"dashmips.syscalls.{mn[:-3]}" for mn in _syscall_files]
 for _sm in _syscall_modules:
     _import_module(_sm)
 
+
+class MipsException(Exception):
+    """Mips related errors."""
+
+    def __init__(self, message: str):
+        """Create MipsException."""
+        super().__init__(message)
+        self.message = message
+
+
 __all__ = [
     "syscalls", "instructions", "plugins", "directives", "hardware", "mips",
     "models", "preprocessor", "run", "debugger", "debuggerserver"
