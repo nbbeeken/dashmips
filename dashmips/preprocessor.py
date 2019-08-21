@@ -3,8 +3,8 @@ import os
 import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
-from . import MipsException
-from .hardware import Memory, Registers, bytesify, hexdump
+from .utils import MipsException, bytesify, hexdump
+from .hardware import Memory, Registers
 from .mips import RE as mipsRE, Directives
 from .models import Label, MipsProgram, SourceLine
 
@@ -48,13 +48,6 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     registers["$sp"] = registers["$fp"] = registers["$gp"] = memory.ram["stack"]["stops"]
 
     load_args(registers, memory, argv)
-
-    print('---stack---')
-    print(hexdump(memory.ram["stack"]["m"], offset=memory.ram["stack"]["start"], reverse_idx=True))
-    print('---data---')
-    print(hexdump(memory.ram["data"]["m"], offset=memory.ram["data"]["start"]))
-    print('---heap---')
-    print(hexdump(memory.ram["heap"]["m"], offset=memory.ram["heap"]["start"]))
 
     return MipsProgram(
         name=filename,
@@ -319,16 +312,15 @@ def macro_with_args(idx: int, lines: List[SourceLine], macro: str, macroinfo: Di
 def load_args(init_regs: Registers, memory: Memory, args: List[str]):
     """Load arguments on to the stack and sets argc."""
     init_regs["$a0"] = len(args)  # argc
-    space_len_pointers = (len(args) + 1) * 4  # num bytes needed for argv pointers + null pointer
-    argv_base_address = memory.extend_stack(bytes(space_len_pointers)) + space_len_pointers
 
     argv: List[int] = []
     for arg in args:
-        ptr = memory.extend_stack(bytesify(arg))
+        ptr = memory.extend_stack(bytesify(arg)) + 1
         argv.append(ptr)
 
-    for idx, ptr in enumerate(argv):
-        store_addr = argv_base_address + idx * 4
-        memory[store_addr: store_addr + 4] = bytesify(ptr, size=4)
+    argv.append(0)
 
-    init_regs["$a1"] = argv_base_address  # argv
+    for idx, ptr in enumerate(argv[::-1]):
+        memory.extend_stack(bytesify(ptr, size=4), align_data=True)
+
+    init_regs["$a1"] = memory.ram["stack"]["stops"] + 4  # argv

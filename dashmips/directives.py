@@ -1,19 +1,8 @@
 """Directive handling."""
 from typing import Union
 
-from .hardware import Memory, bytesify
-
-
-def parse_int(int_str: str) -> int:
-    """Take a python number literal and returns an int."""
-    arg: Union[int, str] = eval(int_str)
-
-    if isinstance(arg, str):
-        arg = int(ord(arg))
-    else:
-        arg = int(arg)
-
-    return arg
+from .utils import parse_int, bytesify
+from .hardware import Memory
 
 
 def directive_align(data: str, memory: Memory):

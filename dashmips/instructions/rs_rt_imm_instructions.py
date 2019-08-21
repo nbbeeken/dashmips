@@ -1,7 +1,8 @@
 """Two Register and Immediate instructions."""
 from typing import Tuple
 
-from . import mips_instruction, parse_int
+from ..utils import parse_int
+from . import mips_instruction
 from ..models import MipsProgram
 
 PATTERN = r"{instr_gap}({register}){args_gap}({register}){args_gap}({number})"

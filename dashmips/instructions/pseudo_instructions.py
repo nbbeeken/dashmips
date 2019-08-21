@@ -1,5 +1,6 @@
 """Instructions that are not real."""
-from . import mips_instruction, parse_int
+from ..utils import parse_int
+from . import mips_instruction
 from ..models import MipsProgram
 
 

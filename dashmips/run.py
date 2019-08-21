@@ -3,7 +3,7 @@ import re
 import sys
 from typing import Callable
 
-from . import MipsException
+from .utils import MipsException
 from .instructions import Instructions
 from .models import MipsProgram
 

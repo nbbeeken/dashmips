@@ -26,15 +26,3 @@ def mips_instruction(pattern: str, parser, label: bool = False):
         return instr
 
     return decorator
-
-
-def parse_int(int_str: str) -> int:
-    """Take a python number literal and returns an int."""
-    arg: Union[int, str] = eval(int_str)
-
-    if isinstance(arg, str):
-        arg = int(ord(arg))
-    else:
-        arg = int(arg)
-
-    return arg

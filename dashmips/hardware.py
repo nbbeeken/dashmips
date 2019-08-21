@@ -57,12 +57,12 @@ class Registers(Dict[str, int]):
 
 
 class Memory:
-    """Memory simulated by bytearray."""
+    """Memory simulated."""
 
     PAGE = 2**12
     TASK_LIMIT = 0xc0000000
     START_DATA = 0x08049000
-    STACK_STOP = 0x007A1200
+    STACK_STOP = 0x00000400
 
     def __init__(self):
         """Create Mips Memory."""
@@ -84,113 +84,109 @@ class Memory:
             },
         }
 
-    def _tlb(self, key):
+    def _tlb(self, virtual_address, sizeof=1):
+        def v2p(pa): return slice(pa, pa + sizeof, 1)
+
         for section_name in self.ram:
             start = self.ram[section_name]["start"]
             stops = self.ram[section_name]["stops"]
 
-            if type(key) is int:
-                if section_name == "stack" and start >= key >= stops:
-                    return section_name, start - key
+            if section_name == "stack" and start >= virtual_address >= stops:
+                return section_name, v2p(start - virtual_address)
 
-                if start <= key <= stops:
-                    return section_name, key - start
+            if start <= virtual_address <= stops:
+                return section_name, v2p(virtual_address - start)
 
-            if type(key) is slice:
-                if section_name == "stack" and start >= key.start and stops <= key.stop:
-                    distance = abs(key.start - key.stop)
-                    address_start = start - key.start
-                    return "stack", slice(address_start, address_start + distance, key.step)
-
-                if start <= key.start and stops >= key.stop:
-                    distance = abs(key.start - key.stop)
-                    address_start = key.start - stops
-                    return section_name, slice(address_start, address_start + distance, key.step)
-
-        self._raise_index_error(key)
+        self._raise_index_error(virtual_address)
 
     def _raise_index_error(self, key, address=None):
         ranges = " ".join([f"{sn}:[0x{s['start']:08x}, 0x{s['stops']:08x})" for sn, s in self.ram.items()])
         tlb_msg = ""
         if address:
             tlb_msg = f" ; tlb generated {address}"
-        print(f"Error: 0x{key:08x} not in ranges {ranges}{tlb_msg}")
+        if type(key) is slice:
+            key_str = f"(0x{key.start:08x}, 0x{key.stop:08x})"
+        else:
+            key_str = f"0x{key:08x}"
+        print(f"Error: {key_str} not in ranges {ranges}{tlb_msg}")
         exit(1)
 
-    def extend_data(self, data: bytes) -> int:
+    def extend_data(self, data: bytes, align_data=False) -> int:
         """Insert data into memory."""
         section = self.ram["data"]
+
+        if align_data:
+            section["m"].extend(alignment_zeros(len(section["m"])))
+            section["stops"] = section["start"] + len(section["m"])
+
         section["m"].extend(data)
         section["stops"] = section["start"] + len(section["m"])
+
         return section["stops"] - len(data)
 
-    def extend_stack(self, data) -> int:
+    def extend_stack(self, data: bytes, align_data=False) -> int:
         """Put data on stack."""
         section = self.ram["stack"]
-        section["m"].extend(data)
+
+        if align_data:
+            section["m"].extend(alignment_zeros(len(section["m"])))
+            section["stops"] = section["start"] - len(section["m"])
+
+        section["m"].extend(data[::-1])
         section["stops"] = section["start"] - len(section["m"])
-        return section["stops"] - len(data)
 
-    def __setitem__(self, key, values):
+        return section["stops"]
+
+    def write08(self, virtual_address: int, values: bytes) -> None:
         """Store to memory."""
-        data = bytesify(values)
-        section_name, address = self._tlb(key)
-        try:
-            self.ram[section_name]["m"][address] = data
-        except IndexError:
-            self._raise_index_error(key, address)
-
-    def __getitem__(self, key):
-        """Search for and get item from ram section."""
-        section, address = self._tlb(key)
-        try:
-            return self.ram[section]["m"][address]
-        except IndexError:
-            self._raise_index_error(key, address)
-
-
-def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> bytes:
-    """Take variety of types and turn them into bytes."""
-    if isinstance(data, str):
-        return bytes(data + ("\0" if null_byte else ""), "utf8")
-    if isinstance(data, int):
-        int_size = size if size else (data.bit_length() // 8) + 1
-        return data.to_bytes(int_size, "big")
-    return bytes(data)
-
-
-def align(data: bytes) -> bytes:
-    """Align bytes to multiple of 4 bytes."""
-    alignment = len(data) + ((4 - len(data) % 4) % 4)
-    return data + bytes(alignment)
-
-
-def hexdump(data, *, offset=0, reverse_idx=False):
-    """Build a hexdump from a bytestring."""
-    hex_string = ""
-    rows = []
-    row = []
-    for idx, byte in enumerate(data):
-        if idx % 0x10 == 0:
-            row = [] if idx != 0 else row
-            rows.append(row)
-        row.append(byte)
-
-    for idx, byte_row in enumerate(rows):
-        if reverse_idx:
-            calc_idx = offset - (idx * 0x10)
+        section_name, physical_address = self._tlb(virtual_address, sizeof=1)
+        if section_name == "stack":
+            self.ram[section_name]["m"][physical_address] = values[::-1]
         else:
-            calc_idx = (idx * 0x10) + offset
-        hex_string += f"{calc_idx:08x}  "
-        hex_string += " ".join([f"{byte:02x}" for byte in byte_row[:8]])
-        hex_string += "  " if len(byte_row) > 8 else ' '
-        hex_string += " ".join([f"{byte:02x}" for byte in byte_row[8:]])
-        spaces = '' if idx != len(rows) - 1 else ' ' * (16 - len(byte_row)) * 3
-        ascii_str = "".join([
-            chr(byte) if ord(' ') <= byte <= ord('~') else '.'
-            for byte in byte_row
-        ])
-        hex_string += f"{spaces}  |{ascii_str}|"
-        hex_string += "\n"
+            self.ram[section_name]["m"][physical_address] = values
 
-    return hex_string
+    def write16(self, virtual_address: int, values: bytes) -> None:
+        """Store to memory."""
+        section_name, physical_address = self._tlb(virtual_address, sizeof=2)
+        if section_name == "stack":
+            self.ram[section_name]["m"][physical_address] = values[::-1]
+        else:
+            self.ram[section_name]["m"][physical_address] = values
+
+    def write32(self, virtual_address: int, values: bytes) -> None:
+        """Store to memory."""
+        section_name, physical_address = self._tlb(virtual_address, sizeof=4)
+        if section_name == "stack":
+            self.ram[section_name]["m"][physical_address] = values[::-1]
+        else:
+            self.ram[section_name]["m"][physical_address] = values
+
+    def read08(self, virtual_address: int) -> bytes:
+        """Search for and get item from ram section."""
+        section_name, physical_address = self._tlb(virtual_address, sizeof=1)
+        data = self.ram[section_name]["m"][physical_address]
+        if section_name == "stack":
+            return data[::-1]
+        return data
+
+    def read16(self, virtual_address: int) -> bytes:
+        """Search for and get item from ram section."""
+        section_name, physical_address = self._tlb(virtual_address, sizeof=2)
+        data = self.ram[section_name]["m"][physical_address]
+        if section_name == "stack":
+            return data[::-1]
+        return data
+
+    def read32(self, virtual_address: int) -> bytes:
+        """Search for and get item from ram section."""
+        section_name, physical_address = self._tlb(virtual_address, sizeof=4)
+        data = self.ram[section_name]["m"][physical_address]
+        if section_name == "stack":
+            return data[::-1]
+        return data
+
+
+def alignment_zeros(data_len) -> bytearray:
+    """Return array of 0s to align to 4."""
+    alignment = ((4 - data_len % 4) % 4)
+    return bytearray(alignment)

@@ -1,5 +1,6 @@
 """Syscalls related to printing."""
 from . import mips_syscall
+from ..utils import intify
 from ..models import MipsProgram
 
 
@@ -13,8 +14,8 @@ def print_string(program: MipsProgram):
     bin_string = []
     offset = 0
     while True:
-        byte = program.memory[address + offset]
-        if not byte:
+        byte = intify(program.memory.read08(address + offset), unsigned=True)
+        if byte == 0:
             # null terminator encountered
             break
         bin_string.append(byte)
@@ -26,10 +27,7 @@ def print_string(program: MipsProgram):
 
 @mips_syscall(11)
 def print_char(program: MipsProgram):
-    """Print string at address provided in $a0.
-
-    :param program:
-    """
+    """Print string at address provided in $a0."""
     character = chr(program.registers["$a0"] & 0xFF)
     print(character, end="")
 

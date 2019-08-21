@@ -1,7 +1,8 @@
 """Instructions that accept a register and immediate as an argument."""
 from typing import Tuple
 
-from . import mips_instruction, parse_int
+from ..utils import parse_int
+from . import mips_instruction
 from ..models import MipsProgram
 
 PATTERN = r"{instr_gap}({register}){args_gap}({number})"
