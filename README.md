@@ -23,12 +23,18 @@ If you installed via pip you should now have a binary in your path that you can 
 dashmips
 ```
 
+or equivalently
+
+```sh
+python -m dashmips
+```
+
 ## "Compiling"
 
 To compile or run a mips program you run:
 
 ```sh
-dashmips compile -f FILE.mips
+dashmips compile FILE.mips
 ```
 
 What "compilation" means in dashmips is a conversion of the source file to a json format that is better understood by the program. You can use this json format to inspect the internals of how your mips program is interpreted by dashmips.

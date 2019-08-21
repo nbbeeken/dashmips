@@ -3,19 +3,16 @@ import os
 import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
-from .utils import MipsException, bytesify, hexdump
 from .hardware import Memory, Registers
 from .mips import RE as mipsRE, Directives
 from .models import Label, MipsProgram, SourceLine
+from .utils import MipsException, bytesify
 
 
 def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     """Prepare Mips for running.
 
     Breaks the code into directive and text sections.
-
-    :param args:
-    :param file: TextIO:
     """
     filename = os.path.abspath(file.name)
     memory = Memory()  # type: ignore
@@ -64,8 +61,6 @@ def split_to_sections(code: List[SourceLine]) -> Tuple[List[str], List[SourceLin
     """Handle file with mixed sections.
 
     .text and .data sections can come in any order.
-
-    :param code:
     """
     section: Optional[str] = None
     if code[0].line in [mipsRE.DATA_SEC, mipsRE.TEXT_SEC]:
@@ -93,10 +88,6 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
     """Construct the .data section to spec.
 
     Fill the .data section memory with user defined static data
-
-    :param labels:
-    :param data_sec:
-    :param memory:
     """
     data_line_re = f"(?:({mipsRE.LABEL}):)?\\s*({mipsRE.DIRECTIVE})\\s+(.*)"
     for line in data_sec:
@@ -120,9 +111,6 @@ def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[So
     """Construct the .text section to spec.
 
     Fill the .text section memory with user code
-
-    :param labels:
-    :param text_sec:
     """
     from .instructions import Instructions
 
@@ -155,10 +143,7 @@ def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[So
 
 
 def process_file(file: TextIO) -> List[SourceLine]:
-    """Process Mips File.
-
-    :param file: Mips source file
-    """
+    """Process Mips File."""
     filename = os.path.abspath(file.name)
     code = file.read()
     linenumbers = list(enumerate(code.splitlines()))
@@ -184,10 +169,7 @@ def process_file(file: TextIO) -> List[SourceLine]:
 
 
 def preprocessor_directives(lines: List[SourceLine]) -> Tuple[List[str], Dict[str, str], List[SourceLine]]:
-    """Preprocessor Directives handler.
-
-    :param lines: lines to compile.
-    """
+    """Preprocessor Directives handler."""
     for idx, srcline in enumerate(lines):
         if ".globl" in srcline.line:
             del lines[idx]
