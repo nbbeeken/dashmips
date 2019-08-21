@@ -8,4 +8,4 @@ def test_add():
     add_regex = Instructions["add"].regex
     assert re.match(add_regex, "add $t0, $t1, $t2") is not None
     assert re.match(add_regex, "add $t0, $zero, $t2") is not None
-    assert re.match(add_regex, "add $t0, hi, lo") is not None
+    assert re.match(add_regex, "add $t0, hi, lo") is None  # hi lo are non accessible registers

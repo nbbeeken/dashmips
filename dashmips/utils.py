@@ -26,7 +26,7 @@ def parse_int(int_str: str) -> int:
     return arg
 
 
-def hexdump(data, *, offset=0, reverse_idx=False):
+def hexdump(data: bytes, *, offset=0, reverse_idx=False) -> str:
     """Build a hexdump from a bytestring."""
     ROW_MUL = 4
     ROW_HAF = 2
