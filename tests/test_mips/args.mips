@@ -17,7 +17,7 @@ at_str: .asciiz     " @ "
 .text
 
 .macro print_num (%reg)
-	li $v0, 1
+	li $v0, 34
 	move $a0, %reg
 	syscall
 .end_macro

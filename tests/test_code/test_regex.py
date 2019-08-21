@@ -3,7 +3,7 @@ import re
 from dashmips.instructions import Instructions
 
 
-def test_add() -> None:
+def test_add():
     """Test this format of instruction."""
     add_regex = Instructions["add"].regex
     assert re.match(add_regex, "add $t0, $t1, $t2") is not None

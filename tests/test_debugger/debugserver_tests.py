@@ -28,8 +28,8 @@ def communicate(msg: Dict[str, Any]) -> Any:
     rfile = s.makefile('r', encoding='utf8', buffering=1)
     wfile.write(json.dumps(msg) + '\r\n')
     wfile.flush()
-    recvd = rfile.readline().strip()
-    resp = json.loads(recvd)
+    received = rfile.readline().strip()
+    resp = json.loads(received)
     s.close()
     return resp
 
@@ -39,8 +39,8 @@ def recv() -> Dict[str, Any]:
     s = socket()
     s.connect(('localhost', 9999))
     rfile = s.makefile('r', encoding='utf8', buffering=1)
-    recvd = rfile.readline().strip()
-    resp = json.loads(recvd)
+    received = rfile.readline().strip()
+    resp = json.loads(received)
     s.close()
     return cast(Dict[str, Any], resp)
 
@@ -48,7 +48,7 @@ def recv() -> Dict[str, Any]:
 class TestMipsDebugServer(unittest.TestCase):
     """Testing for mips debug server."""
 
-    def test_start(self) -> None:
+    def test_start(self):
         """Test start command."""
         program = compile_file('test.mips')
 
@@ -59,19 +59,11 @@ class TestMipsDebugServer(unittest.TestCase):
         self.assertIn('command', resp, pformat(resp))
         self.assertIn('program', resp, pformat(resp))
         self.assertEqual(resp['command'], 'start', pformat(resp))
-        self.assertEqual(
-            program['labels']['main']['value'],
-            program['registers']['pc'],
-            pformat(resp),
-        )
-        self.assertLessEqual(
-            program['registers']['pc'],
-            len(program['source']),
-            pformat(resp),
-        )
+        self.assertEqual(program['labels']['main']['value'], program['registers']['pc'], pformat(resp))
+        self.assertLessEqual(program['registers']['pc'], len(program['source']), pformat(resp))
         self.stop_debugging()
 
-    def stop_debugging(self) -> None:
+    def stop_debugging(self):
         """Send a proper stop command to the debugger."""
         SERVER.kill()
 

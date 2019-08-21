@@ -31,7 +31,7 @@ To compile or run a mips program you run:
 dashmips compile -f FILE.mips
 ```
 
-What "compilation" means in dashmips is a conversion of the source file to a json format that is better understood by the program. You can use this json format to inspect the internals of how your mips program is interpretted by dashmips.
+What "compilation" means in dashmips is a conversion of the source file to a json format that is better understood by the program. You can use this json format to inspect the internals of how your mips program is interpreted by dashmips.
 
 ## Running
 
@@ -83,12 +83,20 @@ If you want to contribute to the dashmips project you will need the following:
 - After installing Poetry, and cloning this repository:
 - `poetry install` - will install the dashmips dependencies in a virtual environment that won't harm your global set up.
 - `poetry run X` - can run X command in the correct python environment
-- Try `poetry run pytest --mypy --docstyle --codestyle` to ensure all tests are passing correctly
+- Try `poetry run pytest --tap-stream --tap-outdir=testout --mypy --docstyle --codestyle` to ensure all tests are passing correctly
 
 
 ### Adding Syscalls / Adding Instructions
 
 You can add to the existing files in the `dashmips/instructions` and `dashmips/syscalls` directories using the relevant decorator (`@`).
 If you add instructions or syscalls to a new file in these subdirectories ensure that the new file is named with the pattern: `*_instructions.py` or `*_syscalls.py` where `*` is whatever identifier you choose.
+
+### Testing environment install
+
+To make sure dashmips installs correctly in a clean environment I've created a dockerfile that sets up the minimal required env for dashmips. The command below can be used to create the image.
+
+```sh
+docker build --rm -f "tests\test_env\Dockerfile" -t dashmips_test_env:latest .
+```
 
 Happy coding!
