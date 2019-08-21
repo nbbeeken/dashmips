@@ -1,8 +1,7 @@
 """Directive handling."""
-from typing import Union
 
-from .utils import parse_int, bytesify, MipsException
 from .hardware import Memory
+from .utils import parse_int, bytesify, MipsException
 
 
 def directive_align(data: str, memory: Memory):

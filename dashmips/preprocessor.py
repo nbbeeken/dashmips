@@ -3,10 +3,10 @@ import os
 import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
-from .utils import MipsException, bytesify, hexdump
 from .hardware import Memory, Registers
 from .mips import RE as mipsRE, Directives
 from .models import Label, MipsProgram, SourceLine
+from .utils import MipsException, bytesify
 
 
 def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:

@@ -9,9 +9,9 @@ All commands need to return
 import os
 from typing import List, Dict, Any, Tuple
 
-from .utils import MipsException
 from .models import MipsProgram
 from .run import next_instruction, run
+from .utils import MipsException
 
 
 def debug_start(program: MipsProgram, params=None) -> Dict[str, int]:

@@ -3,7 +3,6 @@
 NOTE: If you add a new file/module to this package *YOU MUST*
 import the file to `dashmips/__init__.py`
 """
-from typing import Union
 
 from .Instruction import Instruction
 

@@ -1,7 +1,7 @@
 """Syscalls related to printing."""
 from . import mips_syscall
-from ..utils import intify
 from ..models import MipsProgram
+from ..utils import intify
 
 
 @mips_syscall(4)

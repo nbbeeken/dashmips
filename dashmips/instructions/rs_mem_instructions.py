@@ -2,8 +2,8 @@
 from typing import Tuple
 
 from . import mips_instruction
-from ..utils import parse_int, intify, bytesify
 from ..models import MipsProgram
+from ..utils import parse_int, intify, bytesify
 
 PATTERN = r"{instr_gap}({register}){args_gap}({number}?)\(({register})\)"
 

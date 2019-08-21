@@ -1,7 +1,7 @@
 """Instructions that are not real."""
-from ..utils import parse_int
 from . import mips_instruction
 from ..models import MipsProgram
+from ..utils import parse_int
 
 
 @mips_instruction(r"{instr_gap}({register}){args_gap}({label})", lambda args: (args[2], args[3]), label=True)

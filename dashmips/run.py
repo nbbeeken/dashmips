@@ -3,9 +3,9 @@ import re
 import sys
 from typing import Callable
 
-from .utils import MipsException
 from .instructions import Instructions
 from .models import MipsProgram
+from .utils import MipsException
 
 RUN_CONDITION: Callable[[MipsProgram], bool] = (lambda p: not p.exited)
 

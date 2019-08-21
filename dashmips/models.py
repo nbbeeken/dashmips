@@ -2,8 +2,8 @@
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Any
 
-from .utils import hexdump
 from .hardware import Memory, Registers
+from .utils import hexdump
 
 
 @dataclass
