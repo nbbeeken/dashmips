@@ -15,21 +15,13 @@ from .run import next_instruction, run
 
 
 def debug_start(program: MipsProgram, params=None) -> Dict[str, int]:
-    """Debug start.
-
-    :param operation: dict
-    :param program: MipsProgram
-    """
+    """Debug start."""
     program.registers["pc"] = program.labels["main"].value
     return {"pid": os.getpid()}
 
 
 def debug_step(program: MipsProgram, params) -> Dict[str, Any]:
-    """Debug step.
-
-    :param operation: dict
-    :param program: MipsProgram
-    """
+    """Debug step."""
     try:
         next_instruction(program)
 
@@ -43,20 +35,14 @@ def debug_step(program: MipsProgram, params) -> Dict[str, Any]:
 
 
 def debug_continue(program: MipsProgram, params) -> Dict[str, Any]:
-    """Debug continue.
-
-    :param program: MipsProgram
-    """
+    """Debug continue."""
     starting_pc = program.registers["pc"]
     # vscode should have done the translation
     # these are pc values (aka index into srclines)
     verified, breakpoints = verify_breakpoints(program, params)
 
     def breaking_condition(program: MipsProgram) -> bool:
-        """Condition function to stop execution.
-
-        :param program:
-        """
+        """Condition function to stop execution."""
         nonlocal starting_pc
         if program.registers["pc"] == starting_pc:
             # current instruction will execute even if on breakpoint
@@ -79,11 +65,7 @@ def debug_continue(program: MipsProgram, params) -> Dict[str, Any]:
 
 
 def debug_stop(program: MipsProgram, params) -> Dict[str, bool]:
-    """Stop messages incoming mean nothing to a server.
-
-    :param operation: dict
-    :param program: MipsProgram
-    """
+    """Stop messages incoming mean nothing to a server."""
     return {"exited": True}
 
 

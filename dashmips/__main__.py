@@ -11,21 +11,11 @@ from .preprocessor import preprocess
 
 def main_compile(args: argparse.Namespace) -> int:
     """Compile/Exec mips code."""
-    if args.file:
-        program = preprocess(args.file)
+    program = preprocess(args.FILE)
     if args.out:
         json.dump(program.to_dict(), args.out)
-
-    if args.json:
-        # Ending matches socket communication
+    else:
         print(json.dumps(program.to_dict()))
-
-    if args.vscode:
-        snippets = generate_snippets()
-        print(json.dumps(snippets, indent=4))
-        print("\n\n\n")
-        print(instruction_name_regex())
-
     return 0
 
 
@@ -75,15 +65,25 @@ def main_docs(args: argparse.Namespace) -> int:
     print("Instructions")
     print(f"{'format':<35}{'description'}")
     print(f"{'------':<35}{'-----------'}")
-    snips = generate_snippets(examples=True)
+    snippets = generate_snippets(examples=True)
     instr_list = list(Instructions.items())
     instr_list.sort(key=lambda i: i[0])
     for instrname, instruction in instr_list:
-        ex_str = snips[instrname]["example"]
-        desc = snips[instrname]["description"]
+        ex_str = snippets[instrname]["example"]
+        desc = snippets[instrname]["description"]
         print(f"{ex_str:35}# ", end="")
         print(f"{desc}")
 
+    return 0
+
+
+def main_utils(args: argparse.Namespace) -> int:
+    """General utilities to help a mips developer."""
+    if args.snippets:
+        snippets = generate_snippets()
+        print(json.dumps(snippets, indent=4))
+    if args.instruction_regex:
+        print(instruction_name_regex())
     return 0
 
 
@@ -91,28 +91,27 @@ def main() -> NoReturn:
     """Entry function for Dashmips."""
     parser = argparse.ArgumentParser("dashmips")
 
-    parser.add_argument("-v", "--version", action="version", version="0.0.11")
+    parser.add_argument("-v", "--version", action="version", version="0.1.0")
 
     sbp = parser.add_subparsers(title="commands", dest="command")
     compileparse = sbp.add_parser("compile", aliases=["c"])
     runparse = sbp.add_parser("run", aliases=["r"])
     debugparse = sbp.add_parser("debug", aliases=["d"])
     docsparse = sbp.add_parser("docs", aliases=["h"])
+    utilsparse = sbp.add_parser("utils", aliases=["u"])
 
-    compileparse.add_argument("-f", "--file", type=argparse.FileType("r", encoding="utf8"), help="Input file")
+    compileparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
     compileparse.add_argument("-o", "--out", type=argparse.FileType("w", encoding="utf8"), help="Output file name")
-    compileparse.add_argument("-j", "--json", action="store_true", help="Output json to stdout")
-    compileparse.add_argument("--vscode", action="store_true", help="Output json for vscode")
     compileparse.set_defaults(func=main_compile)
 
     runparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
     runparse.add_argument("-a", "--args", dest="mips_args", nargs="*", help="Arguments to pass into the mips main")
-    runparse.add_argument("-t", "--vt100", action="store_true", help="Start VT100 Simulator")
+    runparse.add_argument("--vt100", action="store_true", help="Start VT100 Simulator")
     runparse.set_defaults(func=main_run)
 
     debugparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
     debugparse.add_argument("-a", "--args", dest="mips_args", nargs="*", help="Arguments to pass into the mips main")
-    debugparse.add_argument("-t", "--vt100", action="store_true", help="Start VT100 Simulator")
+    debugparse.add_argument("--vt100", action="store_true", help="Start VT100 Simulator")
     debugparse.add_argument("-p", "--port", type=int, default=2390, help="run debugger on port")
     debugparse.add_argument("-i", "--host", default="0.0.0.0", help="run debugger on host")
     debugparse.add_argument("-l", "--log", dest="log", action="store_true", help="Log all network traffic")
@@ -121,6 +120,10 @@ def main() -> NoReturn:
     docsparse.add_argument("-s", "--syscalls", action="store_true", help="Show syscall table")
     docsparse.add_argument("-i", "--instr", action="store_true", help="Show instruction table")
     docsparse.set_defaults(func=main_docs)
+
+    utilsparse.add_argument("--snippets", action="store_true", help="Output snippets json")
+    utilsparse.add_argument("--instruction_regex", action="store_true", help="Output regex that matches instructions")
+    utilsparse.set_defaults(func=main_utils)
 
     prog_args = parser.parse_args()
     if not hasattr(prog_args, "func"):

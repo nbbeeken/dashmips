@@ -32,7 +32,7 @@ def generate_snippets(examples: bool = False) -> Dict[str, Dict[str, str]]:
             "scope": "mips",
         }
         if examples:
-            example = build_example(ins.name, ins.pattern, ins.label)
+            example = build_example(ins.name, ins.pattern)
             snippets[name]["example"] = example
     return snippets
 
@@ -40,7 +40,6 @@ def generate_snippets(examples: bool = False) -> Dict[str, Dict[str, str]]:
 def build_body(name: str, pattern: str, label: bool) -> str:
     """Create snippet body.
 
-    :param label:
     :param name: Instruction name
     :param pattern: Instruction regex pattern
     """

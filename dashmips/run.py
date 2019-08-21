@@ -11,11 +11,7 @@ RUN_CONDITION: Callable[[MipsProgram], bool] = (lambda p: not p.exited)
 
 
 def run(program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_CONDITION) -> int:
-    """Execute Preprocessed Mips.
-
-    :param program: MipsProgram:
-    :param runnable:  (Default value = lambda p: p.registers["pc"] != -1)
-    """
+    """Execute Preprocessed Mips."""
     try:
         while runnable(program):
             next_instruction(program)
@@ -28,10 +24,7 @@ def run(program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_COND
 
 
 def next_instruction(program: MipsProgram):
-    """Execute One Instruction.
-
-    :param program:
-    """
+    """Execute One Instruction."""
     current_pc = program.registers["pc"]
     if current_pc >= len(program.source):
         # We jumped or executed beyond available text

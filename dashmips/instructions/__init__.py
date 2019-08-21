@@ -11,16 +11,9 @@ Instructions = {}
 
 
 def mips_instruction(pattern: str, parser, label: bool = False):
-    """Make an Instruction object from decorated function.
-
-    :param pattern: param parser:
-    :param parser:
-    """
+    """Make an Instruction object from decorated function."""
     def decorator(function) -> Instruction:
-        """Instruction Decorator wrapper.
-
-        :param function:
-        """
+        """Instruction Decorator wrapper."""
         instr = Instruction(function, pattern, parser, label=label)
         Instructions[instr.name] = instr
         return instr

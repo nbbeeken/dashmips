@@ -2,7 +2,9 @@
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Any
 
+from .utils import hexdump
 from .hardware import Memory, Registers
+
 
 @dataclass
 class SourceLine:
@@ -42,23 +44,23 @@ class MipsProgram:
     eqvs: Dict[str, str] = field(default_factory=dict)
     exited: bool = False
 
-    @staticmethod
-    def from_dict(prg: Dict[str, Any]) -> "MipsProgram":
-        """From Basic dictionary to MipsProgram.
-
-        :param prg:
-        """
-        prg["memory"] = bytearray().fromhex(prg["memory"])
-        # prg["registers"] = check_registers(prg["registers"])
-        prg["labels"] = {ln: Label(**l) for ln, l in prg["labels"].items()}
-        prg["source"] = [SourceLine(**m) for m in prg["source"]]
-        return MipsProgram(**prg)
-
     def to_dict(self) -> Dict[str, Any]:
-        """Two item iterable for dictionary making."""
-        program_dict = asdict(self)
-        program_dict["memory"] = program_dict["memory"].hex()
-        return program_dict
+        """Program object to simple dict."""
+        memory_str = {
+            "stack": hexdump(self.memory.ram["stack"]["m"]),
+            "data": hexdump(self.memory.ram["data"]["m"]),
+            "heap": hexdump(self.memory.ram["heap"]["m"]),
+        }
+        return {
+            "name": self.name,
+            "filenames": self.filenames,
+            "labels": {n: asdict(l) for n, l in self.labels.items()},
+            "source": [asdict(s) for s in self.source],
+            "memory": memory_str,
+            "registers": self.registers,
+            "eqvs": self.eqvs,
+            "exited": self.exited,
+        }
 
     @property
     def current_line(self) -> SourceLine:
