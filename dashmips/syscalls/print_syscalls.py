@@ -8,17 +8,7 @@ from ..utils import intify
 def print_string(program: MipsProgram):
     """Print string at address provided in $a0."""
     address = program.registers["$a0"]
-    bin_string = []
-    offset = 0
-    while True:
-        byte = intify(program.memory.read08(address + offset), unsigned=True)
-        if byte == 0:
-            # null terminator encountered
-            break
-        bin_string.append(byte)
-        offset += 1
-
-    string = "".join([chr(c) for c in bin_string])
+    string = program.memory.read_str(address)
     print(string, end="")
 
 
@@ -26,17 +16,9 @@ def print_string(program: MipsProgram):
 def print_char(program: MipsProgram):
     """Print string at address provided in $a0."""
     character = chr(program.registers["$a0"] & 0xFF)
-    print(character, end="")
-
-
-@mips_syscall(5)
-def read_int(program: MipsProgram):
-    """Read Int from stdin."""
-    user_in = input("")
-    try:
-        program.registers["$v0"] = int(user_in, 10)
-    except ValueError:
-        print("Not a parsable int")
+    if ord(" ") <= ord(character) <= ord("~") or character in ("\n", "\t", "\r"):
+        # is printable
+        print(character, end="")
 
 
 @mips_syscall(1)
@@ -46,9 +28,15 @@ def print_int(program: MipsProgram):
 
 
 @mips_syscall(34)
-def print_hex_int(program: MipsProgram):
+def print_hex(program: MipsProgram):
     """Print Int in Hex."""
-    print(f"0x{program.registers['$a0']:08x}", end="")
+    print(f"{program.registers['$a0'] & 0xFFFFFFFF:08x}", end="")
+
+
+@mips_syscall(35)
+def print_bin(program: MipsProgram):
+    """Print Int in Hex."""
+    print(f"{program.registers['$a0'] & 0xFFFFFFFF:032b}", end="")
 
 
 @mips_syscall(10)

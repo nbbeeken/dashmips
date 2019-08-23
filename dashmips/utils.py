@@ -70,5 +70,16 @@ def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> byte
         return bytes(data + ("\0" if null_byte else ""), "utf8")
     if isinstance(data, int):
         int_size = size if size else (data.bit_length() // 8) + 1
-        return data.to_bytes(int_size, "big")
+        return (data & 0xFFFF_FFFF).to_bytes(int_size, "big")
     return bytes(data)
+
+
+def as_twos_comp(value: int) -> int:
+    """Interpret number as 32-bit twos comp value."""
+    if value & 0x8000_0000 != 0:
+        # negative
+        flipped_value = (~value) & 0xFFFF_FFFF
+        return -(flipped_value + 1)
+    else:
+        # positive
+        return value

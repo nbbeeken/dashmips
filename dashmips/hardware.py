@@ -1,6 +1,8 @@
 """Mips Hardware."""
 from typing import Dict, Union
 
+from .utils import as_twos_comp, intify
+
 register_names = (
     # fmt: off
     "$zero",
@@ -45,24 +47,24 @@ class Registers(Dict[str, int]):
             return super().__setitem__(key, value)
         if key not in Registers.resolve:
             raise Exception(f'Unknown register Reg[{key}]={hex(value)}')
-        if value > 0xFFFFFFFF:
+        if value > 0xFFFF_FFFF:
             raise Exception(f'Registers are only 32-bits Reg[{key}]={hex(value)}')
-        super().__setitem__(Registers.resolve[key], value)
+        super().__setitem__(Registers.resolve[key], value & 0xFFFF_FFFF)
 
     def __getitem__(self, key: str) -> int:
         """Get register value."""
         if key in Registers.SPECIAL:
             return super().__getitem__(key)
-        return super().__getitem__(Registers.resolve[key])
+        return as_twos_comp(super().__getitem__(Registers.resolve[key]))
 
 
 class Memory:
     """Memory simulated."""
 
-    PAGE = 2**12
+    PAGE_SIZE = 2**12
     TASK_LIMIT = 0xc0000000
-    START_DATA = 0x08049000
-    STACK_STOP = 0x00000400
+    START_DATA = 0x00804900
+    STACK_STOP = 0x05F5E100
 
     def __init__(self):
         """Create Mips Memory."""
@@ -184,6 +186,24 @@ class Memory:
         if section_name == "stack":
             return data[::-1]
         return data
+
+    def read_str(self, virtual_address: int) -> str:
+        """Read null terminated string from memory."""
+        bin_string = []
+        offset = 0
+        while True:
+            byte = intify(self.read08(virtual_address + offset), unsigned=True)
+            if byte == 0:
+                # null terminator encountered
+                break
+            bin_string.append(byte)
+            offset += 1
+        return "".join([chr(c) for c in bin_string])
+
+    def write_str(self, virtual_address: int, data: bytes):
+        """Write data string to memory."""
+        for offset, byte in enumerate(data):
+            self.write08(virtual_address + offset, byte)
 
 
 def alignment_zeros(data_len) -> bytearray:

@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 from .hardware import Memory, Registers
 from .mips import RE as mipsRE, Directives
 from .models import Label, MipsProgram, SourceLine
-from .utils import MipsException, bytesify
+from .utils import MipsException, bytesify, hexdump
 
 
 def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
@@ -38,13 +38,15 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
 
     # Cannot run a program without a main
     if not ("main" in labels and labels["main"].location == mipsRE.TEXT_SEC):
-        raise Exception(f"Cannot locate main in {filename}")
+        raise MipsException(f"Cannot locate main label in {filename}")
 
     registers = Registers()  # type: ignore
+    load_args(registers, memory, argv)
+
     registers["pc"] = labels["main"].value
     registers["$sp"] = registers["$fp"] = registers["$gp"] = memory.ram["stack"]["stops"]
 
-    load_args(registers, memory, argv)
+    memory.extend_stack(bytes([ord('@')] * Memory.PAGE_SIZE))
 
     return MipsProgram(
         name=filename,
@@ -159,7 +161,8 @@ def process_file(file: TextIO) -> List[SourceLine]:
     noemptylines: Iterable[SourceLine] = filter(lambda ln: ln.line != "", nocomments)
 
     def manyspaces_to_onespace(ln: SourceLine) -> SourceLine:
-        ln.line = " ".join(ln.line.split())
+        # Do not edit whitespace inside strings.
+        ln.line = re.sub(r'\s+(?=([^"]*"[^"]*")*[^"]*$)', " ", ln.line)
         return ln
 
     # make every white space just one space

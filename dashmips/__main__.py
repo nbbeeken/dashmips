@@ -1,9 +1,11 @@
 """dashmips program."""
 import argparse
 import json
+import sys
 from threading import Thread
 from typing import Any, List, NoReturn
 
+from .utils import MipsException
 from .extension import generate_snippets, instruction_name_regex
 from .plugins.vt100 import VT100
 from .preprocessor import preprocess
@@ -50,29 +52,31 @@ def main_docs(args: argparse.Namespace) -> int:
     from .instructions import Instructions
     from .syscalls import Syscalls
 
-    # Syscall printer
-    print("Syscalls")
-    print(f"{'name':15}{'number':<10}{'description'}")
-    print(f"{'----':15}{'------':<10}{'-----------'}")
-    syscalls_list = list(Syscalls.items())
-    syscalls_list.sort(key=lambda i: i[0])
-    for sys_num, syscall in syscalls_list:
-        print(f"{syscall.name:15}{sys_num:<10}{syscall.description}")
+    print_both = not args.syscalls and not args.instructions
+    if print_both or args.syscalls:
+        # Syscall printer
+        print("Syscalls")
+        print(f"{'name':15}{'number':<10}{'description'}")
+        print(f"{'----':15}{'------':<10}{'-----------'}")
+        syscalls_list = list(Syscalls.items())
+        syscalls_list.sort(key=lambda i: i[0])
+        for sys_num, syscall in syscalls_list:
+            print(f"{syscall.name:15}{sys_num:<10}{syscall.description}")
+        print()
 
-    print()
-
-    # Instructions printer
-    print("Instructions")
-    print(f"{'format':<35}{'description'}")
-    print(f"{'------':<35}{'-----------'}")
-    snippets = generate_snippets(examples=True)
-    instr_list = list(Instructions.items())
-    instr_list.sort(key=lambda i: i[0])
-    for instrname, instruction in instr_list:
-        ex_str = snippets[instrname]["example"]
-        desc = snippets[instrname]["description"]
-        print(f"{ex_str:35}# ", end="")
-        print(f"{desc}")
+    if print_both or args.instructions:
+        # Instructions printer
+        print("Instructions")
+        print(f"{'format':<35}{'description'}")
+        print(f"{'------':<35}{'-----------'}")
+        snippets = generate_snippets(examples=True)
+        instr_list = list(Instructions.items())
+        instr_list.sort(key=lambda i: i[0])
+        for instrname, instruction in instr_list:
+            ex_str = snippets[instrname]["example"]
+            desc = snippets[instrname]["description"]
+            print(f"{ex_str:35}# ", end="")
+            print(f"{desc}")
 
     return 0
 
@@ -118,7 +122,7 @@ def main() -> NoReturn:
     debugparse.set_defaults(func=main_debug)
 
     docsparse.add_argument("-s", "--syscalls", action="store_true", help="Show syscall table")
-    docsparse.add_argument("-i", "--instr", action="store_true", help="Show instruction table")
+    docsparse.add_argument("-i", "--instructions", action="store_true", help="Show instruction table")
     docsparse.set_defaults(func=main_docs)
 
     utilsparse.add_argument("--snippets", action="store_true", help="Output snippets json")
@@ -138,4 +142,10 @@ def main() -> NoReturn:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except MipsException as ex:
+        # All known errors should be caught and re-raised as MipsException
+        # If a user encounters a traceback that should be a fatal issue
+        print("dashmips encountered an error!", file=sys.stderr)
+        print(ex, file=sys.stderr)

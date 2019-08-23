@@ -66,7 +66,7 @@ def xori(program: MipsProgram, rs: str, rt: str, num: int):
 def sra(program: MipsProgram, rd: str, rs: str, num: int):
     """Shift Right Arithmetic."""
     msb = program.registers[rs] & 0x8000_0000
-    program.registers[rd] = program.registers[rs] << num
+    program.registers[rd] = program.registers[rs] >> num
     program.registers[rd] |= msb
 
 

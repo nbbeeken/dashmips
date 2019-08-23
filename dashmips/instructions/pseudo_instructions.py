@@ -75,7 +75,7 @@ def blt(program: MipsProgram, rd: str, rs: str, label: str):
 @mips_instruction(r"{instr_gap}({register}){args_gap}({register})", lambda args: (args[2], args[3]))
 def neg(program: MipsProgram, rd: str, rs: str):
     """Negate Reg[rs] and store in Reg[rd]."""
-    program.registers[rd] = ~program.registers[rs]
+    program.registers[rd] = ((~program.registers[rs]) & 0xFFFF_FFFF) + 1
 
 
 @mips_instruction(

@@ -2,6 +2,7 @@
 from typing import Tuple
 
 from . import mips_instruction
+from ..utils import MipsException
 from ..models import MipsProgram
 from ..syscalls import Syscalls
 
@@ -20,4 +21,7 @@ def nop(program: MipsProgram):
 @mips_instruction("", parse)
 def syscall(program: MipsProgram):
     """Call syscall specified in $v0."""
-    return Syscalls[program.registers["$v0"]](program)
+    try:
+        return Syscalls[program.registers["$v0"]](program)
+    except KeyError:
+        raise MipsException(f"Unsupported syscall {program.registers['$v0']}")
