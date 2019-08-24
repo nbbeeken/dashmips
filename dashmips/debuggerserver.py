@@ -22,7 +22,7 @@ async def client_loop(client: WebSocketServerProtocol, commands: dict):
         command = commands[request["method"]]
         result = command(params=request["params"])
 
-        response = json.dumps({"result": result})
+        response = json.dumps({"method": request["method"], "result": result})
 
         if request["method"] != "info":
             log.info(f"Send `{response}`")
@@ -31,7 +31,7 @@ async def client_loop(client: WebSocketServerProtocol, commands: dict):
 
         if "exited" in result:
             # only check top level
-            log.warn("Program exited")
+            log.error("Program exited")
             break
 
 
@@ -44,10 +44,10 @@ async def dashmips_debugger(client: WebSocketServerProtocol, path: str, commands
     """
     log.info(f"client={client.local_address}")
     try:
-        client_loop(client, commands)
+        await client_loop(client, commands)
         await client.close()
     except websockets.ConnectionClosed:
-        log.warning("Client disconnect")
+        log.error("Client disconnect")
     except Exception as e:
         log.error(f"Unknown error: {e}")
 
@@ -77,7 +77,7 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
 
     # Bind commands positional arg before launching
     ws_func = functools.partial(dashmips_debugger, commands=commands)
-    start_server = websockets.serve(ws_func, host, port)
+    start_server = websockets.serve(ws_func, host, port, close_timeout=2000)
     try:
         loop = asyncio.get_event_loop()
         ws_server = loop.run_until_complete(start_server)

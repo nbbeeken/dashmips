@@ -1,0 +1,57 @@
+
+.macro create_print_str (%lbl, %str)
+    .data
+    %lbl: .asciiz %str
+    .text
+    li $v0, 4
+    la $a0, %lbl
+    syscall
+.end_macro
+
+.text
+main:
+    li      $s0, 0xBAD1DEA
+    li      $s3, 0xBAD1DEA  # we'll never touch s3 for convience
+    jal     my_function
+    bne     $s0, $s3, bad_exit
+    j       exit
+
+
+my_function:
+    addi    $sp, $sp, -8  # make stack space
+    sw      $s0, 0($sp)   # [-- ra --] note the offsets
+    sw      $ra, 4($sp)   # [-- s0 --]
+
+    li      $s0, 0b111    # Use $s0
+    jal     my_subfunction
+    bne     $s0, $s3, bad_exit
+
+    lw      $s0, 0($sp)
+    lw      $ra, 4($sp)
+    addi    $sp, $sp, 8
+    jr      $ra
+
+
+my_subfunction:
+    addi    $sp, $sp, -8  # make stack space
+    sw      $s0, 0($sp)   # [-- ra --] note the offsets
+    sw      $ra, 4($sp)   # [-- s0 --]
+
+    li      $s0, 0b011    # Use $s0
+
+    lw      $s0, 0($sp)
+    lw      $ra, 4($sp)
+    addi    $sp, $sp, 8
+    jr      $ra
+
+
+exit:
+    li      $a0, 0
+    li      $v0, 10
+    syscall
+
+bad_exit:
+    create_print_str(bad_exit_msg, "NOT RESTORED CORRECTLY\n")
+    li      $a0, 1
+    li      $v0, 10
+    syscall

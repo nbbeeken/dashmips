@@ -7,6 +7,7 @@ All commands need to return
 }
 """
 import os
+from dataclasses import asdict
 from typing import List, Dict, Any, Tuple
 
 from .models import MipsProgram
@@ -31,7 +32,7 @@ def debug_step(program: MipsProgram, params) -> Dict[str, Any]:
     except MipsException as exc:
         return {"exited": True, "message": exc.message}
 
-    return {"stopped": True}
+    return {"stopped": True, "line": asdict(program.current_line)}
 
 
 def debug_continue(program: MipsProgram, params) -> Dict[str, Any]:
@@ -39,7 +40,7 @@ def debug_continue(program: MipsProgram, params) -> Dict[str, Any]:
     starting_pc = program.registers["pc"]
     # vscode should have done the translation
     # these are pc values (aka index into srclines)
-    verified, breakpoints = verify_breakpoints(program, params)
+    _, breakpoints = debug_verify_breakpoints(program, params)
 
     def breaking_condition(program: MipsProgram) -> bool:
         """Condition function to stop execution."""
@@ -61,7 +62,7 @@ def debug_continue(program: MipsProgram, params) -> Dict[str, Any]:
     except MipsException as exc:
         return {"exited": True, "message": exc.message}
 
-    return {"stopped": True, "breakpoints": verified}
+    return {"stopped": True, "line": asdict(program.current_line)}
 
 
 def debug_stop(program: MipsProgram, params) -> Dict[str, bool]:
@@ -74,15 +75,14 @@ def debug_info(program: MipsProgram, params) -> Dict[str, Any]:
     return {"program": program.to_dict()}
 
 
-def verify_breakpoints(
-    program: MipsProgram, breakpoints
-) -> Tuple[List[int], List[int]]:
+def debug_verify_breakpoints(program: MipsProgram, params) -> Tuple[List[int], List[int]]:
     """Find the known breakpoint lines."""
+    breakpoints = params
     local_breakpoints = []
     remote_breakpoints = []
     for breakpoint in breakpoints:
         def checkfile(f: str) -> bool:
-            return os.path.samefile(f, breakpoint["src"]["path"])
+            return os.path.samefile(f, breakpoint["path"])
 
         real_line = None
         for pc_value, srcline in enumerate(program.source):
@@ -92,7 +92,7 @@ def verify_breakpoints(
 
         is_known_file = any(checkfile(fn) for fn in program.filenames)
         if real_line is not None and is_known_file:
-            remote_breakpoints.append(breakpoint["line"])
+            remote_breakpoints.append(breakpoint)
             local_breakpoints.append(real_line)
 
     return remote_breakpoints, local_breakpoints
