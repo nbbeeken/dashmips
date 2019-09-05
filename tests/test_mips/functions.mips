@@ -24,7 +24,8 @@ my_function:
 
     li      $s0, 0b111    # Use $s0
     jal     my_subfunction
-    bne     $s0, $s3, bad_exit
+    li      $t0, 7
+    bne     $s0, $t0, bad_exit
 
     lw      $s0, 0($sp)
     lw      $ra, 4($sp)

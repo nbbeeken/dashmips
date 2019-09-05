@@ -96,6 +96,12 @@ class Memory:
             if section_name == "stack" and start >= virtual_address >= stops:
                 return section_name, v2p(start - virtual_address)
 
+            if section_name == "stack" and virtual_address >= stops + Memory.PAGE_SIZE:
+                # Auto growing stack, only grows if access is within a page
+                self.ram["stack"]["m"].extend(bytearray(Memory.PAGE_SIZE))
+                self.ram["stack"]["stops"] = self.ram["stack"]["start"] - len(self.ram["stack"]["m"])
+                return section_name, v2p(start - virtual_address)
+
             if start <= virtual_address <= stops:
                 return section_name, v2p(virtual_address - start)
 

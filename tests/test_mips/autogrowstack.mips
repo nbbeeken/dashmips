@@ -1,0 +1,18 @@
+.text
+
+.eqv QUIT 10
+
+.macro exit
+li $a0, 0  # set exit code
+li $v0, QUIT
+syscall
+.end_macro
+
+main:
+    li      $t0, 0x0BAD1DEA
+
+    sw      $t0, 0($sp)
+    sw      $t0, 4096($sp)
+    sw      $t0, 4300($sp)
+
+    exit
