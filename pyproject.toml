@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "dashmips"
-version = "0.1.1"
+version = "0.1.2"
 description = "Mips Interpreter"
 authors = ["Neal Beeken <nbbeeken@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/nbbeeken/dashmips"
 classifiers=[
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Education",
     "Topic :: Software Development :: Assemblers",
     "Programming Language :: Assembly",

@@ -29,19 +29,7 @@ or equivalently
 python -m dashmips
 ```
 
-## "Compiling"
-
-To compile or run a mips program you run:
-
-```sh
-dashmips compile FILE.mips
-```
-
-What "compilation" means in dashmips is a conversion of the source file to a json format that is better understood by the program. You can use this json format to inspect the internals of how your mips program is interpreted by dashmips.
-
 ## Running
-
-This one's easy:
 
 ```sh
 dashmips run FILE.mips
@@ -55,29 +43,10 @@ In order to leave a flexible environment for debugging dashmips doesn't provide 
 
 There is a vscode extension that can speak dashmips specific json language [here](https://github.com/nbbeeken/dashmips-debugger).
 
-### Debugging protocol
+### Debugger Protocol
 
-Small notes about the protocol if you want to proceed with a manual debugging. The JSON you send to the debug server is expected to take the following format:
-
-```ts
-interface DebugMessage {
-    command: 'start' | 'step' | 'continue' | 'stop';
-    program: MipsProgram;  // MipsProgram can be found in `dashmips/models.py`
-    // properties below are optional
-    breakpoints?: number[];
-    message?: string;
-    error?: boolean;
-}
-```
-
-The commands listed are `start`, `step`, `continue`, and `stop`. In short each operation does the following:
-
-- Start: sets the pc to the main label
-- Step: runs exactly one instruction from current pc
-- Continue: runs as many instructions as there are between current pc and a breakpoint
-- Stop: Does nothing
-
-The server is designed to be stateless so it can handle many clients at once.
+The dashmips process loads the program from a file and opens a websocket. The supported commands can be found in dashmips/debug.py as functions prepended with `debug_`.
+The protocol loosely follows JSONRPC for the sake of quick development iteration it is not compliant however this could be easily remedied in a future release.
 
 ## Contributing
 
@@ -90,7 +59,6 @@ If you want to contribute to the dashmips project you will need the following:
 - `poetry install` - will install the dashmips dependencies in a virtual environment that won't harm your global set up.
 - `poetry run X` - can run X command in the correct python environment
 - Try `poetry run pytest --tap-stream --tap-outdir=testout --mypy --docstyle --codestyle` to ensure all tests are passing correctly
-
 
 ### Adding Syscalls / Adding Instructions
 
