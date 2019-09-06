@@ -65,6 +65,7 @@ class Memory:
     TASK_LIMIT = 0xc0000000
     START_DATA = 0x00804900
     STACK_STOP = 0x05F5E100
+    HEAP_START = 0x00600000
 
     def __init__(self):
         """Create Mips Memory."""
@@ -76,8 +77,8 @@ class Memory:
             },
             "heap": {
                 "m": bytearray(),
-                "start": 0,
-                "stops": 0
+                "start": Memory.HEAP_START,
+                "stops": Memory.HEAP_START
             },
             "data": {
                 "m": bytearray(),
@@ -120,7 +121,7 @@ class Memory:
         exit(1)
 
     def extend_data(self, data: bytes, align_data=False) -> int:
-        """Insert data into memory."""
+        """Insert data into memory in data section."""
         section = self.ram["data"]
 
         if align_data:
@@ -132,8 +133,21 @@ class Memory:
 
         return section["stops"] - len(data)
 
+    def extend_heap(self, data: bytes, align_data=False) -> int:
+        """Insert data into memory in heap section."""
+        section = self.ram["heap"]
+
+        if align_data:
+            section["m"].extend(alignment_zeros(len(section["m"])))
+            section["stops"] = section["start"] + len(section["m"])
+
+        section["m"].extend(data)
+        section["stops"] = section["start"] + len(section["m"])
+
+        return section["stops"] - len(data)
+
     def extend_stack(self, data: bytes, align_data=False) -> int:
-        """Put data on stack."""
+        """Insert data into memory in stack section."""
         section = self.ram["stack"]
 
         if align_data:

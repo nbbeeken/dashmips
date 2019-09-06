@@ -13,7 +13,6 @@ classifiers=[
     "Programming Language :: Assembly",
     "License :: OSI Approved :: MIT License"
 ]
-packages = [{ include = "dashmips", from = "." }]
 
 [tool.poetry.scripts]
 dashmips = "dashmips.__main__:main"

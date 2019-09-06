@@ -12,11 +12,7 @@ Syscalls: Dict[int, Syscall] = {}
 
 
 def mips_syscall(number: int):
-    """Make a Syscall object from decorated function.
-
-    Note: If you use this to make a new instruction
-    YOU MUST import that function in `dashmips/__init__.py`
-    """
+    """Make a Syscall object from decorated function."""
     def decorator(function: Callable[[MipsProgram], None]) -> Syscall:
         """Syscall Decorator wrapper."""
         syscall = Syscall(function, number)

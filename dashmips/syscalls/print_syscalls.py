@@ -23,7 +23,7 @@ def print_char(program: MipsProgram):
 
 @mips_syscall(1)
 def print_int(program: MipsProgram):
-    """Print Int."""
+    """Print Int in Dec."""
     print(program.registers["$a0"], end="")
 
 
@@ -35,7 +35,7 @@ def print_hex(program: MipsProgram):
 
 @mips_syscall(35)
 def print_bin(program: MipsProgram):
-    """Print Int in Hex."""
+    """Print Int in Bin."""
     print(f"{program.registers['$a0'] & 0xFFFFFFFF:032b}", end="")
 
 

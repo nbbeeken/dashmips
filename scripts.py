@@ -35,6 +35,7 @@ def main_clean() -> int:
 
 def main_publish() -> int:
     """Publish module to pypi."""
+    main_clean()
     run(split("poetry build"), shell=True)
     run(split("twine upload dist/*"), shell=True)
     return 0

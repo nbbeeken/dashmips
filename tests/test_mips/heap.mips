@@ -1,0 +1,50 @@
+
+.macro create_print_str (%lbl, %str)
+    .data
+    %lbl: .asciiz %str
+    .text
+    li $v0, 4
+    la $a0, %lbl
+    syscall
+.end_macro
+
+.macro print_address (%reg)
+	li $v0, 34
+	move $a0, %reg
+	syscall
+.end_macro
+
+.macro print_newline
+	li $v0, 11
+	li $a0, '\n'
+	syscall
+.end_macro
+
+.text
+main:
+    li      $v0, 9
+    syscall
+    move    $s0, $v0  # HEAP POINTER AT $s0
+
+    print_address($s0)
+    print_newline
+
+    li      $t0, 0x0BAD1DEA
+
+    sw      $t0, 100($s0)  # write to somewhere in the heap
+    lw      $t1, 100($s0)  # check it stayed the same
+
+    beq     $t0, $t1, exit
+    b       bad_exit
+
+
+exit:
+    li      $a0, 0
+    li      $v0, 10
+    syscall
+
+bad_exit:
+    create_print_str(bad_exit_msg, "NOT RESTORED CORRECTLY\n")
+    li      $a0, 1
+    li      $v0, 10
+    syscall
