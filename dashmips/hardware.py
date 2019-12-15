@@ -1,6 +1,5 @@
 """Mips Hardware."""
-from typing import Dict, Union, Tuple, Any, NoReturn, cast
-from typing_extensions import TypedDict, Literal
+from typing import Dict, Union, Tuple, Any, NoReturn, TypedDict, Literal, cast
 
 from .utils import as_twos_comp, intify
 
