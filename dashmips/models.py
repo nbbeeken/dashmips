@@ -47,7 +47,7 @@ class MipsProgram:
     def to_dict(self) -> Dict[str, Any]:
         """Program object to simple dict."""
         memory_str = {
-            "stack": hexdump(self.memory.ram["stack"]["m"]),
+            "stack": hexdump(self.memory.ram["stack"]["m"], reverse_idx=True),
             "data": hexdump(self.memory.ram["data"]["m"]),
             "heap": hexdump(self.memory.ram["heap"]["m"]),
         }

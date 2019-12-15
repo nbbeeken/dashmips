@@ -2,7 +2,7 @@
 
 Functions that do not depend on anything in the project.
 """
-from typing import Union
+from typing import Union, List
 
 
 class MipsException(Exception):
@@ -32,7 +32,7 @@ def hexdump(data: bytes, *, offset=0, reverse_idx=False) -> str:
     ROW_HAF = 2
     hex_string = ""
     rows = []
-    row = []
+    row: List[int] = []
     for idx, byte in enumerate(data):
         if idx % ROW_MUL == 0:
             row = [] if idx != 0 else row
@@ -41,9 +41,10 @@ def hexdump(data: bytes, *, offset=0, reverse_idx=False) -> str:
 
     for idx, byte_row in enumerate(rows):
         if reverse_idx:
-            calc_idx = offset - (idx * ROW_MUL)
+            calc_idx = ((len(rows) - 1) * ROW_MUL) - (idx * ROW_MUL)
         else:
-            calc_idx = (idx * ROW_MUL) + offset
+            calc_idx = (idx * ROW_MUL)
+        calc_idx += offset
         hex_string += f"{calc_idx:08x}  "
         hex_string += " ".join([f"{byte:02x}" for byte in byte_row[:ROW_MUL]])
         hex_string += "  " if len(byte_row) > ROW_HAF else ' '

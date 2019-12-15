@@ -5,6 +5,7 @@ import importlib
 import inspect
 import json
 import logging as log
+import signal
 
 import websockets
 from websockets import WebSocketServerProtocol
@@ -48,8 +49,6 @@ async def dashmips_debugger(client: WebSocketServerProtocol, path: str, commands
         await client.close()
     except websockets.ConnectionClosed:
         log.error("Client disconnect")
-    except Exception as e:
-        log.error(f"Unknown error: {e}")
 
 
 def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=False):
@@ -75,16 +74,12 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
     for name, command in funcs:
         commands[name.replace("debug_", "")] = functools.partial(command, program=program)
 
-    # Bind commands positional arg before launching
     ws_func = functools.partial(dashmips_debugger, commands=commands)
     start_server = websockets.serve(ws_func, host, port, close_timeout=2000)
+    loop = asyncio.get_event_loop()
     try:
-        loop = asyncio.get_event_loop()
-        ws_server = loop.run_until_complete(start_server)
+        ws_server = asyncio.get_event_loop().run_until_complete(start_server)
         loop.run_forever()
-    except KeyboardInterrupt as e:
-        log.warning("bye bye... Debugger exiting...")
-    finally:
-        ws_server.close()
-        loop.run_until_complete(ws_server.wait_closed())
+    except KeyboardInterrupt:
+        log.warning('Shutting down debugger...')
         loop.close()

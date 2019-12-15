@@ -1,5 +1,6 @@
 """Mips Hardware."""
-from typing import Dict, Union
+from typing import Dict, Union, Tuple, Any, NoReturn, cast
+from typing_extensions import TypedDict, Literal
 
 from .utils import as_twos_comp, intify
 
@@ -58,6 +59,25 @@ class Registers(Dict[str, int]):
         return as_twos_comp(super().__getitem__(Registers.resolve[key]))
 
 
+SectionNames = Union[Literal['stack'], Literal['heap'], Literal['data']]
+
+
+class RAMPART(TypedDict):
+    """Section of memory."""
+
+    m: bytearray
+    start: int
+    stops: int
+
+
+class RAM(TypedDict):
+    """Structure of memory."""
+
+    stack: RAMPART
+    heap: RAMPART
+    data: RAMPART
+
+
 class Memory:
     """Memory simulated."""
 
@@ -69,7 +89,7 @@ class Memory:
 
     def __init__(self):
         """Create Mips Memory."""
-        self.ram = {
+        self.ram: RAM = {
             "stack": {
                 "m": bytearray(),
                 "start": Memory.STACK_STOP,
@@ -87,10 +107,11 @@ class Memory:
             },
         }
 
-    def _tlb(self, virtual_address, sizeof=1):
-        def v2p(pa): return slice(pa, pa + sizeof, 1)
+    def _tlb(self, virtual_address: int, sizeof=1) -> Tuple[SectionNames, slice]:
+        def v2p(pa: int): return slice(pa, pa + sizeof, 1)
 
         for section_name in self.ram:
+            section_name = cast(SectionNames, section_name)
             start = self.ram[section_name]["start"]
             stops = self.ram[section_name]["stops"]
 
@@ -108,8 +129,8 @@ class Memory:
 
         self._raise_index_error(virtual_address)
 
-    def _raise_index_error(self, key, address=None):
-        ranges = " ".join([f"{sn}:[0x{s['start']:08x}, 0x{s['stops']:08x})" for sn, s in self.ram.items()])
+    def _raise_index_error(self, key: Any, address=None) -> NoReturn:
+        ranges = " ".join([f"{sn}:[0x{s['start']:08x}, 0x{s['stops']:08x})" for sn, s in self.ram.items()])  # type: ignore
         tlb_msg = ""
         if address:
             tlb_msg = f" ; tlb generated {address}"
@@ -223,7 +244,7 @@ class Memory:
     def write_str(self, virtual_address: int, data: bytes):
         """Write data string to memory."""
         for offset, byte in enumerate(data):
-            self.write08(virtual_address + offset, byte)
+            self.write08(virtual_address + offset, bytes(byte))
 
 
 def alignment_zeros(data_len) -> bytearray:
