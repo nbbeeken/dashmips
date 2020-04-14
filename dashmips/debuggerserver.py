@@ -27,6 +27,8 @@ async def client_loop(client: WebSocketServerProtocol, commands: dict):
 
         if request["method"] != "info":
             log.info(f"Send `{response}`")
+        else:
+            log.info("Send info response")
 
         await client.send(response)
 
