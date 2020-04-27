@@ -1,56 +1,36 @@
 """Debugger over websockets."""
-import asyncio
 import functools
 import importlib
 import inspect
 import json
 import logging as log
 import signal
-
-import websockets
-from websockets import WebSocketServerProtocol
+import socketserver
 
 from .models import MipsProgram
 
 
-async def client_loop(client: WebSocketServerProtocol, commands: dict):
+def client_loop(message: str, commands: dict):
     """Message loop handler."""
-    async for message in client:
-        log.info(f"Recv `{message}`")
+    log.info(f"Recv `{message}`")
 
-        request = json.loads(message)
+    request = json.loads(message)
 
-        command = commands[request["method"]]
-        result = command(params=request["params"])
+    command = commands[request["method"]]
+    result = command(params=request["params"])
 
-        response = json.dumps({"method": request["method"], "result": result})
+    response = json.dumps({"method": request["method"], "result": result})
 
-        if request["method"] != "info":
-            log.info(f"Send `{response}`")
-        else:
-            log.info("Send info response")
+    if request["method"] != "info":
+        log.info(f"Send `{response}`")
+    else:
+        log.info("Send info response")
 
-        await client.send(response)
+    if "exited" in result:
+        # only check top level
+        log.error("Program exited")
 
-        if "exited" in result:
-            # only check top level
-            log.error("Program exited")
-            break
-
-
-async def dashmips_debugger(client: WebSocketServerProtocol, path: str, commands: dict):
-    """Client handler for debug server.
-
-    :param client: Websocket handler
-    :param path: should never be set always is `/`
-    :param commands: dictionary of debug commands to functions
-    """
-    log.info(f"client={client.local_address}")
-    try:
-        await client_loop(client, commands)
-        await client.close()
-    except websockets.ConnectionClosed:
-        log.error("Client disconnect")
+    return response
 
 
 def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=False):
@@ -69,19 +49,27 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
     logger.addHandler(log.StreamHandler())
     log.info(f"Serving on: ws://{host}:{port}")
 
-    # Collect functions from debugger.py
-    debugger_module = importlib.import_module(".debugger", "dashmips")
-    funcs = inspect.getmembers(debugger_module, inspect.isfunction)
-    commands = {}
-    for name, command in funcs:
-        commands[name.replace("debug_", "")] = functools.partial(command, program=program)
+    class DashmipsTCPServerHandler(socketserver.BaseRequestHandler):
+        def setup(self):
+            # Collect functions from debugger.py
+            debugger_module = importlib.import_module(".debugger", "dashmips")
+            funcs = inspect.getmembers(debugger_module, inspect.isfunction)
+            self.commands = {}
+            for name, command in funcs:
+                self.commands[name.replace("debug_", "")] = functools.partial(command, program=program)
 
-    ws_func = functools.partial(dashmips_debugger, commands=commands)
-    start_server = websockets.serve(ws_func, host, port, close_timeout=2000)
-    loop = asyncio.get_event_loop()
-    try:
-        ws_server = asyncio.get_event_loop().run_until_complete(start_server)
-        loop.run_forever()
-    except KeyboardInterrupt:
-        log.warning('Shutting down debugger...')
-        loop.close()
+        def handle(self):
+            # self.request is the TCP socket connected to the client
+            while True:
+                self.data = self.request.recv(65000).strip()
+                print("{} wrote:".format(self.client_address[0]))
+                print(self.data)
+                # FIX ME
+                response = client_loop(self.data, self.commands)
+                # just send back the same data, but upper-cased
+                self.request.sendall(self.data.upper())
+
+    with socketserver.TCPServer((host, port), DashmipsTCPServerHandler) as server:
+        # Activate the server; this will keep running until you
+        # interrupt the program with Ctrl-C
+        server.serve_forever()
