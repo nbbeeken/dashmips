@@ -1,4 +1,4 @@
-"""Debugger over websockets."""
+"""Debugger over sockets."""
 import functools
 import importlib
 import inspect
@@ -6,6 +6,7 @@ import json
 import logging as log
 import signal
 import socketserver
+import re
 
 from .models import MipsProgram
 
@@ -45,9 +46,9 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
         format="%(asctime)-15s %(levelname)-7s %(message)s",
         level=log.INFO if should_log else log.CRITICAL,
     )
-    logger = log.getLogger("websockets.server")
+    logger = log.getLogger("sockets.server")
     logger.addHandler(log.StreamHandler())
-    log.info(f"Serving on: ws://{host}:{port}")
+    log.info(f"Serving on: s://{host}:{port}")
 
     class DashmipsTCPServerHandler(socketserver.BaseRequestHandler):
         def setup(self):
@@ -61,13 +62,24 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
         def handle(self):
             # self.request is the TCP socket connected to the client
             while True:
-                self.data = self.request.recv(65000).strip()
-                print("{} wrote:".format(self.client_address[0]))
-                print(self.data)
-                # FIX ME
-                response = client_loop(self.data, self.commands)
-                # just send back the same data, but upper-cased
-                self.request.sendall(self.data.upper())
+                data = self.request.recv(65000).strip()
+                while data:
+
+                    x = re.search(b'{"size":[0-9]+}', data)
+
+                    # Checks if x is not None to make mypy happy
+                    if x is not None:
+                        msg_size = int(x.group()[8:-1])
+                        command = x.string[len(x.group()):msg_size + len(x.group())]
+                        data = x.string[msg_size + len(x.group()):]
+
+                        print("{} wrote:".format(self.client_address[0]))
+                        print(command)
+                        response = client_loop(command, self.commands)
+                        self.request.sendall(bytes("{size:%d}" % (len(response)), 'ascii') + bytes(response, 'ascii'))
+
+    # Allows server to reuse address to prevent crash
+    socketserver.TCPServer.allow_reuse_address = True
 
     with socketserver.TCPServer((host, port), DashmipsTCPServerHandler) as server:
         # Activate the server; this will keep running until you
