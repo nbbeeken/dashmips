@@ -76,7 +76,7 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
                         print("{} wrote:".format(self.client_address[0]))
                         print(command)
                         response = client_loop(command, self.commands)
-                        self.request.sendall(bytes("{size:%d}" % (len(response)), 'ascii') + bytes(response, 'ascii'))
+                        self.request.sendall(bytes(json.dumps({"size": len(response)}), 'ascii') + bytes(response, 'ascii'))
 
     # Allows server to reuse address to prevent crash
     socketserver.TCPServer.allow_reuse_address = True
