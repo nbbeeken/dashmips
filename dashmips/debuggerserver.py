@@ -6,7 +6,6 @@ import json
 import logging as log
 import signal
 import socketserver
-import re
 
 from .models import MipsProgram
 
@@ -62,21 +61,19 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
         def handle(self):
             # self.request is the TCP socket connected to the client
             while True:
-                data = self.request.recv(65000).strip()
-                while data:
+                header = b""
+                while True:
+                    header += self.request.recv(1)
+                    if header and chr(header[-1]) == '}':
+                        break
 
-                    x = re.search(b'{"size":[0-9]+}', data)
+                msg_size = int(header[8:-1])
+                command = self.request.recv(msg_size)
 
-                    # Checks if x is not None to make mypy happy
-                    if x is not None:
-                        msg_size = int(x.group()[8:-1])
-                        command = x.string[len(x.group()):msg_size + len(x.group())]
-                        data = x.string[msg_size + len(x.group()):]
-
-                        print("{} wrote:".format(self.client_address[0]))
-                        print(command)
-                        response = client_loop(command, self.commands)
-                        self.request.sendall(bytes(json.dumps({"size": len(response)}), 'ascii') + bytes(response, 'ascii'))
+                print("{} wrote:".format(self.client_address[0]))
+                print(command)
+                response = client_loop(command, self.commands)
+                self.request.sendall(bytes(json.dumps({"size": len(response)}), 'ascii') + bytes(response, 'ascii'))
 
     # Allows server to reuse address to prevent crash
     socketserver.TCPServer.allow_reuse_address = True
