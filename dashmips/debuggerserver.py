@@ -10,6 +10,12 @@ import socketserver
 from .models import MipsProgram
 
 
+class ProgramExit(Exception):
+    """Program exited normally."""
+
+    pass
+
+
 def client_loop(message: str, commands: dict):
     """Message loop handler."""
     log.info(f"Recv `{message}`")
@@ -28,7 +34,7 @@ def client_loop(message: str, commands: dict):
 
     if "exited" in result:
         # only check top level
-        log.error("Program exited")
+        raise ProgramExit
 
     return response
 
@@ -66,13 +72,22 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
                     header += self.request.recv(1)
                     if header and chr(header[-1]) == '}':
                         break
+                    if len(header) >= 1000:
+                        log.error("Communication error between client and server")
+                        break
 
                 msg_size = int(header[8:-1])
                 command = self.request.recv(msg_size)
 
-                print("{} wrote:".format(self.client_address[0]))
-                print(command)
-                response = client_loop(command, self.commands)
+                log.info("{} wrote:".format(self.client_address[0]))
+                log.info(command)
+
+                try:
+                    response = client_loop(command, self.commands)
+                except ProgramExit:
+                    log.info("Program exited normally")
+                    break
+
                 self.request.sendall(bytes(json.dumps({"size": len(response)}), 'ascii') + bytes(response, 'ascii'))
 
     # Allows server to reuse address to prevent crash
@@ -81,4 +96,4 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
     with socketserver.TCPServer((host, port), DashmipsTCPServerHandler) as server:
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
-        server.serve_forever()
+        server.handle_request()
