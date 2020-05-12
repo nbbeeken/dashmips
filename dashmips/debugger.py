@@ -72,6 +72,7 @@ def debug_stop(program: MipsProgram, params) -> Dict[str, bool]:
 
 def debug_info(program: MipsProgram, params) -> Dict[str, Any]:
     """Build program as dict."""
+    # wrap program.to_dict() in dictionary comprehension
     return {"program": program.to_dict()}
 
 
