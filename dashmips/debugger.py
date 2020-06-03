@@ -92,8 +92,10 @@ def debug_verify_breakpoints(program: MipsProgram, params) -> Tuple[List[int], L
                 break
 
         is_known_file = any(checkfile(fn) for fn in program.filenames)
+        remote_breakpoints.append(breakpoint)
         if real_line is not None and is_known_file:
-            remote_breakpoints.append(breakpoint)
             local_breakpoints.append(real_line)
+        elif real_line is None and is_known_file:
+            local_breakpoints.append(-1)
 
     return remote_breakpoints, local_breakpoints
