@@ -149,3 +149,7 @@ if __name__ == "__main__":
         # If a user encounters a traceback that should be a fatal issue
         print("dashmips encountered an error!", file=sys.stderr)
         print(ex, file=sys.stderr)
+    except KeyboardInterrupt as ex:
+        # Program should be closed
+        print("Program terminated.")
+        sys.exit()
