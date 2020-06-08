@@ -96,6 +96,7 @@ def debug_verify_breakpoints(program: MipsProgram, params) -> Tuple[List[int], L
         if real_line is not None and is_known_file:
             local_breakpoints.append(real_line)
         elif real_line is None and is_known_file:
+            # -1 indicates an unverified breakpoint (not a runnable MIPS line of code)
             local_breakpoints.append(-1)
 
     return remote_breakpoints, local_breakpoints
