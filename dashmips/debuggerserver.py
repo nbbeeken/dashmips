@@ -53,7 +53,7 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
     )
     logger = log.getLogger("sockets.server")
     logger.addHandler(log.StreamHandler())
-    log.info(f"Serving on: s://{host}:{port}")
+    log.info(f"Serving on: tcp://{host}:{port}")
 
     class DashmipsTCPServerHandler(socketserver.BaseRequestHandler):
         def setup(self):
@@ -79,8 +79,7 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
                 msg_size = int(header[8:-1])
                 command = self.request.recv(msg_size)
 
-                log.info("{} wrote:".format(self.client_address[0]))
-                log.info(command)
+                log.info(f"{self.client_address[0]} wrote: {command}")
 
                 try:
                     response = client_loop(command, self.commands)
