@@ -20,7 +20,6 @@ dashmips = "dashmips.__main__:main"
 [tool.poetry.dependencies]
 "python" = "^3.8"
 "dataclasses" = { version = "^0.6", python = "3.6" }
-"websockets" =  { version = "^8.0.2", optional = false }
 
 [tool.poetry.dev-dependencies]
 "mypy" = "^0.720"
@@ -35,5 +34,5 @@ dashmips = "dashmips.__main__:main"
 "pytest-mypy" = "^0.3.2"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.0.0"]
 build-backend = "poetry.masonry.api"
