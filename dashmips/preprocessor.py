@@ -92,6 +92,8 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
     Fill the .data section memory with user defined static data
     """
     data_line_re = f"(?:({mipsRE.LABEL}):)?\\s*({mipsRE.DIRECTIVE})\\s+(.*)"
+    second_pass = []
+
     for line in data_sec:
         match = re.match(data_line_re, line)
         if match:
@@ -99,12 +101,52 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
             directive_name = match[2][1:]
             raw_data = match[3]
             directive = Directives[directive_name]
-            address = directive(raw_data, memory)
+
+            try:
+                address = directive(raw_data, memory)
+            except NameError as err:
+                second_pass.append((line, err.args[0][6:-16]))
+                continue
+
             if label_name:
+                if label_name in labels:
+                    raise MipsException(f"Label {label_name} already defined")
                 # Not all directives need labels
                 labels[label_name] = Label(name=label_name, value=address, location=mipsRE.DATA_SEC, kind=match[2][1:])
         else:
             raise MipsException(f"Unknown directive {line}")
+
+    for pair in second_pass:
+        match = re.match(data_line_re, pair[0])
+        if match:
+            label_name = match[1]
+            directive_name = match[2][1:]
+            if pair[1] in labels:
+                raw_data = match[3].replace(pair[1], str(labels[pair[1]].value))
+            else:
+                label_position = [i for i in range(0, len(second_pass)) if second_pass[i][0][0:len(pair[1])] == pair[1]]
+                if len(label_position) == 0:
+                    raise MipsException(f'Symbol {pair[1]} not found in symbol table')
+                elif len(label_position) > 1000:
+                    raise MipsException(f'Cannot make labels refer to each other')
+                else:
+                    second_pass.insert(label_position[-1] + 1, pair)
+                    continue
+
+            directive = Directives[directive_name]
+            try:
+                address = directive(raw_data, memory)
+            except NameError as err:
+                second_pass.append((pair[0].replace(match[3], raw_data), err.args[0][6:-16]))
+                continue
+
+            if label_name:
+                if label_name in labels:
+                    raise MipsException(f"Label {label_name} already defined")
+                # Not all directives need labels
+                labels[label_name] = Label(name=label_name, value=address, location=mipsRE.DATA_SEC, kind=match[2][1:])
+        else:
+            raise MipsException(f"Unknown directive {pair[0]}")
 
     address = Directives["space"]('4', memory)  # Pad the end of data section
 
@@ -136,8 +178,7 @@ def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[So
         else:
             instruction = srcline.line.split(" ")[0]
             if instruction not in Instructions:
-                print(f"Error line {idx}: `{instruction}` invalid")
-                exit(1)
+                raise MipsException(f"Error line {idx}: `{instruction}` invalid")
             # Otherwise save the line as is
             text.append(srcline)
 
@@ -186,15 +227,18 @@ def preprocessor_directives(lines: List[SourceLine]) -> Tuple[List[str], Dict[st
 def resolve_include(lines: List[SourceLine], includes: List[str]) -> List[SourceLine]:
     """Resolve all includes recursively."""
     for idx, srcline in enumerate(lines):
-        match = re.match(r'\s*\.include\s+"(.*)"\s*', srcline.line)
-        if match:
-            includefilename = os.path.abspath(match[1])
-            if includefilename in includes:
-                raise MipsException("Recursive importing detected")
-            includes.append(includefilename)
-            includefile = open(includefilename)
-            includelines = resolve_include(process_file(includefile), includes)
-            lines[idx] = includelines  # type: ignore
+        try:
+            match = re.match(r'\s*\.include\s+"(.*)"\s*', srcline.line)
+            if match:
+                includefilename = os.path.abspath(match[1])
+                if includefilename in includes:
+                    raise MipsException("Recursive importing detected")
+                includes.append(includefilename)
+                includefile = open(includefilename)
+                includelines = resolve_include(process_file(includefile), includes)
+                lines[idx] = includelines  # type: ignore
+        except FileNotFoundError:
+            raise MipsException(f"Error reading include {includefilename}")
 
     lines = flatten(lines)
 

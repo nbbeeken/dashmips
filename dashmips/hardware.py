@@ -1,7 +1,8 @@
 """Mips Hardware."""
 from typing import Dict, Union, Tuple, Any, NoReturn, TypedDict, Literal, cast
 
-from .utils import as_twos_comp, intify
+import sys
+from .utils import as_twos_comp, intify, MipsException
 
 register_names = (
     # fmt: off
@@ -46,9 +47,9 @@ class Registers(Dict[str, int]):
         if key in Registers.SPECIAL:
             return super().__setitem__(key, value)
         if key not in Registers.resolve:
-            raise Exception(f'Unknown register Reg[{key}]={hex(value)}')
+            raise MipsException(f'Unknown register Reg[{key}]={hex(value)}')
         if value > 0xFFFF_FFFF:
-            raise Exception(f'Registers are only 32-bits Reg[{key}]={hex(value)}')
+            print(f'Warning: Overflowed 32-bit Reg[{key}]={hex(value)}', file=sys.stderr)
         super().__setitem__(Registers.resolve[key], value & 0xFFFF_FFFF)
 
     def __getitem__(self, key: str) -> int:
