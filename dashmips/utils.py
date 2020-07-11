@@ -43,17 +43,14 @@ def hexdump(data: bytes, *, offset=0, reverse_idx=False) -> str:
         if reverse_idx:
             calc_idx = ((len(rows) - 1) * ROW_MUL) - (idx * ROW_MUL)
         else:
-            calc_idx = (idx * ROW_MUL)
+            calc_idx = idx * ROW_MUL
         calc_idx += offset
         hex_string += f"{calc_idx:08x}  "
         hex_string += " ".join([f"{byte:02x}" for byte in byte_row[:ROW_MUL]])
-        hex_string += "  " if len(byte_row) > ROW_HAF else ' '
+        hex_string += "  " if len(byte_row) > ROW_HAF else " "
         hex_string += " ".join([f"{byte:02x}" for byte in byte_row[ROW_MUL:]])
-        spaces = '' if idx != len(rows) - 1 else ' ' * (ROW_MUL - len(byte_row)) * 3
-        ascii_str = "".join([
-            chr(byte) if ord(' ') <= byte <= ord('~') else '.'
-            for byte in byte_row
-        ])
+        spaces = "" if idx != len(rows) - 1 else " " * (ROW_MUL - len(byte_row)) * 3
+        ascii_str = "".join([chr(byte) if ord(" ") <= byte <= ord("~") else "." for byte in byte_row])
         hex_string += f"{spaces}  |{ascii_str}|"
         hex_string += "\n"
 

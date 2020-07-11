@@ -22,8 +22,7 @@ def addi(program: MipsProgram, rs: str, rt: str, num: int):
 @mips_instruction(PATTERN, parse)
 def addiu(program: MipsProgram, rs: str, rt: str, num: int):
     """Add immediate unsigned Reg[rs] = Reg[rt] + immediate."""
-    program.registers[rs] = (
-        abs(program.registers[rt]) + abs(num)) & 0xFFFF_FFFF
+    program.registers[rs] = (abs(program.registers[rt]) + abs(num)) & 0xFFFF_FFFF
 
 
 @mips_instruction(PATTERN, parse)
