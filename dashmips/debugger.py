@@ -82,6 +82,7 @@ def debug_verify_breakpoints(program: MipsProgram, params) -> Tuple[List[int], L
     local_breakpoints = []
     remote_breakpoints = []
     for breakpoint in breakpoints:
+
         def checkfile(f: str) -> bool:
             return os.path.samefile(f, breakpoint["path"])
 

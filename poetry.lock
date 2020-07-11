@@ -200,7 +200,7 @@ description = "A pytest plugin to enable format checking with black"
 name = "pytest-black"
 optional = false
 python-versions = ">=2.7"
-version = "0.3.9"
+version = "0.3.10"
 
 [package.dependencies]
 pytest = ">=3.5.0"
@@ -208,7 +208,7 @@ toml = "*"
 
 [package.dependencies.black]
 python = ">=3.6"
-version = ">=19.3b0"
+version = "*"
 
 [[package]]
 category = "dev"
@@ -300,7 +300,7 @@ python-versions = "*"
 version = "1.4.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Backported and Experimental Type Hints for Python 3.5+"
 name = "typing-extensions"
 optional = false
@@ -327,7 +327,7 @@ version = "0.34.2"
 test = ["pytest (>=3.0.0)", "pytest-cov"]
 
 [metadata]
-content-hash = "24a676384473675a80b915007888a168fd3607165342b63ea4356f5b2f708c2a"
+content-hash = "bba2d28b86400b6c05037f830f3884bdc65520da5a43df21b6667ccc71a867d2"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -416,7 +416,7 @@ pytest = [
     {file = "pytest-5.4.3.tar.gz", hash = "sha256:7979331bfcba207414f5e1263b5a0f8f521d0f457318836a7355531ed1a4c7d8"},
 ]
 pytest-black = [
-    {file = "pytest-black-0.3.9.tar.gz", hash = "sha256:c743dfeffe6b2cb25c0ed1a84cc306dff4b504b713b5a6d1bc3824fa73a7d693"},
+    {file = "pytest-black-0.3.10.tar.gz", hash = "sha256:5f3c0cfee9b41e6281a9e52e2987f4c90ec4a13a92bbf2f249d26d7b58747437"},
 ]
 pytest-mypy = [
     {file = "pytest-mypy-0.6.2.tar.gz", hash = "sha256:2560a9b27d59bb17810d12ec3402dfc7c8e100e40539a70d2814bcbb27240f27"},

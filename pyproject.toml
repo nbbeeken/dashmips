@@ -20,6 +20,7 @@ dashmips = "dashmips.__main__:main"
 [tool.poetry.dependencies]
 "python" = "^3.8"
 "dataclasses" = { version = "^0.6", python = "3.6" }
+"typing-extensions" = "3.7.4.2"
 
 [tool.poetry.dev-dependencies]
 "pip" = "^20.1.1"

@@ -36,7 +36,7 @@ class Instruction:
         try:
             self.function(program, *args)
         except KeyError as err:
-            raise MipsException(f'Symbol {err} not found in symbol table')
+            raise MipsException(f"Symbol {err} not found in symbol table")
         program.registers["pc"] += 1
 
     def __repr__(self) -> str:

@@ -27,11 +27,7 @@ VGA_COLORS = {
     0b1111: "White",
 }
 
-TAGS = {
-    f"{c1}_{c2}": {"bg": c1.lower(), "fg": c2.lower()}
-    for c1 in VGA_COLORS.values()
-    for c2 in VGA_COLORS.values()
-}
+TAGS = {f"{c1}_{c2}": {"bg": c1.lower(), "fg": c2.lower()} for c1 in VGA_COLORS.values() for c2 in VGA_COLORS.values()}
 
 
 class VT100(Plugin):
@@ -83,10 +79,7 @@ class VT100(Plugin):
         normal = ("Courier", 12, "normal")
         for tagname, color in TAGS.items():
             self.vt.tag_configure(
-                tagname,
-                foreground=color["fg"],
-                background=color["bg"],
-                font=(bold if any(c.isupper() for c in tagname) else normal),
+                tagname, foreground=color["fg"], background=color["bg"], font=(bold if any(c.isupper() for c in tagname) else normal),
             )
 
     @staticmethod
@@ -103,7 +96,7 @@ class VT100(Plugin):
 
     def close(self, *a: Any):
         """Close the VT100 Window."""
-        self.root.quit()  # type: ignore
+        self.root.quit()
 
     def request_close(self):
         """Request to close the VT100 Window."""
@@ -111,7 +104,7 @@ class VT100(Plugin):
 
     def pull(self, *changes: Any):
         """Pull Updated Screen."""
-        vga_memory: bytes = self.content.get()  # type: ignore
+        vga_memory: bytes = self.content.get()
 
         if not len(vga_memory) % 2 == 0 or not len(vga_memory) <= VT100.SIZE:
             # Sequence incomplete
@@ -123,13 +116,13 @@ class VT100(Plugin):
         for i, (color, char) in enumerate(vga):
             tag = VT100.get_tagname(color)
             pos = VT100.get_index(i)
-            self.vt.insert(pos, char, (tag))  # type: ignore
+            self.vt.insert(pos, char, (tag))
 
         self.vt["state"] = "disabled"
 
     def push(self, memory: bytearray):
         """Push a new memory text layout."""
-        mmio = bytes(memory[VT100.BASE_ADDR: VT100.BASE_ADDR + VT100.SIZE])
+        mmio = bytes(memory[VT100.BASE_ADDR : VT100.BASE_ADDR + VT100.SIZE])
         if mmio == self.screen:
             return
-        self.content.set(mmio)  # type: ignore
+        self.content.set(mmio)
