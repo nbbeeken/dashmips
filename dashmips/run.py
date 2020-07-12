@@ -19,6 +19,10 @@ def run(program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_COND
         print(f"{mips_ex.message} on ", file=sys.stderr, end="")
         print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr)
         sys.exit()
+    except ZeroDivisionError as ex:
+        print(f"Divide by zero on ", file=sys.stderr, end="")
+        print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr)
+        sys.exit()
 
     return program.registers["$a0"]  # should hold program exit code
 
@@ -38,6 +42,8 @@ def next_instruction(program: MipsProgram):
     match = re.match(instruction_fn.regex, line)
     if match:
         # Instruction has the correct format
+        if match.regs[0][1] + 1 < match.endpos:
+            raise MipsException("Too many or incorrectly formatted arguments.")
         args = instruction_fn.parser(match)
         instruction_fn(program, args)
     else:
