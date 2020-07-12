@@ -3,6 +3,7 @@ from typing import Any, Iterable
 
 from ..mips import RE
 from ..models import MipsProgram
+from ..utils import MipsException
 
 
 class Instruction:
@@ -32,7 +33,10 @@ class Instruction:
 
     def __call__(self, program: MipsProgram, args: Iterable[Any] = tuple()):
         """Callable Instruction."""
-        self.function(program, *args)
+        try:
+            self.function(program, *args)
+        except KeyError as err:
+            raise MipsException(f'Symbol {err} not found in symbol table')
         program.registers["pc"] += 1
 
     def __repr__(self) -> str:

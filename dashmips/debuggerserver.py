@@ -6,6 +6,7 @@ import json
 import logging as log
 import signal
 import socketserver
+from time import sleep
 
 from .models import MipsProgram
 
@@ -95,4 +96,22 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
     with socketserver.TCPServer((host, port), DashmipsTCPServerHandler) as server:
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
+        server.handle_request()
+
+
+def connectPreprocessFailure(host: str = "localhost", port: int = 2390):
+    """Connect to extension and fail due to preprocessing failure."""
+    class TCPHandler(socketserver.BaseRequestHandler):
+
+        def handle(self):
+            sleep(0.1)
+            return
+
+    # Allows server to reuse address to prevent crash
+    socketserver.TCPServer.allow_reuse_address = True
+    socketserver.TCPServer.timeout = 0.1
+
+    with socketserver.TCPServer((host, port), TCPHandler) as server:
+        # Activate the server; this will keep running until you
+
         server.handle_request()

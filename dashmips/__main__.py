@@ -41,8 +41,12 @@ def main_run(args: argparse.Namespace) -> int:
 
 def main_debug(args: argparse.Namespace) -> int:
     """Start debug server for mips."""
-    from .debuggerserver import debug_mips
-    program = preprocess(args.FILE, args=args.mips_args)
+    from .debuggerserver import debug_mips, connectPreprocessFailure
+    try:
+        program = preprocess(args.FILE, args=args.mips_args)
+    except MipsException as err:
+        connectPreprocessFailure(host = args.host, port = args.port)
+        raise MipsException(err.message)
     debug_mips(program, args.host, args.port, should_log=args.log)
     return 0
 
@@ -147,7 +151,7 @@ if __name__ == "__main__":
     except MipsException as ex:
         # All known errors should be caught and re-raised as MipsException
         # If a user encounters a traceback that should be a fatal issue
-        print("dashmips encountered an error!", file=sys.stderr)
+        print("\nDashmips encountered an error while assembling:", file=sys.stderr)
         print(ex, file=sys.stderr)
     except KeyboardInterrupt as ex:
         # Program should be closed

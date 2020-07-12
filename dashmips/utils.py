@@ -16,12 +16,27 @@ class MipsException(Exception):
 
 def parse_int(int_str: str) -> int:
     """Take a python number literal and returns an int."""
+    if '\"' in int_str:
+        raise MipsException('"%s" is not a valid integer constant or label.' % int_str[int_str.index('\"'): int_str.replace('\"', 'x', 1).find('\"') + 1])
+
+    # WARNING: SECURITY FLAW
     arg: Union[int, str] = eval(int_str)
 
     if isinstance(arg, str):
         arg = int(ord(arg))
-    else:
+    elif isinstance(arg, int):
         arg = int(arg)
+    elif isinstance(arg, tuple):
+        a = []
+        for i in range(len(arg)):
+            if isinstance(arg[i], str):
+                try:
+                    a.append(int(ord(arg[i])))
+                except TypeError:
+                    raise MipsException(f"Invalid language element: '{arg[i]}'")
+            elif isinstance(arg[i], int):
+                a.append(int(arg[i]))
+        return tuple(a)
 
     return arg
 
@@ -72,6 +87,13 @@ def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> byte
     if isinstance(data, int):
         int_size = size if size else (data.bit_length() // 8) + 1
         return (data & 0xFFFF_FFFF).to_bytes(int_size, "big")
+    if isinstance(data, tuple):
+        byte_string = bytes()
+        for integer in data:
+            int_size = size if size else (integer.bit_length() // 8) + 1
+            byte_string += (integer & 0xFFFF_FFFF).to_bytes(int_size, "big")
+        return byte_string
+
     return bytes(data)
 
 
