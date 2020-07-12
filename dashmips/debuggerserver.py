@@ -49,8 +49,7 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
     :param should_log:  (Default value = False)
     """
     log.basicConfig(
-        format="%(asctime)-15s %(levelname)-7s %(message)s",
-        level=log.INFO if should_log else log.CRITICAL,
+        format="%(asctime)-15s %(levelname)-7s %(message)s", level=log.INFO if should_log else log.CRITICAL,
     )
     logger = log.getLogger("sockets.server")
     logger.addHandler(log.StreamHandler())
@@ -71,7 +70,7 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
                 header = b""
                 while True:
                     header += self.request.recv(1)
-                    if header and chr(header[-1]) == '}':
+                    if header and chr(header[-1]) == "}":
                         break
                     if len(header) >= 1000:
                         log.error("Communication error between client and server")
@@ -88,7 +87,7 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
                     log.info("Program exited normally")
                     break
 
-                self.request.sendall(bytes(json.dumps({"size": len(response)}), 'ascii') + bytes(response, 'ascii'))
+                self.request.sendall(bytes(json.dumps({"size": len(response)}), "ascii") + bytes(response, "ascii"))
 
     # Allows server to reuse address to prevent crash
     socketserver.TCPServer.allow_reuse_address = True
@@ -101,8 +100,8 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
 
 def connectPreprocessFailure(host: str = "localhost", port: int = 2390):
     """Connect to extension and fail due to preprocessing failure."""
-    class TCPHandler(socketserver.BaseRequestHandler):
 
+    class TCPHandler(socketserver.BaseRequestHandler):
         def handle(self):
             sleep(0.1)
             return

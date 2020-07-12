@@ -1,8 +1,10 @@
 """Mips Hardware."""
-from typing import Dict, Union, Tuple, Any, NoReturn, TypedDict, Literal, cast
-
 import sys
-from .utils import as_twos_comp, intify, MipsException
+from typing import Any, Dict, NoReturn, Tuple, Union, cast
+
+from typing_extensions import Literal, TypedDict
+
+from .utils import MipsException, as_twos_comp, intify
 
 register_names = (
     # fmt: off
@@ -47,9 +49,9 @@ class Registers(Dict[str, int]):
         if key in Registers.SPECIAL:
             return super().__setitem__(key, value)
         if key not in Registers.resolve:
-            raise MipsException(f'Unknown register Reg[{key}]={hex(value)}')
+            raise MipsException(f"Unknown register Reg[{key}]={hex(value)}")
         if value > 0xFFFF_FFFF:
-            print(f'Warning: Overflowed 32-bit Reg[{key}]={hex(value)}', file=sys.stderr)
+            print(f"Warning: Overflowed 32-bit Reg[{key}]={hex(value)}", file=sys.stderr)
         super().__setitem__(Registers.resolve[key], value & 0xFFFF_FFFF)
 
     def __getitem__(self, key: str) -> int:
@@ -59,7 +61,7 @@ class Registers(Dict[str, int]):
         return as_twos_comp(super().__getitem__(Registers.resolve[key]))
 
 
-SectionNames = Union[Literal['stack'], Literal['heap'], Literal['data']]
+SectionNames = Union[Literal["stack"], Literal["heap"], Literal["data"]]
 
 
 class RAMPART(TypedDict):
@@ -81,8 +83,8 @@ class RAM(TypedDict):
 class Memory:
     """Memory simulated."""
 
-    PAGE_SIZE = 2**12
-    TASK_LIMIT = 0xc0000000
+    PAGE_SIZE = 2 ** 12
+    TASK_LIMIT = 0xC0000000
     START_DATA = 0x00804900
     STACK_STOP = 0x05F5E100
     HEAP_START = 0x00600000
@@ -90,25 +92,14 @@ class Memory:
     def __init__(self):
         """Create Mips Memory."""
         self.ram: RAM = {
-            "stack": {
-                "m": bytearray(),
-                "start": Memory.STACK_STOP,
-                "stops": Memory.STACK_STOP
-            },
-            "heap": {
-                "m": bytearray(),
-                "start": Memory.HEAP_START,
-                "stops": Memory.HEAP_START
-            },
-            "data": {
-                "m": bytearray(),
-                "start": Memory.START_DATA,
-                "stops": Memory.START_DATA
-            },
+            "stack": {"m": bytearray(), "start": Memory.STACK_STOP, "stops": Memory.STACK_STOP},
+            "heap": {"m": bytearray(), "start": Memory.HEAP_START, "stops": Memory.HEAP_START},
+            "data": {"m": bytearray(), "start": Memory.START_DATA, "stops": Memory.START_DATA},
         }
 
     def _tlb(self, virtual_address: int, sizeof=1) -> Tuple[SectionNames, slice]:
-        def v2p(pa: int): return slice(pa, pa + sizeof, 1)
+        def v2p(pa: int):
+            return slice(pa, pa + sizeof, 1)
 
         for section_name in self.ram:
             section_name = cast(SectionNames, section_name)
@@ -249,5 +240,5 @@ class Memory:
 
 def alignment_zeros(data_len) -> bytearray:
     """Return array of 0s to align to 4."""
-    alignment = ((4 - data_len % 4) % 4)
+    alignment = (4 - data_len % 4) % 4
     return bytearray(alignment)

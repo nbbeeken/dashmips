@@ -7,10 +7,8 @@ from .hardware import Memory
 
 Directives: Dict[str, Callable[[str, Memory], int]] = {
     name.replace("directive_", ""): fn
-    for name, fn in inspect.getmembers(
-        import_module(".directives", "dashmips"),
-        inspect.isfunction
-    ) if name.startswith("directive_")
+    for name, fn in inspect.getmembers(import_module(".directives", "dashmips"), inspect.isfunction)
+    if name.startswith("directive_")
 }
 
 

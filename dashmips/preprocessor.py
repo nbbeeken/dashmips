@@ -4,7 +4,8 @@ import re
 from typing import Any, Dict, Iterable, List, Optional, TextIO, Tuple
 
 from .hardware import Memory, Registers
-from .mips import RE as mipsRE, Directives
+from .mips import RE as mipsRE
+from .mips import Directives
 from .models import Label, MipsProgram, SourceLine
 from .utils import MipsException, bytesify, hexdump
 
@@ -15,7 +16,7 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     Breaks the code into directive and text sections.
     """
     filename = os.path.abspath(file.name)
-    memory = Memory()  # type: ignore
+    memory = Memory()
 
     argv = [filename]
     if args:
@@ -40,23 +41,15 @@ def preprocess(file: TextIO, args: Optional[List[str]] = None) -> MipsProgram:
     if not ("main" in labels and labels["main"].location == mipsRE.TEXT_SEC):
         raise MipsException(f"Cannot locate main label in {filename}")
 
-    registers = Registers()  # type: ignore
+    registers = Registers()
     load_args(registers, memory, argv)
 
     registers["pc"] = labels["main"].value
     registers["$sp"] = registers["$fp"] = registers["$gp"] = memory.ram["stack"]["stops"]
 
-    memory.extend_stack(bytes([ord('@')] * Memory.PAGE_SIZE))
+    memory.extend_stack(bytes([ord("@")] * Memory.PAGE_SIZE))
 
-    return MipsProgram(
-        name=filename,
-        filenames=[filename, *includes],
-        labels=labels,
-        memory=memory,
-        source=processed_code,
-        registers=registers,
-        eqvs=eqvs,
-    )
+    return MipsProgram(name=filename, filenames=[filename, *includes], labels=labels, memory=memory, source=processed_code, registers=registers, eqvs=eqvs,)
 
 
 def split_to_sections(code: List[SourceLine]) -> Tuple[List[str], List[SourceLine]]:
@@ -124,11 +117,11 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
             if pair[1] in labels:
                 raw_data = match[3].replace(pair[1], str(labels[pair[1]].value))
             else:
-                label_position = [i for i in range(0, len(second_pass)) if second_pass[i][0][0:len(pair[1])] == pair[1]]
+                label_position = [i for i in range(0, len(second_pass)) if second_pass[i][0][0 : len(pair[1])] == pair[1]]
                 if len(label_position) == 0:
-                    raise MipsException(f'Symbol {pair[1]} not found in symbol table')
+                    raise MipsException(f"Symbol {pair[1]} not found in symbol table")
                 elif len(label_position) > 1000:
-                    raise MipsException(f'Cannot make labels refer to each other')
+                    raise MipsException(f"Cannot make labels refer to each other")
                 else:
                     second_pass.insert(label_position[-1] + 1, pair)
                     continue
@@ -148,7 +141,7 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
         else:
             raise MipsException(f"Unknown directive {pair[0]}")
 
-    address = Directives["space"]('4', memory)  # Pad the end of data section
+    address = Directives["space"]("4", memory)  # Pad the end of data section
 
 
 def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[SourceLine]:
@@ -170,7 +163,7 @@ def code_labels(labels: Dict[str, Label], text_sec: List[SourceLine]) -> List[So
                 # If the line is longer than what was matched, lets assume
                 # the rest is an instruction (comments and whitespace should
                 # already have been stripped) we cut out the label
-                srcline.line = srcline.line[len(match[0]):].strip()
+                srcline.line = srcline.line[len(match[0]) :].strip()
                 text.append(srcline)
             else:
                 # To offset the previously removed label lines
@@ -291,9 +284,7 @@ def resolve_macros(lines: List[SourceLine]) -> List[SourceLine]:
             if match:
                 found_macro = match[1]
                 macros[match[1]] = {
-                    "args": [a.strip() for a in match[2].split(", ")]
-                    if match[2]
-                    else None,
+                    "args": [a.strip() for a in match[2].split(", ")] if match[2] else None,
                     "lines": [],
                 }
                 lines_to_remove.append(idx)
@@ -330,11 +321,7 @@ def macro_with_args(idx: int, lines: List[SourceLine], macro: str, macroinfo: Di
             modified_line = s.line
             for a, v in argsmap.items():
                 modified_line = modified_line.replace(a, v)
-            expanded_macro.append(
-                SourceLine(
-                    line=modified_line,
-                    lineno=s.lineno,
-                    filename=s.filename))
+            expanded_macro.append(SourceLine(line=modified_line, lineno=s.lineno, filename=s.filename))
         lines[idx] = expanded_macro  # type: ignore
 
 
