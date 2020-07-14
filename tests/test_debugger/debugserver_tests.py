@@ -15,18 +15,17 @@ sleep(0.1)  # Should be plenty of time to start and bind
 
 def compile_file(filename: str) -> Dict[str, Any]:
     """Run compiler on filename."""
-    proc = run(split(f"python -m dashmips c {filename} -j"),
-               capture_output=True, encoding='utf8')
+    proc = run(split(f"python -m dashmips c {filename} -j"), capture_output=True, encoding="utf8")
     return cast(Dict[str, Any], json.loads(proc.stdout.strip()))
 
 
 def communicate(msg: Dict[str, Any]) -> Any:
     """Send json encoded message."""
     s = socket()
-    s.connect(('localhost', 9999))
-    wfile = s.makefile('w', encoding='utf8', buffering=1)
-    rfile = s.makefile('r', encoding='utf8', buffering=1)
-    wfile.write(json.dumps(msg) + '\r\n')
+    s.connect(("localhost", 9999))
+    wfile = s.makefile("w", encoding="utf8", buffering=1)
+    rfile = s.makefile("r", encoding="utf8", buffering=1)
+    wfile.write(json.dumps(msg) + "\r\n")
     wfile.flush()
     received = rfile.readline().strip()
     resp = json.loads(received)
@@ -37,8 +36,8 @@ def communicate(msg: Dict[str, Any]) -> Any:
 def recv() -> Dict[str, Any]:
     """Recv json encoded message."""
     s = socket()
-    s.connect(('localhost', 9999))
-    rfile = s.makefile('r', encoding='utf8', buffering=1)
+    s.connect(("localhost", 9999))
+    rfile = s.makefile("r", encoding="utf8", buffering=1)
     received = rfile.readline().strip()
     resp = json.loads(received)
     s.close()
@@ -50,17 +49,17 @@ class TestMipsDebugServer(unittest.TestCase):
 
     def test_start(self):
         """Test start command."""
-        program = compile_file('test.mips')
+        program = compile_file("test.mips")
 
-        resp = communicate({'command': 'start', 'program': program})
+        resp = communicate({"command": "start", "program": program})
 
-        program = resp['program']
+        program = resp["program"]
 
-        self.assertIn('command', resp, pformat(resp))
-        self.assertIn('program', resp, pformat(resp))
-        self.assertEqual(resp['command'], 'start', pformat(resp))
-        self.assertEqual(program['labels']['main']['value'], program['registers']['pc'], pformat(resp))
-        self.assertLessEqual(program['registers']['pc'], len(program['source']), pformat(resp))
+        self.assertIn("command", resp, pformat(resp))
+        self.assertIn("program", resp, pformat(resp))
+        self.assertEqual(resp["command"], "start", pformat(resp))
+        self.assertEqual(program["labels"]["main"]["value"], program["registers"]["pc"], pformat(resp))
+        self.assertLessEqual(program["registers"]["pc"], len(program["source"]), pformat(resp))
         self.stop_debugging()
 
     def stop_debugging(self):
@@ -68,7 +67,7 @@ class TestMipsDebugServer(unittest.TestCase):
         SERVER.kill()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         unittest.main()
     finally:

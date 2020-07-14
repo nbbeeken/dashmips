@@ -43,8 +43,7 @@ def b(program: MipsProgram, label: str):
 
 
 @mips_instruction(
-    r"{instr_gap}({register}){args_gap}({register}|{number}){args_gap}({label})",
-    lambda args: (args[2], args[3], args[4]),
+    r"{instr_gap}({register}){args_gap}({register}|{number}){args_gap}({label})", lambda args: (args[2], args[3], args[4]),
 )
 def bgt(program: MipsProgram, rd: str, rs: str, label: str):
     """Branch to label if Reg[rd]>Reg[rs]."""
@@ -57,10 +56,7 @@ def bgt(program: MipsProgram, rd: str, rs: str, label: str):
         program.registers["pc"] = program.labels[label].value - 1
 
 
-@mips_instruction(
-    r"{instr_gap}({register}){args_gap}({register}|{number}){args_gap}({label})",
-    lambda args: (args[2], args[3], args[4])
-)
+@mips_instruction(r"{instr_gap}({register}){args_gap}({register}|{number}){args_gap}({label})", lambda args: (args[2], args[3], args[4]))
 def blt(program: MipsProgram, rd: str, rs: str, label: str):
     """Branch to label if Reg[rd]<Reg[rs]."""
     if rs not in program.registers:
@@ -79,8 +75,7 @@ def neg(program: MipsProgram, rd: str, rs: str):
 
 
 @mips_instruction(
-    r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})",
-    lambda args: (args[2], args[3], args[4]),
+    r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})", lambda args: (args[2], args[3], args[4]),
 )
 def bge(program: MipsProgram, rd: str, rs: str, label: str):
     """Branch to label if Reg[rd]>Reg[rs]."""
@@ -89,8 +84,7 @@ def bge(program: MipsProgram, rd: str, rs: str, label: str):
 
 
 @mips_instruction(
-    r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})",
-    lambda args: (args[2], args[3], args[4]),
+    r"{instr_gap}({register}){args_gap}({register}){args_gap}({label})", lambda args: (args[2], args[3], args[4]),
 )
 def ble(program: MipsProgram, rd: str, rs: str, label: str):
     """Branch to label if Reg[rd]<Reg[rs]."""
