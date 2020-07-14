@@ -6,7 +6,6 @@ import json
 import logging as log
 import signal
 import socketserver
-from time import sleep
 
 from .models import MipsProgram
 
@@ -103,8 +102,26 @@ def connectPreprocessFailure(host: str = "localhost", port: int = 2390):
 
     class TCPHandler(socketserver.BaseRequestHandler):
         def handle(self):
-            sleep(0.1)
-            return
+            for _ in range(2):
+                header = b""
+                while True:
+                    header += self.request.recv(1)
+                    if header and chr(header[-1]) == "}":
+                        break
+                    if len(header) >= 1000:
+                        log.error("Communication error between client and server")
+                        break
+
+                msg_size = int(header[8:-1])
+                command = self.request.recv(msg_size)
+
+                if b"verify_breakpoints" in command:
+                    response = '{"method": "verify_breakpoints", "result": []}'
+                    self.request.sendall(bytes(json.dumps({"size": len(response)}), "ascii") + bytes(response, "ascii"))
+                else:
+                    response = '{"method": "start", "result": {"exited": true}}'
+                    self.request.sendall(bytes(json.dumps({"size": len(response)}), "ascii") + bytes(response, "ascii"))
+                    return
 
     # Allows server to reuse address to prevent crash
     socketserver.TCPServer.allow_reuse_address = True
