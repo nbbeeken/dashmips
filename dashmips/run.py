@@ -42,8 +42,6 @@ def next_instruction(program: MipsProgram):
     match = re.match(instruction_fn.regex, line)
     if match:
         # Instruction has the correct format
-        if match.regs[0][1] + 1 < match.endpos:
-            raise MipsException("Too many or incorrectly formatted arguments.")
         args = instruction_fn.parser(match)
         instruction_fn(program, args)
     else:

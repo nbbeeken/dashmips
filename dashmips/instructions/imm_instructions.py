@@ -16,10 +16,7 @@ def parse(args: Tuple[str, str, str]) -> Tuple[str]:
 @mips_instruction(PATTERN, parse, label=True)
 def j(program: MipsProgram, address: str):
     """Jump unconditionally to label."""
-    if address in program.labels:
-        program.registers["pc"] = program.labels[address].value - 1
-    else:
-        raise MipsException('"j": too many or incorrectly formatted operands')
+    program.registers["pc"] = program.labels[address].value - 1
 
 
 @mips_instruction(PATTERN, parse, label=True)
