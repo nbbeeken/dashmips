@@ -22,7 +22,9 @@ def parse_int(int_str: str) -> int:
     # WARNING: SECURITY FLAW
     arg: Union[int, str] = eval(int_str)
 
-    if isinstance(arg, str):
+    if isinstance(arg, str) and len(arg) != 1:
+        raise MipsException(f"Invalid language element: '{arg}'")
+    elif isinstance(arg, str):
         arg = int(ord(arg))
     elif isinstance(arg, int):
         arg = int(arg)

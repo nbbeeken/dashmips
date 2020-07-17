@@ -3,6 +3,7 @@ from typing import Tuple
 
 from . import mips_instruction
 from ..models import MipsProgram
+from ..utils import MipsException
 
 PATTERN = r"{instr_gap}({label})"
 

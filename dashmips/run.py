@@ -19,6 +19,10 @@ def run(program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_COND
         print(f"{mips_ex.message} on ", file=sys.stderr, end="")
         print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr)
         sys.exit()
+    except ZeroDivisionError as ex:
+        print(f"Divide by zero on ", file=sys.stderr, end="")
+        print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr)
+        sys.exit()
 
     return program.registers["$a0"]  # should hold program exit code
 
