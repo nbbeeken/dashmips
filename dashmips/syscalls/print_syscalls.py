@@ -51,7 +51,9 @@ def print_ascii(program: MipsProgram):
     """Print Word in Ascii.          $a0 = word to print."""
     int_to_four_bytes = Struct('<I').pack
     y1, y2, y3, y4 = int_to_four_bytes(program.registers['$a0'] & 0xFFFFFFFF)
-    print("{}{}{}{}".format(chr(y4) if y1 != 0 else "\\0", chr(y3) if y2 != 0 else "\\0", chr(y2) if y3 != 0 else "\\0", chr(y1) if y4 != 0 else "\\0"), end=" ")
+    print(
++        "{}{}{}{}".format(chr(y4) if y1 != 0 else "\\0", chr(y3) if y2 != 0 else "\\0", chr(y2) if y3 != 0 else "\\0", chr(y1) if y4 != 0 else "\\0"), end=" "
++    )
 
 
 @mips_syscall(10)
