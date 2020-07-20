@@ -61,8 +61,8 @@ def main_docs(args: argparse.Namespace) -> int:
     if print_both or args.syscalls:
         # Syscall printer
         print("Syscalls")
-        print(f"{'name':15}{'number':<10}{'description'}")
-        print(f"{'----':15}{'------':<10}{'-----------'}")
+        print(f"{'name':15}{'$v0':<10}{'description':<30}{'arguments/result'}")
+        print(f"{'----':15}{'---':<10}{'-----------':<30}{'----------------'}")
         syscalls_list = list(Syscalls.items())
         syscalls_list.sort(key=lambda i: i[0])
         for sys_num, syscall in syscalls_list:

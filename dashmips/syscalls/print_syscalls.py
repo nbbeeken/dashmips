@@ -2,41 +2,59 @@
 from . import mips_syscall
 from ..models import MipsProgram
 from ..utils import intify
+from struct import Struct
 
 
 @mips_syscall(4)
 def print_string(program: MipsProgram):
-    """Print string at address provided in $a0."""
+    """Print string.                 $a0 = address of null-terminated string to print."""
     address = program.registers["$a0"]
     string = program.memory.read_str(address)
-    print(string, end="")
+    print(string, end=" ")
 
 
 @mips_syscall(11)
 def print_char(program: MipsProgram):
-    """Print string at address provided in $a0."""
+    """Print character.              $a0 = character to print."""
     character = chr(program.registers["$a0"] & 0xFF)
     if ord(" ") <= ord(character) <= ord("~") or character in ("\n", "\t", "\r"):
         # is printable
-        print(character, end="")
+        print(character, end=" ")
 
 
 @mips_syscall(1)
 def print_int(program: MipsProgram):
-    """Print Int in Dec."""
-    print(program.registers["$a0"], end="")
+    """Print Int in Dec.             $a0 = integer to print."""
+    print(program.registers["$a0"], end=" ")
 
 
 @mips_syscall(34)
 def print_hex(program: MipsProgram):
-    """Print Int in Hex."""
-    print(f"{program.registers['$a0'] & 0xFFFFFFFF:08x}", end="")
+    """Print Int in Hex.             $a0 = integer to print."""
+    print(f"0x{program.registers['$a0'] & 0xFFFFFFFF:08x}", end=" ")
 
 
 @mips_syscall(35)
 def print_bin(program: MipsProgram):
-    """Print Int in Bin."""
-    print(f"{program.registers['$a0'] & 0xFFFFFFFF:032b}", end="")
+    """Print Int in Binary.          $a0 = integer to print."""
+    print(f"{program.registers['$a0'] & 0xFFFFFFFF:032b}", end=" ")
+
+
+@mips_syscall(36)
+def print_unsigned(program: MipsProgram):
+    """Print Int as Unsigned.        $a0 = integer to print."""
+    print(f"{program.registers['$a0'] if program.registers['$a0'] > 0 else program.registers['$a0'] + 2**32}", end=" ")
+
+
+@mips_syscall(37)
+def print_ascii(program: MipsProgram):
+    """Print Word in Ascii.          $a0 = word to print."""
+    int_to_four_bytes = Struct('<I').pack
+    y1, y2, y3, y4 = int_to_four_bytes(program.registers['$a0'] & 0xFFFFFFFF)
+    print("{}{}{}{}".format(chr(y4) if y1 != 0 else "\\0",
+                            chr(y3) if y2 != 0 else "\\0",
+                            chr(y2) if y3 != 0 else "\\0",
+                            chr(y1) if y4 != 0 else "\\0"), end=" ")
 
 
 @mips_syscall(10)
@@ -51,4 +69,4 @@ def dump_program(program: MipsProgram):
     """Print json format of program."""
     import json
 
-    print(json.dumps(program.to_dict(), indent=4))
+    print(json.dumps(program.to_dict(), indent=4), end=" ")
