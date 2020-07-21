@@ -68,7 +68,7 @@ def main_docs(args: argparse.Namespace) -> int:
         syscalls_list = list(Syscalls.items())
         syscalls_list.sort(key=lambda i: i[0])
         for sys_num, syscall in syscalls_list:
-            index = syscall.description.index('.') + 1
+            index = syscall.description.index(".") + 1
             print(f"| {syscall.name:15} | {sys_num:<3} | {syscall.description[:index]:<30} | {syscall.description[index+1:]:<80} |")
 
     if print_both or args.instructions:
