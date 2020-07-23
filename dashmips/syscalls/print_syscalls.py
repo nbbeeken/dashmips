@@ -37,7 +37,7 @@ def print_hex(program: MipsProgram):
 @mips_syscall(35)
 def print_bin(program: MipsProgram):
     """Print Int in Binary. $a0 = integer to print."""
-    print(f"{program.registers['$a0'] & 0xFFFFFFFF:032b}", end=" ")
+    print(f"0b{program.registers['$a0'] & 0xFFFFFFFF:032b}", end=" ")
 
 
 @mips_syscall(36)
