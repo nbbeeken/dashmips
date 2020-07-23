@@ -18,7 +18,7 @@ def read_int(program: MipsProgram):
 
 @mips_syscall(8)
 def read_str(program: MipsProgram):
-    """Read Str from stdin. $a0 = address of input buffer $a1 = maximum number of characters to read."""
+    """Read Str from stdin. $a0 = address of input buffer  $a1 = maximum number of characters to read."""
     user_input = input("")
     truncated_user_input = user_input[: program.registers["$a1"]]
     address = program.registers["$a0"]
@@ -28,6 +28,6 @@ def read_str(program: MipsProgram):
 
 @mips_syscall(12)
 def read_char(program: MipsProgram):
-    """Read Str from stdin. $a0 = address of input buffer $a1 = maximum number of characters to read."""
+    """Read Chr from stdin. $a0 = address of input buffer  $a1 = maximum number of characters to read."""
     user_input = os.read(0, 1)
     program.registers["$v0"] = intify(user_input)

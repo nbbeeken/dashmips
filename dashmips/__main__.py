@@ -60,29 +60,34 @@ def main_docs(args: argparse.Namespace) -> int:
     print_both = not args.syscalls and not args.instructions
     if print_both or args.syscalls:
         # Syscall printer
+        print()
         print("Syscalls")
-        print(f"{'name':15}{'number':<10}{'description'}")
-        print(f"{'----':15}{'------':<10}{'-----------'}")
+        print()
+        print(f"| {'name':15} | {'$v0':<3} | {'description':<30} | {'arguments/result':<80} |")
+        print(f"|{'-' * 17}|{'-' * 5}|{'-' * 32}|{'-' * 82}|")
         syscalls_list = list(Syscalls.items())
         syscalls_list.sort(key=lambda i: i[0])
         for sys_num, syscall in syscalls_list:
-            print(f"{syscall.name:15}{sys_num:<10}{syscall.description}")
-        print()
+            index = syscall.description.index(".") + 1
+            print(f"| {syscall.name:15} | {sys_num:<3} | {syscall.description[:index]:<30} | {syscall.description[index+1:]:<80} |")
 
     if print_both or args.instructions:
         # Instructions printer
+        print()
         print("Instructions")
-        print(f"{'format':<35}{'description'}")
-        print(f"{'------':<35}{'-----------'}")
+        print()
+        print(f"| {'format':<35} | {'description':70} |")
+        print(f"|{'-' * 37}|{'-' * 72}|")
         snippets = generate_snippets(examples=True)
         instr_list = list(Instructions.items())
         instr_list.sort(key=lambda i: i[0])
         for instrname, instruction in instr_list:
             ex_str = snippets[instrname]["example"]
             desc = snippets[instrname]["description"]
-            print(f"{ex_str:35}# ", end="")
-            print(f"{desc}")
+            print(f"| {ex_str:35} | # ", end="")
+            print(f"{desc:68} |")
 
+    print()
     return 0
 
 

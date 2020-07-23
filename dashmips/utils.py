@@ -83,6 +83,8 @@ def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> byte
     """Take variety of types and turn them into bytes."""
     if isinstance(data, str):
         return bytes(data + ("\0" if null_byte else ""), "utf8")
+    if isinstance(data, int) and data == 0:
+        return b"\0\0\0\0"
     if isinstance(data, int):
         int_size = size if size else (data.bit_length() // 8) + 1
         return (data & 0xFFFF_FFFF).to_bytes(int_size, "big")
