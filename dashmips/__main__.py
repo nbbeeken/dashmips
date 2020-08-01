@@ -5,6 +5,7 @@ import sys
 from threading import Thread
 from typing import Any, List, NoReturn
 from re import findall
+from pkg_resources import get_distribution
 
 from .extension import generate_snippets, instruction_name_regex
 from .plugins.vt100 import VT100
@@ -111,7 +112,7 @@ def main() -> NoReturn:
     """Entry function for Dashmips."""
     parser = argparse.ArgumentParser("dashmips")
 
-    parser.add_argument("-v", "--version", action="version", version="0.1.0")
+    parser.add_argument("-v", "--version", action="version", version=get_distribution("dashmips").version)
 
     sbp = parser.add_subparsers(title="commands", dest="command")
     compileparse = sbp.add_parser("compile", aliases=["c"])
