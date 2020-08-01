@@ -18,7 +18,7 @@ ADDRESS = ("localhost", 2390)
 def server():
     """Start dashmips server."""
     if SHOULD_START_SERVER:
-        debugger = Popen(split("dashmips debug -i localhost -l tests/test_mips/smallest.mips"))
+        debugger = Popen(split("python -m dashmips debug -i localhost -l tests/test_mips/smallest.mips"))
         assert debugger.returncode is None, "dashmips exited before we could test"
         time.sleep(0.2)  # sleep so we can connect
         return debugger
