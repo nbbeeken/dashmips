@@ -23,7 +23,13 @@ def main_compile(args: argparse.Namespace) -> int:
     if args.visual:
         hex = "[0-9A-Fa-f]"
         for section in ["stack", "heap", "data"]:
-            memory = "".join([chr(int(num, 16)) for segments in findall(f"({hex}{hex} {hex}{hex} {hex}{hex} {hex}{hex})    \|....\|\n", program.to_dict()["memory"][section]) for num in segments.split()])
+            memory = "".join(
+                [
+                    chr(int(num, 16))
+            for segments in findall(f"({hex}{hex} {hex}{hex} {hex}{hex} {hex}{hex})    \|....\|\n", program.to_dict()["memory"][section])
+                    for num in segments.split()
+                ]
+            )
             print(memory, file=args.visual, end="")
     return 0
 
