@@ -150,24 +150,12 @@ def connectPreprocessFailure(host: str = "localhost", port: int = 2390):
     class TCPHandler(socketserver.BaseRequestHandler):
         def handle(self):
             for _ in range(2):
-                header = b""
-                while True:
-                    header += self.request.recv(1)
-                    if header and chr(header[-1]) == "}":
-                        break
-                    if len(header) >= 1000:
-                        log.error("Communication error between client and server")
-                        break
-
-                msg_size = int(header[8:-1])
-                command = self.request.recv(msg_size)
+                command = receive_dashmips_message(self.request)
 
                 if b"verify_breakpoints" in command:
-                    response = '{"method": "verify_breakpoints", "result": []}'
-                    self.request.sendall(bytes(json.dumps({"size": len(response)}), "ascii") + bytes(response, "ascii"))
+                    send_dashmips_message(self.request, '{"method": "verify_breakpoints", "result": []}')
                 else:
-                    response = '{"method": "start", "result": {"exited": true}}'
-                    self.request.sendall(bytes(json.dumps({"size": len(response)}), "ascii") + bytes(response, "ascii"))
+                    send_dashmips_message(self.request, '{"method": "start", "result": {"exited": true}}')
                     return
 
     # Allows server to reuse address to prevent crash
