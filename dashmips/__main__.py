@@ -27,7 +27,7 @@ def main_compile(args: argparse.Namespace) -> int:
                 [
                     chr(int(num, 16))
                     for segments in findall(
-        f"({hex}{hex} {hex}{hex} {hex}{hex} {hex}{hex})    <....<\n", program.to_dict()["memory"][section].replace("|", "<")
+                f"({hex}{hex} {hex}{hex} {hex}{hex} {hex}{hex})    <....<\n", program.to_dict()["memory"][section].replace("|", "<")
                     )
                     for num in segments.split()
                 ]
