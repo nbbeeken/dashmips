@@ -4,6 +4,8 @@ import json
 import sys
 from threading import Thread
 from typing import Any, List, NoReturn
+from re import findall
+from pkg_resources import get_distribution
 
 from .extension import generate_snippets, instruction_name_regex
 from .plugins.vt100 import VT100
@@ -18,6 +20,19 @@ def main_compile(args: argparse.Namespace) -> int:
         json.dump(program.to_dict(), args.out)
     else:
         print(json.dumps(program.to_dict()))
+    if args.visual:
+        hex = "[0-9A-Fa-f]"
+        for section in ["stack", "heap", "data"]:
+            memory = "".join(
+                [
+                    chr(int(num, 16))
+                    for segments in findall(
+                        f"({hex}{hex} {hex}{hex} {hex}{hex} {hex}{hex})    <....<\n", program.to_dict()["memory"][section].replace("|", "<")
+                    )
+                    for num in segments.split()
+                ]
+            )
+            print(memory, file=args.visual, end="")
     return 0
 
 
@@ -105,7 +120,7 @@ def main() -> NoReturn:
     """Entry function for Dashmips."""
     parser = argparse.ArgumentParser("dashmips")
 
-    parser.add_argument("-v", "--version", action="version", version="0.1.0")
+    parser.add_argument("-v", "--version", action="version", version=get_distribution("dashmips").version)
 
     sbp = parser.add_subparsers(title="commands", dest="command")
     compileparse = sbp.add_parser("compile", aliases=["c"])
@@ -116,6 +131,7 @@ def main() -> NoReturn:
 
     compileparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
     compileparse.add_argument("-o", "--out", type=argparse.FileType("w", encoding="utf8"), help="Output file name")
+    compileparse.add_argument("-v", "--visual", type=argparse.FileType("w", encoding="utf8"), help="Visualize memory to file name")
     compileparse.set_defaults(func=main_compile)
 
     runparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
