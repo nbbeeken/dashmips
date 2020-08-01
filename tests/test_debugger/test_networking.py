@@ -40,6 +40,10 @@ def test_connect(server):
     except ConnectionRefusedError as e:
         assert False, "Failed to connect"
 
+    if server:
+        server.kill()  # Avoid reuse addr errors
+        time.sleep(0.2)  # sleep so we can reconnect
+
 
 def test_handshake(server):
     """Test that the socket is available for connecting."""
@@ -55,3 +59,7 @@ def test_handshake(server):
         assert server.pid == response["result"]["pid"]
 
     send_dashmips_message(s, json.dumps({"method": "stop"}))
+
+    if server:
+        server.kill()  # Avoid reuse addr errors
+        time.sleep(0.2)  # sleep so we can reconnect
