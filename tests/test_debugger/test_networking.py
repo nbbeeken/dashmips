@@ -1,12 +1,13 @@
 """Tests for the socket server."""
 
 from typing import Optional
-from subprocess import PIPE, Popen, run
+from subprocess import Popen, run, PIPE
 from shlex import split
 import time
 import pytest
 import socket as net
 import json
+import logging
 
 from dashmips.debuggerserver import send_dashmips_message, receive_dashmips_message
 
@@ -18,8 +19,12 @@ ADDRESS = ("localhost", 2390)
 def server():
     """Start dashmips server."""
     if SHOULD_START_SERVER:
-        debugger = Popen(split("python -m dashmips debug -i localhost -l tests/test_mips/smallest.mips"))
+        debugger = Popen(split("python -m dashmips debug -i localhost -l tests/test_mips/smallest.mips"), bufsize=1, stderr=PIPE, encoding="utf8")
         time.sleep(0.2)  # sleep so we can connect
+
+        if debugger.stderr:
+            print(debugger.stderr.readline())
+
         assert debugger.returncode is None, "dashmips exited before we could test"
         return debugger
     return None
@@ -34,11 +39,9 @@ def test_connect(server):
     """Test that the socket is available for connecting."""
     if server:
         assert server.returncode is None, "Dashmips Exited before we could test!!"
-    try:
-        s = net.create_connection(ADDRESS)
-        assert s is not None
-    except ConnectionRefusedError as e:
-        assert False, "Failed to connect"
+
+    s = net.create_connection(ADDRESS)
+    assert s is not None
 
     if server:
         server.kill()  # Avoid reuse addr errors
