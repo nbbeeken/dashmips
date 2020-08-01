@@ -101,3 +101,8 @@ def debug_verify_breakpoints(program: MipsProgram, params) -> Tuple[List[int], L
             local_breakpoints.append(-1)
 
     return remote_breakpoints, local_breakpoints
+
+
+def debug_error(program: MipsProgram, params):
+    """Raise an error on the interpreter's end."""
+    raise MipsException("".join(params))

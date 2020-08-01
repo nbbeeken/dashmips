@@ -6,8 +6,14 @@ import json
 import logging as log
 import signal
 import socketserver
+from socket import socket
+import re
 
+from .utils import MipsException
 from .models import MipsProgram
+
+
+HEADER_REGEX = re.compile(r'{\s*"size"\s*:\s*\d+\s*}')
 
 
 class ProgramExit(Exception):
@@ -16,14 +22,63 @@ class ProgramExit(Exception):
     pass
 
 
-def client_loop(message: str, commands: dict):
+def receive_dashmips_message(client: socket) -> dict:
+    r"""Receive a dashmips debugger message.
+
+    Dashmips communicates in a modified JSON-RPC format.
+    An example message looks like (in regex form):
+    {"size": \d+}{"method": "\w+"}
+    Two concatenated JSON objects, the first reporting the size of the second object.
+    """
+    message = client.recv(30).decode("utf8")  # { "size": 9007199254740991 } <- largest message with some padding
+
+    if message == "":
+        # Client is disconnected! maybe we should just exit?
+        return {"method": "stop"}
+
+    header_search = HEADER_REGEX.match(message)
+    if header_search:
+        header = header_search[0]
+    else:
+        raise MipsException(f"Header not included in message: {message}")
+
+    msg_size = json.loads(header)["size"]  # must be valid json {size: \d+}
+    command = message[len(header) :]
+
+    remaining_bytes = msg_size - len(command)
+    if remaining_bytes > 0:
+        command += client.recv(remaining_bytes).decode("utf8")
+
+    return json.loads(command)
+
+
+def send_dashmips_message(client: socket, data: str):
+    r"""Send a dashmips debugger message.
+
+    Size is calculated from the utf8 encoding of data.
+    """
+    data_encoded = bytes(data, "utf8")
+    size = len(data_encoded)
+    size_header = bytes(json.dumps({"size": size}), "utf8")
+    out_message = size_header + data_encoded
+    client.sendall(out_message)
+
+
+def run_method(request: dict, commands: dict):
     """Message loop handler."""
-    log.info(f"Recv `{message}`")
+    log.info(f"Recv `{request}`")
 
-    request = json.loads(message)
+    if "method" not in request:
+        raise MipsException("Must specify 'method' in debug messages.")
 
-    command = commands[request["method"]]
-    result = command(params=request["params"])
+    method = request["method"]
+    params = request.get("params", [])
+
+    if method not in commands:
+        raise MipsException(f"Unsupported method '{method}'.")
+
+    command = commands[method]
+    result = command(params=params)
 
     response = json.dumps({"method": request["method"], "result": result})
 
@@ -65,28 +120,20 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
 
         def handle(self):
             # self.request is the TCP socket connected to the client
-            while True:
-                header = b""
-                while True:
-                    header += self.request.recv(1)
-                    if header and chr(header[-1]) == "}":
-                        break
-                    if len(header) >= 1000:
-                        log.error("Communication error between client and server")
-                        break
+            client: socket = self.request
 
-                msg_size = int(header[8:-1])
-                command = self.request.recv(msg_size)
+            while True:  # Enter the loop that will continuously chat with the debugger client
+                command = receive_dashmips_message(client)
 
                 log.info(f"{self.client_address[0]} wrote: {command}")
 
                 try:
-                    response = client_loop(command, self.commands)
+                    response = run_method(command, self.commands)
                 except ProgramExit:
                     log.info("Program exited normally")
                     break
 
-                self.request.sendall(bytes(json.dumps({"size": len(response)}), "ascii") + bytes(response, "ascii"))
+                send_dashmips_message(client, response)
 
     # Allows server to reuse address to prevent crash
     socketserver.TCPServer.allow_reuse_address = True

@@ -1,0 +1,5 @@
+.text
+main:
+    li $a0, 0  # set exit code
+    li $v0, 10
+    syscall

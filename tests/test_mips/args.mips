@@ -77,4 +77,5 @@ main:  # main($a0 = argc, $a1 = argv)
         j loop
     end_loop:
         li $v0, 10
+        move $a0, $zero
         syscall
