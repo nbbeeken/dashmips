@@ -19,8 +19,8 @@ def server():
     """Start dashmips server."""
     if SHOULD_START_SERVER:
         debugger = Popen(split("python -m dashmips debug -i localhost -l tests/test_mips/smallest.mips"))
-        assert debugger.returncode is None, "dashmips exited before we could test"
         time.sleep(0.2)  # sleep so we can connect
+        assert debugger.returncode is None, "dashmips exited before we could test"
         return debugger
     return None
 
@@ -34,8 +34,11 @@ def test_connect(server):
     """Test that the socket is available for connecting."""
     if server:
         assert server.returncode is None, "Dashmips Exited before we could test!!"
-    s = net.create_connection(ADDRESS)
-    assert s is not None
+    try:
+        s = net.create_connection(ADDRESS)
+        assert s is not None
+    except ConnectionRefusedError as e:
+        assert False, "Failed to connect"
 
 
 def test_handshake(server):

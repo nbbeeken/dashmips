@@ -1,4 +1,5 @@
 [virtualenvs]
 create = true
 in-project = true
-path = "./.venv"
+cache-dir = "."
+path = ".venv"
