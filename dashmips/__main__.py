@@ -22,11 +22,12 @@ def main_compile(args: argparse.Namespace) -> int:
         print(json.dumps(program.to_dict()))
     if args.visual:
         hex = "[0-9A-Fa-f]"
+        or_char = "\|"
         for section in ["stack", "heap", "data"]:
             memory = "".join(
                 [
                     chr(int(num, 16))
-            for segments in findall("(%s%s %s%s %s%s %s%s)    \|....\|\n" % (hex, hex, hex, hex, hex, hex, hex, hex), program.to_dict()["memory"][section])
+            for segments in findall(f"({hex}{hex} {hex}{hex} {hex}{hex} {hex}{hex})    {or_char}....{or_char}\n", program.to_dict()["memory"][section])
                     for num in segments.split()
                 ]
             )
