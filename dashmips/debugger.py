@@ -84,7 +84,11 @@ def debug_verify_breakpoints(program: MipsProgram, params) -> Tuple[List[int], L
     for breakpoint in breakpoints:
 
         def checkfile(f: str) -> bool:
-            return os.path.samefile(f, breakpoint["path"])
+            if os.path.exists(breakpoint["path"]):
+                return os.path.samefile(f, breakpoint["path"])
+            else:
+                # If the file doesn't exist they are not the same file
+                return False
 
         real_line = None
         for pc_value, srcline in enumerate(program.source):
