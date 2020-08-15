@@ -6,7 +6,7 @@ from struct import Struct
 from sys import stdout
 
 
-def print_unbuffered(s):
+def print_unbuffered(s: str):
     """Print string unbuffered."""
     stdout.write(s)
     stdout.flush()
@@ -32,7 +32,8 @@ def print_char(program: MipsProgram):
 @mips_syscall(1)
 def print_int(program: MipsProgram):
     """Print Int in Dec. $a0 = integer to print."""
-    print_unbuffered(program.registers["$a0"])
+    stdout.write(str(program.registers["$a0"]))
+    stdout.flush()
 
 
 @mips_syscall(34)
