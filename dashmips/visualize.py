@@ -13,11 +13,11 @@ def visualize_memory(args):
         formatted_output = ""
 
         if section == "stack":
-            memory = program.memory.ram['stack']
+            memory = program.memory.ram["stack"]
         elif section == "heap":
-            memory = program.memory.ram['heap']
+            memory = program.memory.ram["heap"]
         elif section == "data":
-            memory = program.memory.ram['data']
+            memory = program.memory.ram["data"]
 
         if section == "stack":
             virtual_add = memory["start"] - 1
@@ -39,12 +39,12 @@ def visualize_memory(args):
             formatted_output += "\t"
 
             if rep_int:
-                formatted_output += str(int.from_bytes(program.memory.read32(virtual_add), byteorder='little')) + "\t"
+                formatted_output += str(int.from_bytes(program.memory.read32(virtual_add), byteorder="little")) + "\t"
             elif rep_float:
                 byte_array = bytearray()
                 for j in range(4):
                     if virtual_add - j >= end:
-                        byte_array.insert(j, int.from_bytes(program.memory.read08(virtual_add - j), byteorder='little'))
+                        byte_array.insert(j, int.from_bytes(program.memory.read08(virtual_add - j), byteorder="little"))
                     else:
                         byte_array.insert(j, 0)
                 formatted_output += str(unpack("<f", byte_array)[0]) + "\t"
@@ -53,9 +53,9 @@ def visualize_memory(args):
                     if virtual_add - j >= end:
                         try:
                             s = program.memory.read08(virtual_add - j).decode("utf-8")
-                            formatted_output += ((escape_dict[repr(s)] if repr(s) in escape_dict else b'\x00'.decode('utf-8')) if "\\" in repr(s) else s) + "\t"
+                            formatted_output += ((escape_dict[repr(s)] if repr(s) in escape_dict else b"\x00".decode("utf-8")) if "\\" in repr(s) else s) + "\t"
                         except UnicodeDecodeError:
-                            formatted_output += b'\x00'.decode("utf-8") + "\t"
+                            formatted_output += b"\x00".decode("utf-8") + "\t"
                     else:
                         formatted_output += (4 - j) * "\t"
                         break
