@@ -39,7 +39,7 @@ def visualize_memory(args):
             formatted_output += "\t"
 
             if rep_int:
-                formatted_output += str(int.from_bytes(program.memory.read32(virtual_add), byteorder="little")) + "\t"
+                formatted_output += str(int.from_bytes(program.memory.read32(virtual_add - 3), byteorder="little")) + "\t"
             elif rep_float:
                 byte_array = bytearray()
                 for j in range(4):
