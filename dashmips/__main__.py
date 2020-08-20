@@ -53,9 +53,14 @@ def main_visualize(args: argparse.Namespace) -> int:
 def main_debug(args: argparse.Namespace) -> int:
     """Start debug server for mips."""
     from .debuggerserver import debug_mips, connectPreprocessFailure
+    try:
+        f = open(args.FILE, "r", encoding="utf8")
+    except FileNotFoundError as err:
+        connectPreprocessFailure(host=args.host, port=args.port)
+        raise MipsException(f"File '{args.FILE}' could not be opened.")
 
     try:
-        program = preprocess(args.FILE, args=args.mips_args)
+        program = preprocess(f, args=args.mips_args)
     except MipsException as err:
         connectPreprocessFailure(host=args.host, port=args.port)
         raise MipsException(err.message)
@@ -148,7 +153,7 @@ def main() -> NoReturn:
     runparse.add_argument("--vt100", action="store_true", help="Start VT100 Simulator")
     runparse.set_defaults(func=main_run)
 
-    debugparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
+    debugparse.add_argument("FILE", type=str, help="Input file")
     debugparse.add_argument("-a", "--args", dest="mips_args", nargs="*", help="Arguments to pass into the mips main")
     debugparse.add_argument("--vt100", action="store_true", help="Start VT100 Simulator")
     debugparse.add_argument("-p", "--port", type=int, default=2390, help="run debugger on port")
