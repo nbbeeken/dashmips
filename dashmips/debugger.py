@@ -117,16 +117,16 @@ def debug_error(program: MipsProgram, params):
 def debug_update_visualizer(program: MipsProgram, params):
     """Send the updated visualizer content."""
     args = argparse.Namespace(
-        sa = "Stack: Ascii" in params[0],
-        si = "Stack: Int" in params[0],
-        sf = "Stack: Float" in params[0],
-        ha = "Heap: Ascii" in params[0],
-        hi = "Heap: Int" in params[0],
-        hf = "Heap: Float" in params[0],
-        da = "Data: Ascii" in params[0],
-        di = "Data: Int" in params[0],
-        df = "Data: Float" in params[0],
-        FILE = False,
-        program = program,
+        sa="Stack: Ascii" in params[0],
+        si="Stack: Int" in params[0],
+        sf="Stack: Float" in params[0],
+        ha="Heap: Ascii" in params[0],
+        hi="Heap: Int" in params[0],
+        hf="Heap: Float" in params[0],
+        da="Data: Ascii" in params[0],
+        di="Data: Int" in params[0],
+        df="Data: Float" in params[0],
+        FILE=False,
+        program=program,
     )
     return visualize_memory(args)
