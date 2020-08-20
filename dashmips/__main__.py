@@ -53,6 +53,7 @@ def main_visualize(args: argparse.Namespace) -> int:
 def main_debug(args: argparse.Namespace) -> int:
     """Start debug server for mips."""
     from .debuggerserver import debug_mips, connectPreprocessFailure
+
     try:
         f = open(args.FILE, "r", encoding="utf8")
     except FileNotFoundError as err:
