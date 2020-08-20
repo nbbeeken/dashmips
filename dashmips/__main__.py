@@ -45,8 +45,9 @@ def main_run(args: argparse.Namespace) -> int:
 
 def main_visualize(args: argparse.Namespace) -> int:
     """Visualize the stack, heap, data of mips program."""
+    print(visualize_memory(args).split("&&&& ")[[args.sa, args.si, args.sf, args.ha, args.hi, args.hf, args.da, args.di, args.df].index(True)], end="")
 
-    return visualize_memory(args)
+    return 0
 
 
 def main_debug(args: argparse.Namespace) -> int:
@@ -130,11 +131,16 @@ def main() -> NoReturn:
     compileparse.set_defaults(func=main_compile)
 
     visualparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
-    visualparse.add_argument("--s", action="store_true", help="Visualize Stack")
-    visualparse.add_argument("--h", action="store_true", help="Visualize Heap")
-    visualparse.add_argument("--d", action="store_true", help="Visualize Data")
-    visualparse.add_argument("--i", action="store_true", help="View as Integer")
-    visualparse.add_argument("--f", action="store_true", help="View as Float")
+    visualparse.add_argument("--sa", action="store_true", help="Visualize Stack in Ascii")
+    visualparse.add_argument("--si", action="store_true", help="Visualize Stack as Int")
+    visualparse.add_argument("--sf", action="store_true", help="Visualize Stack as Float")
+    visualparse.add_argument("--ha", action="store_true", help="Visualize Heap in Ascii")
+    visualparse.add_argument("--hi", action="store_true", help="Visualize Heap as Int")
+    visualparse.add_argument("--hf", action="store_true", help="Visualize Heap as Float")
+    visualparse.add_argument("--da", action="store_true", help="Visualize Data in Ascii")
+    visualparse.add_argument("--di", action="store_true", help="Visualize Data as Int")
+    visualparse.add_argument("--df", action="store_true", help="Visualize Data as Float")
+
     visualparse.set_defaults(func=main_visualize)
 
     runparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
