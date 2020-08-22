@@ -11,6 +11,8 @@ from .extension import generate_snippets, instruction_name_regex
 from .plugins.vt100 import VT100
 from .preprocessor import preprocess
 from .utils import MipsException
+from .models import MipsProgram
+from .visualize import visualize_memory
 
 
 def main_compile(args: argparse.Namespace) -> int:
@@ -20,19 +22,6 @@ def main_compile(args: argparse.Namespace) -> int:
         json.dump(program.to_dict(), args.out)
     else:
         print(json.dumps(program.to_dict()))
-    if args.visual:
-        hex = "[0-9A-Fa-f]"
-        for section in ["stack", "heap", "data"]:
-            memory = "".join(
-                [
-                    chr(int(num, 16))
-                    for segments in findall(
-                        f"({hex}{hex} {hex}{hex} {hex}{hex} {hex}{hex})    <....<\n", program.to_dict()["memory"][section].replace("|", "<")
-                    )
-                    for num in segments.split()
-                ]
-            )
-            print(memory, file=args.visual, end="")
     return 0
 
 
@@ -54,12 +43,25 @@ def main_run(args: argparse.Namespace) -> int:
         return run(program)
 
 
+def main_visualize(args: argparse.Namespace) -> int:
+    """Visualize the stack, heap, data of mips program."""
+    print(visualize_memory(args).split("&&&& ")[[args.sa, args.si, args.sf, args.ha, args.hi, args.hf, args.da, args.di, args.df].index(True)], end="")
+
+    return 0
+
+
 def main_debug(args: argparse.Namespace) -> int:
     """Start debug server for mips."""
     from .debuggerserver import debug_mips, connectPreprocessFailure
 
     try:
-        program = preprocess(args.FILE, args=args.mips_args)
+        f = open(args.FILE, "r", encoding="utf8")
+    except FileNotFoundError as err:
+        connectPreprocessFailure(host=args.host, port=args.port)
+        raise MipsException(f"File '{args.FILE}' could not be opened.")
+
+    try:
+        program = preprocess(f, args=args.mips_args)
     except MipsException as err:
         connectPreprocessFailure(host=args.host, port=args.port)
         raise MipsException(err.message)
@@ -128,18 +130,31 @@ def main() -> NoReturn:
     debugparse = sbp.add_parser("debug", aliases=["d"])
     docsparse = sbp.add_parser("docs", aliases=["h"])
     utilsparse = sbp.add_parser("utils", aliases=["u"])
+    visualparse = sbp.add_parser("visual", aliases=["v"])
 
     compileparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
     compileparse.add_argument("-o", "--out", type=argparse.FileType("w", encoding="utf8"), help="Output file name")
-    compileparse.add_argument("-v", "--visual", type=argparse.FileType("w", encoding="utf8"), help="Visualize memory to file name")
     compileparse.set_defaults(func=main_compile)
+
+    visualparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
+    visualparse.add_argument("--sa", action="store_true", help="Visualize Stack in Ascii")
+    visualparse.add_argument("--si", action="store_true", help="Visualize Stack as Int")
+    visualparse.add_argument("--sf", action="store_true", help="Visualize Stack as Float")
+    visualparse.add_argument("--ha", action="store_true", help="Visualize Heap in Ascii")
+    visualparse.add_argument("--hi", action="store_true", help="Visualize Heap as Int")
+    visualparse.add_argument("--hf", action="store_true", help="Visualize Heap as Float")
+    visualparse.add_argument("--da", action="store_true", help="Visualize Data in Ascii")
+    visualparse.add_argument("--di", action="store_true", help="Visualize Data as Int")
+    visualparse.add_argument("--df", action="store_true", help="Visualize Data as Float")
+
+    visualparse.set_defaults(func=main_visualize)
 
     runparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
     runparse.add_argument("-a", "--args", dest="mips_args", nargs="*", help="Arguments to pass into the mips main")
     runparse.add_argument("--vt100", action="store_true", help="Start VT100 Simulator")
     runparse.set_defaults(func=main_run)
 
-    debugparse.add_argument("FILE", type=argparse.FileType("r", encoding="utf8"), help="Input file")
+    debugparse.add_argument("FILE", type=str, help="Input file")
     debugparse.add_argument("-a", "--args", dest="mips_args", nargs="*", help="Arguments to pass into the mips main")
     debugparse.add_argument("--vt100", action="store_true", help="Start VT100 Simulator")
     debugparse.add_argument("-p", "--port", type=int, default=2390, help="run debugger on port")

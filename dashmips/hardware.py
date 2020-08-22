@@ -8,6 +8,7 @@ from .utils import MipsException, as_twos_comp, intify
 
 register_names = (
     # fmt: off
+    "lowest_stack",
     "$zero",
     "$at",
     "$v0", "$v1",
@@ -20,6 +21,8 @@ register_names = (
     # fmt: on
 )
 
+invisible_registers = ("lowest_stack",)
+
 
 class Registers(Dict[str, int]):
     """Mips Register File."""
@@ -27,8 +30,8 @@ class Registers(Dict[str, int]):
     SPECIAL = ("pc", "hi", "lo")
 
     resolve: Dict[Union[str, int], str] = {
-        **{name: name for (i, name) in enumerate(register_names)},
-        **{f"${i}": name for (i, name) in enumerate(register_names)},
+        **{name: name for (i, name) in enumerate(register_names) if name not in invisible_registers},
+        **{f"${i}": name for (i, name) in enumerate(register_names) if name not in invisible_registers},
     }
 
     def __init__(self):
@@ -49,15 +52,24 @@ class Registers(Dict[str, int]):
         if key in Registers.SPECIAL:
             return super().__setitem__(key, value)
         if key not in Registers.resolve:
-            raise MipsException(f"Unknown register Reg[{key}]={hex(value)}")
+            if key in invisible_registers:  # Ensures that hidden registers don't appear
+                super().__setitem__(key, value & 0xFFFF_FFFF)
+                return
+            else:  # This register should not be used
+                raise MipsException(f"Unknown register Reg[{key}]={hex(value)}")
         if value > 0xFFFF_FFFF:
             print(f"Warning: Overflowed 32-bit Reg[{key}]={hex(value)}", file=sys.stderr)
         super().__setitem__(Registers.resolve[key], value & 0xFFFF_FFFF)
+        if key == "$sp":
+            if super().__getitem__("$sp") < super().__getitem__("lowest_stack") or super().__getitem__("lowest_stack") == 0:
+                super().__setitem__("lowest_stack", value & 0xFFFF_FFFF)  # lowest_stack tracks the lowest the $sp has been
 
     def __getitem__(self, key: str) -> int:
         """Get register value."""
         if key in Registers.SPECIAL:
             return super().__getitem__(key)
+        if key in invisible_registers:
+            return as_twos_comp(super().__getitem__(key))
         return as_twos_comp(super().__getitem__(Registers.resolve[key]))
 
 

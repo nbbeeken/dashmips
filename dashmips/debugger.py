@@ -7,12 +7,14 @@ All commands need to return
 }
 """
 import os
+import argparse
 from dataclasses import asdict
 from typing import List, Dict, Any, Tuple
 
 from .models import MipsProgram
 from .run import next_instruction, run
 from .utils import MipsException
+from .visualize import visualize_memory
 
 
 def debug_start(program: MipsProgram, params=None) -> Dict[str, int]:
@@ -110,3 +112,21 @@ def debug_verify_breakpoints(program: MipsProgram, params) -> Tuple[List[int], L
 def debug_error(program: MipsProgram, params):
     """Raise an error on the interpreter's end."""
     raise MipsException("".join(params))
+
+
+def debug_update_visualizer(program: MipsProgram, params):
+    """Send the updated visualizer content."""
+    args = argparse.Namespace(
+        sa="Stack: Ascii" in params[0],
+        si="Stack: Int" in params[0],
+        sf="Stack: Float" in params[0],
+        ha="Heap: Ascii" in params[0],
+        hi="Heap: Int" in params[0],
+        hf="Heap: Float" in params[0],
+        da="Data: Ascii" in params[0],
+        di="Data: Int" in params[0],
+        df="Data: Float" in params[0],
+        FILE=False,
+        program=program,
+    )
+    return visualize_memory(args)
