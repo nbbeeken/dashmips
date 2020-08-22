@@ -34,14 +34,14 @@ def directive_byte(data: str, memory: Memory) -> int:
 def directive_half(data: str, memory: Memory) -> int:
     """Half directive."""
     value = bytesify(parse_int(data), size=2)
-    address = memory.extend_data(value)
+    address = memory.extend_data(value, align_data=True)
     return address
 
 
 def directive_word(data: str, memory: Memory) -> int:
     """Word directive."""
     value = bytesify(parse_int(data), size=4)
-    address = memory.extend_data(value)
+    address = memory.extend_data(value, align_data=True)
     return address
 
 

@@ -21,14 +21,14 @@ def visualize_memory(args):
             memory = program.memory.ram["data"]
 
         if section == "stack":
-            virtual_add = memory["start"] - 1
+            virtual_add = memory["start"]
             end = program.registers["lowest_stack"] + 1
         else:
-            virtual_add = memory["stops"] - 2
+            virtual_add = memory["stops"] - 1 - ((memory["stops"]) % 4)
             end = memory["start"]
 
         while virtual_add >= end:
-            formatted_output += hex(virtual_add - 3) + "\t\t"
+            formatted_output += hex(virtual_add - 4) + "\t\t"
 
             for j in range(4):
                 if virtual_add - j >= end:
@@ -62,8 +62,8 @@ def visualize_memory(args):
                         break
 
             virtual_add -= 4
-            if virtual_add < program.registers["$sp"] and section == "stack" and not added_pointer:
-                formatted_output += "<--"
+            if virtual_add - 1 < program.registers["$sp"] and section == "stack" and not added_pointer:
+                formatted_output += "<-- $sp"
                 added_pointer = True
 
             formatted_output += "\n"
