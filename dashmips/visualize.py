@@ -1,6 +1,7 @@
 """Memory visualizer."""
 from .models import MipsProgram
 from .preprocessor import preprocess
+from .utils import MipsException
 from struct import unpack
 
 
@@ -71,7 +72,10 @@ def visualize_memory(args):
         return formatted_output
 
     if args.FILE:
-        program = preprocess(args.FILE)
+        try:
+            program = preprocess(args.FILE)
+        except MipsException as err:
+            return f"Error: {args.FILE.name} failed to assemble:\n" + err.message
     else:
         program = args.program
 
