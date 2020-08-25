@@ -45,7 +45,9 @@ def main_run(args: argparse.Namespace) -> int:
 
 def main_visualize(args: argparse.Namespace) -> int:
     """Visualize the stack, heap, data of mips program."""
-    print(visualize_memory(args).split("&&&& ")[[args.sa, args.si, args.sf, args.ha, args.hi, args.hf, args.da, args.di, args.df].index(True)], end="")
+    index = [args.sa, args.si, args.sf, args.ha, args.hi, args.hf, args.da, args.di, args.df].index(True)
+    memory_dump = visualize_memory(args)
+    print(memory_dump.split("&&&& ")[index] if "&&&& " in memory_dump else memory_dump, end="")
 
     return 0
 

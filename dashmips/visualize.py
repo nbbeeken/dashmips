@@ -1,6 +1,7 @@
 """Memory visualizer."""
 from .models import MipsProgram
 from .preprocessor import preprocess
+from .utils import MipsException
 from struct import unpack
 
 
