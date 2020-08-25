@@ -21,8 +21,6 @@ register_names = (
     # fmt: on
 )
 
-invisible_registers = ("lowest_stack",)
-
 
 class Registers(Dict[str, int]):
     """Mips Register File."""
@@ -30,8 +28,8 @@ class Registers(Dict[str, int]):
     SPECIAL = ("pc", "hi", "lo")
 
     resolve: Dict[Union[str, int], str] = {
-        **{name: name for (i, name) in enumerate(register_names) if name not in invisible_registers},
-        **{f"${i}": name for (i, name) in enumerate(register_names) if name not in invisible_registers},
+        **{name: name for (i, name) in enumerate(register_names)},
+        **{f"${i}": name for (i, name) in enumerate(register_names)},
     }
 
     def __init__(self):
@@ -52,11 +50,7 @@ class Registers(Dict[str, int]):
         if key in Registers.SPECIAL:
             return super().__setitem__(key, value)
         if key not in Registers.resolve:
-            if key in invisible_registers:  # Ensures that hidden registers don't appear
-                super().__setitem__(key, value & 0xFFFF_FFFF)
-                return
-            else:  # This register should not be used
-                raise MipsException(f"Unknown register Reg[{key}]={hex(value)}")
+            raise MipsException(f"Unknown register Reg[{key}]={hex(value)}")
         if value > 0xFFFF_FFFF:
             print(f"Warning: Overflowed 32-bit Reg[{key}]={hex(value)}", file=sys.stderr)
         super().__setitem__(Registers.resolve[key], value & 0xFFFF_FFFF)
@@ -68,8 +62,6 @@ class Registers(Dict[str, int]):
         """Get register value."""
         if key in Registers.SPECIAL:
             return super().__getitem__(key)
-        if key in invisible_registers:
-            return as_twos_comp(super().__getitem__(key))
         return as_twos_comp(super().__getitem__(Registers.resolve[key]))
 
 
