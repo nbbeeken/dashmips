@@ -11,7 +11,9 @@ def visualize_memory(args):
         """Create the list to be visualized."""
         escape_dict = {repr("\x00"): "\\0", repr("\n"): "\\n", repr("\t"): "\\t"}
         formatted_output = ""
-        added_pointer = False
+        ptr = "<-- $sp/$fp" if (program.registers["$sp"] // 4) == (program.registers["$fp"] // 4) else "<-- $sp"
+        added_fp = True if (program.registers["$sp"] // 4) == (program.registers["$fp"] // 4) else False
+        added_sp = False
 
         if section == "stack":
             memory = program.memory.ram["stack"]
@@ -62,9 +64,12 @@ def visualize_memory(args):
                         break
 
             virtual_add -= 4
-            if virtual_add - 1 < program.registers["$sp"] and section == "stack" and not added_pointer:
-                formatted_output += "<-- $sp"
-                added_pointer = True
+            if not added_sp and virtual_add - 1 < program.registers["$sp"] and section == "stack":
+                formatted_output += ptr
+                added_sp = True
+            if not added_fp and virtual_add - 1 < program.registers["$fp"] and section == "stack":
+                formatted_output += "<-- $fp"
+                added_fp = True
 
             formatted_output += "\n"
 
