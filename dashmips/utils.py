@@ -87,12 +87,12 @@ def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> byte
         return b"\0\0\0\0"
     if isinstance(data, int):
         int_size = size if size else (data.bit_length() // 8) + 1
-        return (data & 0xFFFF_FFFF).to_bytes(int_size, "big")
+        return (data & 0xFFFF_FFFF).to_bytes(int_size, "little")
     if isinstance(data, tuple):
         byte_string = bytes()
         for integer in data:
             int_size = size if size else (integer.bit_length() // 8) + 1
-            byte_string += (integer & 0xFFFF_FFFF).to_bytes(int_size, "big")
+            byte_string += (integer & 0xFFFF_FFFF).to_bytes(int_size, "little")
         return byte_string
 
     return bytes(data)
