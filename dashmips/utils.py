@@ -76,7 +76,7 @@ def hexdump(data: bytes, *, offset=0, reverse_idx=False) -> str:
 
 def intify(values: bytes, unsigned=False) -> int:
     """Convert bytes to int."""
-    return int.from_bytes(values, byteorder="big", signed=(not unsigned))
+    return int.from_bytes(values, byteorder="little", signed=(not unsigned))
 
 
 def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> bytes:
