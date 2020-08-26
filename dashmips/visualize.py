@@ -27,6 +27,10 @@ def visualize_memory(args):
             virtual_add = memory["start"]
             end = program.registers["lowest_stack"] + 1
             offset = 4
+        elif section == "heap":
+            virtual_add = memory["stops"] - 1
+            end = memory["start"]
+            offset = 3
         elif section == "data":
             virtual_add = memory["stops"] - 1 - ((memory["stops"]) % 4)
             end = memory["start"]
@@ -81,7 +85,7 @@ def visualize_memory(args):
         return formatted_output
 
     program = preprocess(args.FILE) if args.FILE else args.program
-    message = "\nVisualizer represents assembled program." if args.FILE else "\nVisualizer represents LIVE Debugging."
+    message = "" if args.FILE else "\nVisualizer represents LIVE Debugging"
 
     output = ""
 
