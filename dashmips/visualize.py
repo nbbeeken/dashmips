@@ -17,30 +17,26 @@ def visualize_memory(args):
         added_sp = False
 
         if section == "stack":
-            memory = program.memory.ram["stack"]
-        elif section == "heap":
-            memory = program.memory.ram["heap"]
-        elif section == "data":
-            memory = program.memory.ram["data"]
-
-        if section == "stack":
-            virtual_add = memory["start"]
+            virtual_add = program.memory.ram["stack"]["start"]
             end = program.registers["lowest_stack"] + 1
             offset = 4
         elif section == "heap":
-            virtual_add = memory["stops"] - 1
-            end = memory["start"]
+            start = program.registers["end_heap"] - 1
+            virtual_add = ((program.registers["end_heap"] // 4) * 4) + (0 if program.registers["end_heap"] % 4 == 0 else 4) - 1
+            end = program.memory.ram["heap"]["start"]
             offset = 3
         elif section == "data":
-            virtual_add = memory["stops"] - 1 - ((memory["stops"]) % 4)
-            end = memory["start"]
+            virtual_add = program.memory.ram["data"]["stops"] - 1 - ((program.memory.ram["data"]["stops"]) % 4)
+            end = program.memory.ram["data"]["start"]
             offset = 3
 
         while virtual_add >= end:
             formatted_output += hex(virtual_add - offset) + "\t\t"
 
             for j in range(4):
-                if virtual_add - j >= end:
+                if section == "heap" and virtual_add - j > start:
+                    formatted_output += "\t"
+                elif virtual_add - j >= end:
                     formatted_output += program.memory.read08(virtual_add - j).hex().upper() + "\t"
                 else:
                     formatted_output += (4 - j) * "\t"
@@ -48,9 +44,9 @@ def visualize_memory(args):
 
             formatted_output += "\t"
 
-            if rep_int:
+            if rep_int:  # Int
                 formatted_output += str(int.from_bytes(program.memory.read32(virtual_add - 3), byteorder="little")) + "\t"
-            elif rep_float:
+            elif rep_float:  # Float
                 byte_array = bytearray()
                 for j in range(4):
                     if virtual_add - j >= end:
@@ -58,9 +54,11 @@ def visualize_memory(args):
                     else:
                         byte_array.insert(j, 0)
                 formatted_output += str(unpack("<f", byte_array)[0]) + "\t"
-            elif rep_ascii:
+            elif rep_ascii:  # Ascii
                 for j in range(4):
-                    if virtual_add - j >= end:
+                    if section == "heap" and virtual_add - j > start:
+                        formatted_output += "\t"
+                    elif virtual_add - j >= end:
                         try:
                             s = program.memory.read08(virtual_add - j).decode("utf-8")
                             formatted_output += ((escape_dict[repr(s)] if repr(s) in escape_dict else b"\x00".decode("utf-8")) if "\\" in repr(s) else s) + "\t"
@@ -71,6 +69,8 @@ def visualize_memory(args):
                         break
 
             virtual_add -= 4
+
+            # Add pointers for the stack
             if not added_sp and virtual_add - 1 < program.registers["$sp"] and section == "stack":
                 formatted_output += ptr
                 added_sp = True

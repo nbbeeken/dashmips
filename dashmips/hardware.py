@@ -8,7 +8,7 @@ from .utils import MipsException, as_twos_comp, intify
 
 register_names = (
     # fmt: off
-    "lowest_stack",
+    "lowest_stack", "end_heap",
     "$zero",
     "$at",
     "$v0", "$v1",
