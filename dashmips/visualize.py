@@ -17,21 +17,18 @@ def visualize_memory(args):
         added_sp = False
 
         if section == "stack":
-            virtual_add = program.memory.ram["stack"]["start"]
+            virtual_add = program.memory.ram["stack"]["start"] - 1
             end = program.registers["lowest_stack"] + 1
-            offset = 4
         elif section == "heap":
             start = program.registers["end_heap"] - 1
             virtual_add = ((program.registers["end_heap"] // 4) * 4) + (0 if program.registers["end_heap"] % 4 == 0 else 4) - 1
             end = program.memory.ram["heap"]["start"]
-            offset = 3
         elif section == "data":
             virtual_add = program.memory.ram["data"]["stops"] - 1 - ((program.memory.ram["data"]["stops"]) % 4)
             end = program.memory.ram["data"]["start"]
-            offset = 3
 
         while virtual_add >= end:
-            formatted_output += hex(virtual_add - offset) + "\t\t"
+            formatted_output += hex(virtual_add - 3) + "\t\t"
 
             for j in range(4):
                 if section == "heap" and virtual_add - j > start:

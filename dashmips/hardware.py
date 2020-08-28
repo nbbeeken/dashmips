@@ -54,8 +54,9 @@ class Registers(Dict[str, int]):
         if value > 0xFFFF_FFFF:
             print(f"Warning: Overflowed 32-bit Reg[{key}]={hex(value)}", file=sys.stderr)
         super().__setitem__(Registers.resolve[key], value & 0xFFFF_FFFF)
-        if key == "$sp":
-            if super().__getitem__("$sp") < super().__getitem__("lowest_stack") or super().__getitem__("lowest_stack") == 0:
+        if key == "$sp" or key == "$fp":
+            ls = super().__getitem__("lowest_stack")
+            if ls == 0 or super().__getitem__("$sp") < ls or super().__getitem__("$fp") < ls:
                 super().__setitem__("lowest_stack", value & 0xFFFF_FFFF)  # lowest_stack tracks the lowest the $sp has been
 
     def __getitem__(self, key: str) -> int:
@@ -167,7 +168,7 @@ class Memory:
         section = self.ram["stack"]
 
         if align_data:
-            section["m"].extend(alignment_zeros(len(section["m"])))
+            section["m"].extend(alignment_zeros(len(section["m"]) - 1))
             section["stops"] = section["start"] - len(section["m"])
 
         section["m"].extend(data[::-1])
