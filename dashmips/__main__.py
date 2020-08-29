@@ -46,8 +46,11 @@ def main_run(args: argparse.Namespace) -> int:
 def main_visualize(args: argparse.Namespace) -> int:
     """Visualize the stack, heap, data of mips program."""
     index = [args.sa, args.si, args.sf, args.ha, args.hi, args.hf, args.da, args.di, args.df].index(True)
-    memory_dump = visualize_memory(args)
-    print(memory_dump.split("&&&& ")[index] if "&&&& " in memory_dump else memory_dump, end="")
+    try:
+        memory_dump = visualize_memory(args)
+        print(memory_dump.split("&&&& ")[index] if "&&&& " in memory_dump else memory_dump, end="")
+    except MipsException as err:
+        print(f"Error: Dashmips failed to assemble file\n" + err.message)
 
     return 0
 
