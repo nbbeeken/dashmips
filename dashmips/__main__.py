@@ -50,7 +50,7 @@ def main_visualize(args: argparse.Namespace) -> int:
         memory_dump = visualize_memory(args)
         print(memory_dump.split("&&&& ")[index] if "&&&& " in memory_dump else memory_dump, end="")
     except MipsException as err:
-        print(f"Error: Dashmips failed to assemble file\n" + err.message)
+        print(f"Error: Dashmips failed to assemble file:\n" + err.message)
 
     return 0
 
