@@ -142,7 +142,10 @@ class Memory:
         section = self.ram["data"]
 
         if align_data:
-            section["m"].extend(alignment_zeros(len(section["m"])))
+            if len(data) == 2:
+                section["m"].extend(alignment_half(len(section["m"])))
+            else:
+                section["m"].extend(alignment_zeros(len(section["m"])))
             section["stops"] = section["start"] + len(section["m"])
 
         section["m"].extend(data)
@@ -246,4 +249,10 @@ class Memory:
 def alignment_zeros(data_len) -> bytearray:
     """Return array of 0s to align to 4."""
     alignment = (4 - data_len % 4) % 4
+    return bytearray(alignment)
+
+
+def alignment_half(data_len) -> bytearray:
+    """Return array of 0s to align to 4."""
+    alignment = (4 - data_len % 4) % 2
     return bytearray(alignment)
