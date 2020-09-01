@@ -91,7 +91,7 @@ class Memory:
     PAGE_SIZE = 2 ** 12
     TASK_LIMIT = 0xC0000000
     START_DATA = 0x00804900
-    STACK_STOP = 0x06000000
+    STACK_STOP = 0x05F5E100
     HEAP_START = 0x00600000
 
     def __init__(self):
@@ -103,8 +103,8 @@ class Memory:
         }
 
     def _tlb(self, virtual_address: int, sizeof=1) -> Tuple[SectionNames, slice]:
-        def v2p(section: str, pa: int):
-            return slice(pa - (sizeof - 1 if section == "stack" else 0), pa + (1 if section == "stack" else sizeof), 1)
+        def v2p(pa: int):
+            return slice(pa, pa + sizeof, 1)
 
         for section_name in self.ram:
             section_name = cast(SectionNames, section_name)
@@ -112,16 +112,16 @@ class Memory:
             stops = self.ram[section_name]["stops"]
 
             if section_name == "stack" and start >= virtual_address >= stops:
-                return section_name, v2p(section_name, start - virtual_address)
+                return section_name, v2p(start - virtual_address)
 
             if section_name == "stack" and virtual_address >= stops + Memory.PAGE_SIZE:
                 # Auto growing stack, only grows if access is within a page
                 self.ram["stack"]["m"].extend(bytearray(Memory.PAGE_SIZE))
                 self.ram["stack"]["stops"] = self.ram["stack"]["start"] - len(self.ram["stack"]["m"])
-                return section_name, v2p(section_name, start - virtual_address)
+                return section_name, v2p(start - virtual_address)
 
             if start <= virtual_address <= stops:
-                return section_name, v2p(section_name, virtual_address - start)
+                return section_name, v2p(virtual_address - start)
 
         self._raise_index_error(virtual_address)
 
@@ -142,10 +142,7 @@ class Memory:
         section = self.ram["data"]
 
         if align_data:
-            if len(data) == 2:
-                section["m"].extend(alignment_half(len(section["m"])))
-            else:
-                section["m"].extend(alignment_zeros(len(section["m"])))
+            section["m"].extend(alignment_zeros(len(section["m"])))
             section["stops"] = section["start"] + len(section["m"])
 
         section["m"].extend(data)
@@ -172,10 +169,10 @@ class Memory:
 
         if align_data:
             section["m"].extend(alignment_zeros(len(section["m"]) - 1))
-            section["stops"] = section["start"] - len(section["m"]) + 1
+            section["stops"] = section["start"] - len(section["m"])
 
         section["m"].extend(data[::-1])
-        section["stops"] = section["start"] - len(section["m"]) + 1
+        section["stops"] = section["start"] - len(section["m"])
 
         return section["stops"]
 
@@ -249,10 +246,4 @@ class Memory:
 def alignment_zeros(data_len) -> bytearray:
     """Return array of 0s to align to 4."""
     alignment = (4 - data_len % 4) % 4
-    return bytearray(alignment)
-
-
-def alignment_half(data_len) -> bytearray:
-    """Return array of 0s to align to 4."""
-    alignment = (4 - data_len % 4) % 2
     return bytearray(alignment)

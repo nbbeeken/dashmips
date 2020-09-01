@@ -8,7 +8,7 @@ from struct import unpack
 def visualize_memory(args):
     """Visualize the stack, heap, data of mips program."""
 
-    def format_output(program: MipsProgram, section: str, rep_ascii: bool, rep_int: bool, rep_float: bool) -> str:
+    def format_output(program: MipsProgram, section: str, message: str, rep_ascii: bool, rep_int: bool, rep_float: bool) -> str:
         """Create the list to be visualized."""
         escape_dict = {repr("\x00"): "\\0", repr("\n"): "\\n", repr("\t"): "\\t"}
         formatted_output = ""
@@ -18,7 +18,7 @@ def visualize_memory(args):
 
         if section == "stack":
             virtual_add = program.memory.ram["stack"]["start"] - 1
-            end = program.registers["lowest_stack"]
+            end = program.registers["lowest_stack"] + 1
         elif section == "heap":
             start = program.registers["end_heap"] - 1
             virtual_add = ((program.registers["end_heap"] // 4) * 4) + (0 if program.registers["end_heap"] % 4 == 0 else 4) - 1
@@ -77,56 +77,58 @@ def visualize_memory(args):
 
             formatted_output += "\n"
 
+        formatted_output += message
+
         return formatted_output
 
     program = preprocess(args.FILE) if args.FILE else args.program
-    message = " at assemble time" if args.FILE else " at runtime"
+    message = "" if args.FILE else "\nVisualizer represents LIVE Debugging"
 
     output = ""
 
     if args.sa:
-        output += "Stack" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Stack:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "stack", True, False, False)
+        output += format_output(program, "stack", message, True, False, False)
     output += "&&&& "
     if args.si:
-        output += "Stack" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Stack:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "stack", False, True, False)
+        output += format_output(program, "stack", message, False, True, False)
     output += "&&&& "
     if args.sf:
-        output += "Stack" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Stack:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "stack", False, False, True)
+        output += format_output(program, "stack", message, False, False, True)
     output += "&&&& "
     if args.ha:
-        output += "Heap" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Heap:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "heap", True, False, False)
+        output += format_output(program, "heap", message, True, False, False)
     output += "&&&& "
     if args.hi:
-        output += "Heap" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Heap:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "heap", False, True, False)
+        output += format_output(program, "heap", message, False, True, False)
     output += "&&&& "
     if args.hf:
-        output += "Heap" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Heap:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "heap", False, False, True)
+        output += format_output(program, "heap", message, False, False, True)
     output += "&&&& "
     if args.da:
-        output += "Data" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Data:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "data", True, False, False)
+        output += format_output(program, "data", message, True, False, False)
     output += "&&&& "
     if args.di:
-        output += "Data" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Data:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "data", False, True, False)
+        output += format_output(program, "data", message, False, True, False)
     output += "&&&& "
     if args.df:
-        output += "Data" + message + "\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
+        output += "Data:\n\n" + f"{'Address':15} {'03':<3} {'02':<3} {'01':<3} {'00':<7} {'Decoded Text'}\n" + ("-" * 50) + "\n"
 
-        output += format_output(program, "data", False, False, True)
+        output += format_output(program, "data", message, False, False, True)
     output += "&&&& "
     return output
