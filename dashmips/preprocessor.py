@@ -331,7 +331,7 @@ def load_args(init_regs: Registers, memory: Memory, args: List[str]):
 
     argv: List[int] = []
     for arg in args:
-        ptr = memory.extend_stack(bytesify(arg)) + 1
+        ptr = memory.extend_stack(bytesify(arg))
         argv.append(ptr)
 
     argv.append(0)
@@ -339,4 +339,4 @@ def load_args(init_regs: Registers, memory: Memory, args: List[str]):
     for idx, ptr in enumerate(argv[::-1]):
         memory.extend_stack(bytesify(ptr, size=4), align_data=True)
 
-    init_regs["$a1"] = memory.ram["stack"]["stops"] + 4  # argv
+    init_regs["$a1"] = memory.ram["stack"]["stops"]  # argv
