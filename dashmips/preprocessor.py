@@ -86,6 +86,7 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
     """
     data_line_re = f"(?:({mipsRE.LABEL}):)?\\s*({mipsRE.DIRECTIVE})\\s+(.*)"
     second_pass = []
+    save_for_next: List[re.Match] = []
 
     for line in data_sec:
         match = re.match(data_line_re, line)
@@ -106,8 +107,18 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
                     raise MipsException(f"Label {label_name} already defined")
                 # Not all directives need labels
                 labels[label_name] = Label(name=label_name, value=address, location=mipsRE.DATA_SEC, kind=match[2][1:])
+                if save_for_next:
+                    labels[save_for_next.pop()[1]] = Label(name=label_name, value=address, location=mipsRE.DATA_SEC, kind=match[2][1:])
         else:
-            raise MipsException(f"Unknown directive {line}")
+            match = re.match(f"(?:(\\b[\\w]+\\b):)+\\s*(\\S*)", line)
+            if match:
+                if not match[2]:  # Example: 'argc: '
+                    save_for_next.append(match)
+                elif match[2] in labels:
+                    ptr = labels[match[2]]
+                    labels[match[1]] = Label(name=match[1], value=ptr.value, location=ptr.location, kind=ptr.kind)
+                else:
+                    second_pass.append((line, match[2]))
 
     for pair in second_pass:
         match = re.match(data_line_re, pair[0])
@@ -139,7 +150,13 @@ def data_labels(labels: Dict[str, Label], data_sec: List[str], memory: Memory):
                 # Not all directives need labels
                 labels[label_name] = Label(name=label_name, value=address, location=mipsRE.DATA_SEC, kind=match[2][1:])
         else:
-            raise MipsException(f"Unknown directive {pair[0]}")
+            match = re.match(f"(?:(\\b[\\w]+\\b):)+\\s*(\\S*)", pair[0])
+            if match:
+                if match[2] in labels:
+                    ptr = labels[match[2]]
+                    labels[match[1]] = Label(name=match[1], value=ptr.value, location=ptr.location, kind=ptr.kind)
+                else:
+                    raise MipsException(f"Unknown directive {pair[0]}")
 
     address = Directives["space"]("4", memory)  # Pad the end of data section
 
@@ -331,7 +348,7 @@ def load_args(init_regs: Registers, memory: Memory, args: List[str]):
 
     argv: List[int] = []
     for arg in args:
-        ptr = memory.extend_stack(bytesify(arg)) + 1
+        ptr = memory.extend_stack(bytesify(arg))
         argv.append(ptr)
 
     argv.append(0)
@@ -339,4 +356,4 @@ def load_args(init_regs: Registers, memory: Memory, args: List[str]):
     for idx, ptr in enumerate(argv[::-1]):
         memory.extend_stack(bytesify(ptr, size=4), align_data=True)
 
-    init_regs["$a1"] = memory.ram["stack"]["stops"] + 4  # argv
+    init_regs["$a1"] = memory.ram["stack"]["stops"]  # argv
