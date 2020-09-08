@@ -23,7 +23,7 @@ def read_str(program: MipsProgram):
     truncated_user_input = user_input[: program.registers["$a1"]]
     address = program.registers["$a0"]
     for offset, byte in enumerate(bytesify(truncated_user_input)):
-        program.memory.write08(address + offset, bytes(byte))
+        program.memory.write08(address + offset, bytes([byte]))
 
 
 @mips_syscall(12)
