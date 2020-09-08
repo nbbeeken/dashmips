@@ -2,7 +2,7 @@
 import os
 
 from ..models import MipsProgram
-from ..utils import bytesify, intify
+from ..utils import bytesify, intify, MipsException
 from . import mips_syscall
 
 
@@ -13,7 +13,7 @@ def read_int(program: MipsProgram):
     try:
         program.registers["$v0"] = int(user_input, 10)
     except ValueError:
-        print("Not a parsable int")
+        raise MipsException("Not a parsable int")
 
 
 @mips_syscall(8)
