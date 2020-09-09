@@ -87,7 +87,10 @@ def bytesify(data: Union[str, int, bytes], *, size=None, null_byte=True) -> byte
         return b"\0\0\0\0"
     if isinstance(data, int):
         int_size = size if size else (data.bit_length() // 8) + 1
-        return (data & 0xFFFF_FFFF).to_bytes(int_size, "little")
+        try:
+            return (data & 0xFFFF_FFFF).to_bytes(int_size, "little")
+        except OverflowError as err:
+            raise MipsException(f"Overflow: value of {data} too large to be stored.")
     if isinstance(data, tuple):
         byte_string = bytes()
         for integer in data:
