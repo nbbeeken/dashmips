@@ -203,7 +203,12 @@ def process_file(file: TextIO) -> List[SourceLine]:
 
     def remove_comments(ln):
         lineno, line = ln[0], ln[1]
-        return SourceLine(filename, lineno + 1, re.sub(mipsRE.COMMENT, "", line).strip())
+        string = re.search(mipsRE.STRING, line)
+        if string:  # If there is a string, remove the contents of the string, remove any comments, then finally replace captured string
+            line = re.sub(mipsRE.STRING, string.group().replace("\\", "\\\\"), re.sub(mipsRE.COMMENT, "", re.sub(mipsRE.STRING, "''", line))).strip()
+            return SourceLine(filename, lineno + 1, line)
+        else:
+            return SourceLine(filename, lineno + 1, re.sub(mipsRE.COMMENT, "", line).strip())
 
     # remove comments
     nocomments: Iterable[SourceLine] = map(remove_comments, linenumbers)

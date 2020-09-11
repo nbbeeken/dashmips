@@ -27,6 +27,7 @@ class RE:
     EQVS = r"\.eqv\s+(\w+)\s+(.+)"
 
     COMMENT = r"\#.*"
+    STRING = r"([\"'])(.*)\1"
 
     INSTRGAP = r"\s+"
     ARGSGAP = r"\s*,\s*"
