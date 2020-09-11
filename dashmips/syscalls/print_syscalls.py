@@ -58,7 +58,7 @@ def print_unsigned(program: MipsProgram):
 def print_ascii(program: MipsProgram):
     """Print Word in Ascii. $a0 = word to print."""
     ascii_string = repr(bytesify(program.registers["$a0"] & 0xFFFFFFFF)).replace("\\x00", "0\\")[2:-1][::-1]
-    print_unbuffered("%s" % ("\\0" * (4 - len(ascii_string))) + ascii_string)
+    print_unbuffered("%s" % ("\\0" * (4 - len(ascii_string.replace("\\0", "0")))) + ascii_string)
 
 
 @mips_syscall(10)
