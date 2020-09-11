@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dashmips"
-version = "0.1.8"
+version = "0.1.9"
 description = "Mips Interpreter"
 authors = ["Neal Beeken <nbbeeken@gmail.com>"]
 license = "MIT"
