@@ -197,5 +197,5 @@ if __name__ == "__main__":
         print(ex, file=sys.stderr)
     except KeyboardInterrupt as ex:
         # Program should be closed
-        print("Program terminated.", file=sys.stderr)
+        print("\nProgram terminated.", file=sys.stderr)
         sys.exit()
