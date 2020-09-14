@@ -138,10 +138,13 @@ def debug_mips(program: MipsProgram, host="localhost", port=2390, should_log=Fal
     # Allows server to reuse address to prevent crash
     socketserver.TCPServer.allow_reuse_address = True
 
-    with socketserver.TCPServer((host, port), DashmipsTCPServerHandler) as server:
-        # Activate the server; this will keep running until you
-        # interrupt the program with Ctrl-C
-        server.handle_request()
+    try:
+        with socketserver.TCPServer((host, port), DashmipsTCPServerHandler) as server:
+            # Activate the server; this will keep running until you
+            # interrupt the program with Ctrl-C
+            server.handle_request()
+    except OSError:
+        print("Error: Dashmips already has another debug session running.\n")
 
 
 def connectPreprocessFailure(host: str = "localhost", port: int = 2390):
