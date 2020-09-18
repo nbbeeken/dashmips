@@ -1,5 +1,6 @@
 """Three Register instructions."""
 from typing import Tuple
+from re import search
 
 from . import mips_instruction
 from ..models import MipsProgram
@@ -63,6 +64,20 @@ def nor(program: MipsProgram, rd: str, rs: str, rt: str):
 def _or(program: MipsProgram, rd: str, rs: str, rt: str):
     """Bitwise And Reg[rd] = Reg[rs] | Reg[rt]."""
     program.registers[rd] = program.registers[rs] | program.registers[rt]
+
+
+@mips_instruction(r"{instr_gap}({register}){args_gap}({register}){args_gap}({register}|{number})", parse)
+def rol(program: MipsProgram, rd: str, rs: str, rt: str):
+    """Rotate Left Reg[rd] = Reg[rs] << Reg[rt]."""
+    bit_shift = program.registers[rt] if search(r"(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])|zero|sp|fp|gp|ra))", rt) else int(rt)
+    program.registers[rd] = (program.registers[rs] << bit_shift) | (program.registers[rs] >> (32 - bit_shift)) & 0xFFFFFFFF
+
+
+@mips_instruction(r"{instr_gap}({register}){args_gap}({register}){args_gap}({register}|{number})", parse)
+def ror(program: MipsProgram, rd: str, rs: str, rt: str):
+    """Rotate Right Reg[rd] = Reg[rs] >> Reg[rt]."""
+    bit_shift = program.registers[rt] if search(r"(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])|zero|sp|fp|gp|ra))", rt) else int(rt)
+    program.registers[rd] = (program.registers[rs] >> bit_shift) | (program.registers[rs] << (32 - bit_shift)) & 0xFFFFFFFF
 
 
 @mips_instruction(PATTERN, parse)
