@@ -19,7 +19,7 @@ class RE:
     TEXT_SEC = ".text"
 
     REGISTER = r"(?:\$(?:(?:0|t[0-9]|s[0-7]|v[0-1]|a[0-3])|zero|sp|fp|gp|ra))"
-    LABEL = r"\b[\w]+\b"
+    LABEL = r"%?\b[\w]+\b"
     DIRECTIVE = "\\." + "|\\.".join(Directives.keys())
 
     MACRO = r"\.macro\s+(\w+)\s*(?:\((.+)\))?"

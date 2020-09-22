@@ -2,6 +2,7 @@
 from typing import Dict
 
 from .instructions import Instructions
+from .mips import RE
 
 snippet_part = "${{{count}:{filler}}}"
 
@@ -23,11 +24,15 @@ def generate_snippets(examples: bool = False) -> Dict[str, Dict[str, str]]:
     for name in names:
         ins = Instructions[name]
         body = build_body(ins.name, ins.pattern, ins.label)
+        format = build_format(ins.name, ins.pattern, ins.label)
+        regex = ins.name + ins.pattern.format(**RE.ALL)
         desc = ins.description
 
         snippets[name] = {
             "prefix": name,
             "body": body,
+            "format": format,
+            "regex": regex,
             "description": desc,
             "scope": "mips",
         }
@@ -60,6 +65,32 @@ def build_body(name: str, pattern: str, label: bool) -> str:
         replace_ct += 1
     else:
         snip = snip.replace("number", f"${{{replace_ct}:100}}")
+        replace_ct += 1
+
+    return snip
+
+
+def build_format(name: str, pattern: str, label: bool) -> str:
+    """Create snippet format.
+
+    :param name: Instruction name
+    :param pattern: Instruction regex pattern
+    """
+    snip: str = f"{name:7s}" + pattern.format(**SNIPPET_REPLACEMENTS)
+    snip = snip.replace("(", "")
+    snip = snip.replace(")", "")
+    snip = snip.replace("number?\\\\$reg\\", "number(\\$reg)")
+    snip = snip.replace("\\$", "")
+    replace_ct = 1
+
+    reg_ct = snip.count("reg")
+    for i in range(0, reg_ct):
+        f = f"${REG_ARGS[i]}"
+        snip = snip.replace("reg", f, 1)
+        replace_ct += 1
+
+    if not label:
+        snip = snip.replace("number", "100")
         replace_ct += 1
 
     return snip
