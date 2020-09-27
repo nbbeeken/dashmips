@@ -17,7 +17,10 @@ def run(program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_COND
             next_instruction(program)
     except MipsException as mips_ex:
         print(f"{mips_ex.message} on ", file=sys.stderr, end="")
-        print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr)
+        try:
+            print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr, end="")
+        except IndexError:
+            print(f"(dropped off bottom)", file=sys.stderr, end="")
         sys.exit()
     except ZeroDivisionError as ex:
         print(f"Divide by zero on ", file=sys.stderr, end="")
