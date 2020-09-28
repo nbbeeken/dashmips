@@ -20,7 +20,7 @@ def run(program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_COND
         try:
             print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr, end="")
         except IndexError:
-            print(f"(dropped off bottom)", file=sys.stderr, end="")
+            print(f"(dropped off bottom)", file=sys.stderr)
         sys.exit()
     except ZeroDivisionError as ex:
         print(f"Divide by zero on ", file=sys.stderr, end="")
@@ -35,7 +35,7 @@ def next_instruction(program: MipsProgram):
     current_pc = program.registers["pc"]
     if current_pc >= len(program.source):
         # We jumped or executed beyond available text
-        raise MipsException(f"Bad pc value {current_pc}")
+        raise MipsException(f"Program counter invalid")
 
     line = program.source[current_pc].line  # line to execute
     instruction = line.split(" ")[0]  # Grab the instruction name
