@@ -20,6 +20,7 @@ def run(program: MipsProgram, runnable: Callable[[MipsProgram], bool] = RUN_COND
         try:
             print(f"{program.current_line.filename}:{program.current_line.lineno}", file=sys.stderr, end="")
         except IndexError:
+            # If user does not call syscall(10)
             print(f"(dropped off bottom)", file=sys.stderr)
         sys.exit()
     except ZeroDivisionError as ex:
