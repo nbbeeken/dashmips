@@ -24,7 +24,7 @@ dashmips = "dashmips.__main__:main"
 
 [tool.poetry.dev-dependencies]
 "pip" = "^20.1.1"
-"wheel" = "^0.34.2"
+"wheel" = "^0.38.1"
 "mypy" = "^0.782"
 "mypy-extensions" = "^0.4.1"
 "pycodestyle" = "^2.5.0"
