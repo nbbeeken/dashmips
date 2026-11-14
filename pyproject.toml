@@ -20,20 +20,13 @@ dashmips = "dashmips.__main__:main"
 
 [tool.poetry.dependencies]
 "python" = "^3.15"
-"typing-extensions" = "^4.16.0"
 
 [tool.poetry.group.dev.dependencies]
 "wheel" = "^0.48.0"
 "mypy" = "^2.4.1"
 "mypy-extensions" = "^1.2.0"
-"pycodestyle" = "^2.5.0"
-"pydocstyle" = "^5.0.2"
 "black" = "^26.10.1"
 "pytest" = "^9.2.0"
-"pytest-pycodestyle" = "^2.0.1"
-"pytest-pydocstyle" = "^2.0.1"
-"pytest-mypy" = "^1.1.0"
-"pytest-black" = "^0.6.0"
 "rope" = "^0.17.0"
 
 [tool.black]

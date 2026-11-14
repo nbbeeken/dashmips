@@ -4,14 +4,12 @@ import json
 import sys
 from threading import Thread
 from typing import Any, List, NoReturn
-from re import findall
-from pkg_resources import get_distribution
+from importlib.metadata import version
 
 from .extension import generate_snippets, instruction_name_regex
 from .plugins.vt100 import VT100
 from .preprocessor import preprocess
 from .utils import MipsException
-from .models import MipsProgram
 from .visualize import visualize_memory
 
 
@@ -123,11 +121,18 @@ def main_utils(args: argparse.Namespace) -> int:
     return 0
 
 
+def get_version() -> str:
+    """Get the version from the package dist or fallback"""
+    try:
+        return version("dashmips")
+    except:
+        return "local"
+
 def main() -> NoReturn:
     """Entry function for Dashmips."""
     parser = argparse.ArgumentParser("dashmips")
 
-    parser.add_argument("-v", "--version", action="version", version=get_distribution("dashmips").version)
+    parser.add_argument("-v", "--version", action="version", version=get_version())
 
     sbp = parser.add_subparsers(title="commands", dest="command")
     compileparse = sbp.add_parser("compile", aliases=["c"])

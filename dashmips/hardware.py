@@ -1,8 +1,6 @@
 """Mips Hardware."""
 import sys
-from typing import Any, Dict, NoReturn, Tuple, Union, cast
-
-from typing_extensions import Literal, TypedDict
+from typing import Any, Dict, NoReturn, Tuple, TypedDict, Literal, Union, cast
 
 from .utils import MipsException, as_twos_comp, intify
 
