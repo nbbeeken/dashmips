@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - name: Set up Python 3.16
+      - name: Set up Python 3
         uses: actions/setup-python@v7
         with:
-          python-version: 3.16
+          python-version: 3.15
       - name: Install Poetry
         run: |
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
