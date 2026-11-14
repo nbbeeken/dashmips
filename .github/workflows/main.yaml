@@ -20,14 +20,8 @@ jobs:
         with:
           python-version: 3.15
       - name: Install Poetry
-        run: |
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-          source $HOME/.poetry/env
+        run: pipx install poetry
       - name: Install Dependencies
-        run: |
-          source $HOME/.poetry/env
-          poetry install
+        run: poetry install
       - name: Test with pytest
-        run: |
-          source $HOME/.poetry/env
-          poetry run pytest
+        run: poetry run pytest
